@@ -99,6 +99,8 @@
       toggle.className = 'skek-switch';
       toggle.type = 'checkbox';
       toggle.setAttribute('role', 'switch');
+      // Before storage answers, so a switch that's on doesn't slide on every open.
+      toggle.checked = settingDefaults[site.followsSetting];
       toggle.addEventListener('change', () => chrome.runtime.sendMessage({ type: setting.message, enabled: toggle.checked }));
       label.append(text, toggle);
       switches.append(label);

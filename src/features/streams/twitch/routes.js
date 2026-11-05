@@ -110,7 +110,7 @@
   function handlePopState(event) {
     const saved = event.state?.skekRoute;
     // Routes saved by older versions have no site in them, and were all YouTube.
-    const hasSite = (route) => SHORTENED_PATHS.includes(`/${route.split('/')[0]}`);
+    const hasSite = (route) => SHORTENED_PATHS.some((path) => route.startsWith(`${path.slice(1)}/`));
     const route = (saved && !hasSite(saved) ? `yt/${saved}` : saved) ?? location.pathname.match(STREAM_PATH)?.[1];
     if (route) {
       currentRoute = route;

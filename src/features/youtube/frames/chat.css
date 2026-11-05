@@ -33,7 +33,7 @@ html.skek[data-skek-theme='light'] {
   --skek-shadow: rgba(0, 0, 0, 0.2);
 }
 
-/* chat.js sets the real size. */
+/* streams/frames/chat-settings.js sets the real size. */
 html.skek { --skek-chat-size: 14px; }
 
 html.skek,
@@ -300,7 +300,7 @@ html.skek yt-live-chat-renderer #input-manager {
    shorter frame, like stacked mode's in a wide window. */
 html.skek yt-live-chat-app { min-height: 0 !important; }
 
-/* Floating chat: chat.js sets this while the window behind the frame draws the background. It
+/* Floating chat: streams/frames/chat-settings.js sets this while the window behind the frame draws the background. It
    comes after the rules it overrides. The colour scheme has to be set here and on the frame in
    player-view.css, or the browser paints the frame white. The message box keeps its own
    background, so typing stays readable. */

@@ -1,6 +1,6 @@
 # Testing
 
-`node --test` only covers a few small functions, so try your change in the browser too.
+`node --test` covers a few small functions and how the project's files connect, not how anything behaves on a site, so try your change in the browser too.
 
 1. Reload the extension and your Twitch tabs, as described under [Development setup](CONTRIBUTING.md#development-setup).
 2. Check the extensions page for service worker errors.

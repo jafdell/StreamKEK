@@ -117,8 +117,8 @@ Sites like YouTube and Kick share everything on Twitch's side, so a new one is m
 - Reach into a site's internals, like Twitch's player through React or YouTube's `movie_player`, only when nothing else can do the job, and make it do nothing if they change. `player/quality.js` is the example.
 - Never rename a storage key after release. Nothing migrates old keys, so users would lose that value.
 - Use `innerHTML` only with constants from the code, never with text from a page or a stream.
-- A `message` listener checks `event.source` before trusting what it receives, as `player-view.js` does.
-- Don't add a script loader, a router or other shared machinery until a second feature really needs it. Code moves to `src/twitch/` when a second feature needs it. The stream view's half of a feature doesn't count: `player-view.js` uses `player/floating-window.js` because floating chat is one feature on two players.
+- A `message` listener checks `event.source` before trusting what it receives, as `view-layouts.js` does.
+- Don't add a script loader, a router or other shared machinery until a second feature really needs it. Code moves to `src/twitch/` when a second feature needs it. The stream view's half of a feature doesn't count: `view-layouts.js` uses `player/floating-window.js` because floating chat is one feature on two players.
 - New permissions need a stated reason in the PR.
 - Leave `version` in `manifest.json` alone; the maintainer sets it.
 - Don't lower `minimum_chrome_version` below 145. The `topDomains` limit in `rules/youtube-watch-frame.json` only exists from Chrome 145.

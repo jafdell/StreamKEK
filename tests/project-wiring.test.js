@@ -107,6 +107,19 @@ test('every site in sites.js is complete', () => {
       assert.ok(handlers[`${site.messagePrefix}:${action}`], `${platform} has no handler for ${action}`);
     }
     assert.ok(settingKeys.has(site.followsSetting), `${platform} needs the setting ${site.followsSetting}`);
+    for (const field of ['name', 'domain', 'routePrefix', 'placeholder', 'managerHint']) {
+      assert.equal(typeof site[field], 'string', `${platform} needs ${field}`);
+    }
+    for (const field of ['channelUrl', 'streamUrl', 'previewUrl', 'frameUrls']) {
+      assert.equal(typeof site[field], 'function', `${platform} needs ${field}`);
+    }
+    for (const field of ['id', 'title', 'glyph']) assert.ok(site.section?.[field], `${platform} needs section.${field}`);
+    for (const field of ['path', 'tabId', 'panelId', 'sectionId', 'sectionTitle']) {
+      assert.ok(site.following?.[field], `${platform} needs following.${field}`);
+    }
+    for (const field of ['own', 'followed', 'live', 'status', 'hidden']) assert.ok(site.keys?.[field], `${platform} needs keys.${field}`);
+    assert.ok(read('src/features/streams/twitch/player-view.css').includes(`.skek-button--${platform}`), `${platform} needs a button colour`);
+    assert.ok(read('src/twitch/helpers.js').includes(`${site.section.glyph}: '`), `${platform} needs the icon ${site.section.glyph}`);
     assert.ok(context.skek.SETTINGS.some((setting) => setting.category === site.name), `${platform} needs a settings category`);
     for (const key of Object.values(site.keys)) {
       assert.ok(!seen.has(key), `two sites share the storage key ${key}`);
