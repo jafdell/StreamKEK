@@ -1,10 +1,10 @@
-#skek-following-tab a { position: relative; }
+.skek-following-tab a { position: relative; }
 
 /* Twitch still marks its own tab active underneath, so hand the look over to ours. */
-html.skek-youtube-tab-open ul[role='tablist'] li:not(#skek-following-tab) [class*='ScTabIndicatorLayout'] { display: none; }
-html.skek-youtube-tab-open ul[role='tablist'] li:not(#skek-following-tab) [class*='ScTitle'] { color: var(--color-text-base) !important; }
-html.skek-youtube-tab-open #skek-following-tab [class*='ScTitle'] { color: var(--color-text-link) !important; }
-html.skek-youtube-tab-open #skek-following-tab a::after {
+html.skek-site-tab-open ul[role='tablist'] li:not(.skek-following-tab--active) [class*='ScTabIndicatorLayout'] { display: none; }
+html.skek-site-tab-open ul[role='tablist'] li:not(.skek-following-tab--active) [class*='ScTitle'] { color: var(--color-text-base) !important; }
+html.skek-site-tab-open .skek-following-tab--active [class*='ScTitle'] { color: var(--color-text-link) !important; }
+html.skek-site-tab-open .skek-following-tab--active a::after {
   content: '';
   position: absolute;
   left: 0;

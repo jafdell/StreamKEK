@@ -1,5 +1,6 @@
 .skek-section { margin-bottom: 8px; }
-html[data-skek-on~='hideYouTubeLive'] .skek-section { display: none; }
+html[data-skek-on~='hideYouTubeLive'] #skek-section,
+html[data-skek-on~='hideKickLive'] #skek-kick-section { display: none; }
 
 .skek-section__head {
   display: flex;
@@ -10,7 +11,8 @@ html[data-skek-on~='hideYouTubeLive'] .skek-section { display: none; }
   margin: 8px 0;
 }
 /* Logged out there's no heading above us, so Twitch's collapse arrow sits on this row. */
-.skek-section:first-child .skek-section__head { padding-right: 50px; }
+.skek-section:first-child .skek-section__head,
+html[data-skek-on~='hideYouTubeLive'] #skek-section:first-child + #skek-kick-section .skek-section__head { padding-right: 50px; }
 .skek-section__title {
   margin: 0;
   font-size: 14px;
@@ -100,7 +102,8 @@ html[data-skek-on~='hideYouTubeLive'] .skek-section { display: none; }
 .side-nav--collapsed .skek-section__empty,
 .side-nav--collapsed .skek-section__add { display: none; }
 .side-nav--collapsed .skek-section__head { justify-content: center; padding: 0; }
-.side-nav--collapsed .skek-section:first-child .skek-section__head { padding: 0; margin-top: 40px; }
+.side-nav--collapsed .skek-section:first-child .skek-section__head,
+html[data-skek-on~='hideYouTubeLive'] .side-nav--collapsed #skek-section:first-child + #skek-kick-section .skek-section__head { padding: 0; margin-top: 40px; }
 .side-nav--collapsed .skek-section__glyph { display: inline-flex; }
 .side-nav--collapsed .skek-card { justify-content: center; padding: 5px 0; }
 .side-nav--collapsed .skek-card__avatar { margin-right: 0; }

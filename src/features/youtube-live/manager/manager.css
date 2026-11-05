@@ -45,8 +45,8 @@ button[type='submit']:disabled { opacity: 0.6; cursor: default; }
 #message { margin: 8px 0 0; color: var(--muted); }
 #message.error { color: var(--error); }
 
-#subs { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; cursor: pointer; }
-#subs > span { min-width: 0; display: flex; flex-direction: column; }
+.subs { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; cursor: pointer; }
+.subs > span { min-width: 0; display: flex; flex-direction: column; }
 .subs-title { font-weight: 600; }
 
 ul {
@@ -116,7 +116,7 @@ li img { flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; object-f
 
 /* Inside the settings window: see manager.js. */
 html[data-embedded] h1,
-html[data-embedded] #subs { display: none; }
+html[data-embedded] .subs { display: none; }
 html[data-embedded] body { width: auto; min-height: 0; padding: 0; background: transparent; }
 html[data-embedded] ul { margin: 10px 0 0; }
 html[data-embedded] li { padding: 5px 6px; border-radius: 6px; }

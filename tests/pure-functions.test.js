@@ -10,6 +10,7 @@ import { extractJson } from '../src/features/youtube-live/background/youtube-pag
 import { viewerCount } from '../src/features/youtube-live/background/streams.js';
 import { inputToUrl } from '../src/features/youtube-live/background/channels.js';
 import { liveChannelsFromGuide } from '../src/features/youtube-live/background/subscriptions.js';
+import { channelPageToLive, followedStreamToLive, slugFromInput, startedAtIso } from '../src/features/kick-live/background/kick-api.js';
 
 // format.js is a classic content script, so it runs in a context holding the globals it expects.
 const context = { skek: { helpers: { el() {} }, youtube: {} } };
@@ -34,6 +35,48 @@ test('liveChannelsFromGuide keeps only live channels, once each', () => {
   const lofi = 'UCSJ4gkVC6NrvII8umztf0Ow';
   const guide = { items: [entry(lofi, true), entry(lofi, true), entry('UCc5afI6aaaaaaaaaaaaaaaa', false), entry('FEwhat_to_watch', true)] };
   assert.deepEqual(liveChannelsFromGuide(guide), [{ id: lofi, name: 'Lofi Girl', handle: '@LofiGirl', avatar: 'large' }]);
+});
+
+test('slugFromInput reads Kick links and refuses anything else', () => {
+  assert.equal(slugFromInput('Odablock'), 'odablock');
+  assert.equal(slugFromInput('@some-name'), 'some-name');
+  assert.equal(slugFromInput('https://kick.com/Odablock'), 'odablock');
+  assert.equal(slugFromInput('kick.com/some-name?x=1'), 'some-name');
+  assert.equal(slugFromInput('https://www.kick.com/popout/odablock/chat'), 'odablock');
+  assert.equal(slugFromInput('https://player.kick.com/odablock'), 'odablock');
+  assert.equal(slugFromInput('https://kick.com/'), null);
+  assert.equal(slugFromInput('https://notkick.com/odablock'), null);
+});
+
+test('startedAtIso treats Kick times as UTC', () => {
+  assert.equal(startedAtIso('2026-11-05 11:21:54'), '2026-11-05T11:21:54.000Z');
+  assert.equal(startedAtIso('2026-11-05T11:21:54Z'), '2026-11-05T11:21:54.000Z');
+  assert.equal(startedAtIso(null), null);
+  assert.equal(startedAtIso('soon'), null);
+});
+
+test('followedStreamToLive builds a channel and its live entry', () => {
+  const { channel, entry } = followedStreamToLive({
+    id: 136123059,
+    session_title: 'Title',
+    viewer_count: 10951,
+    start_time: '2026-11-05 11:21:54',
+    thumbnail: { src: 'thumb' },
+    categories: [{ name: 'Old School RuneScape' }],
+    channel: { slug: 'odablock', user: { username: 'Odablock', profilepic: 'pic' } },
+  });
+  assert.deepEqual(channel, { id: 'kick:odablock', platform: 'kick', slug: 'odablock', name: 'Odablock', handle: null, avatar: 'pic' });
+  assert.equal(entry.videoId, '136123059');
+  assert.equal(entry.category, 'Old School RuneScape');
+  assert.equal(entry.streams.length, 1);
+  assert.equal(followedStreamToLive({ id: 1 }), null);
+});
+
+test('channelPageToLive has no entry for an offline channel', () => {
+  const page = { slug: 'odablock', user: { username: 'Odablock', profile_pic: 'pic' }, livestream: null };
+  assert.equal(channelPageToLive(page).entry, null);
+  assert.equal(channelPageToLive(page).channel.avatar, 'pic');
+  assert.equal(channelPageToLive({ ...page, livestream: { id: 1, is_live: true } }).entry.category, 'Kick');
 });
 
 test('viewerCount reads plain numbers', () => {

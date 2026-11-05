@@ -12,12 +12,13 @@ In a pull request, say what you tried and what you couldn't.
 | If you changed | Try |
 | --- | --- |
 | YouTube Live | The sidebar section, a channel with several streams, an offline channel, and reloading on `/yt/<channel>` |
-| Channel manager | Adding and removing a channel in the **+** frame and the settings window, and the subscriptions switch |
+| Channel manager | Adding and removing a channel in the **+** frame and in the settings window's YouTube and Kick tabs, which should each show only their own channels, and the subscriptions and follows switches |
 | Hiding subscriptions | Hiding a live subscription from its sidebar card, that it stays hidden after a reload, and **Show** in the **+** frame and the settings window. The card you're watching, a channel you added and the collapsed sidebar shouldn't offer hiding. Hiding a stream that's open in another tab closes it there |
-| Following page | The **YouTube** tab and the **YouTube live** section |
-| Theatre, stacked or floating chat | The button, Alt key and Esc, on a YouTube stream, a Twitch stream and a Twitch video. The video shouldn't restart |
+| Kick Live | The sidebar section under YouTube Live, its previews and hiding, a stream with its player filling the frame, its quality menu, chat being signed in and **Watch on Kick**, reloading on `/kick/<channel>`, adding a Kick link with **+**, being signed out of Kick, and that kick.com in a normal tab is unchanged |
+| Following page | The **YouTube** and **Kick** tabs and the **YouTube live** and **Kick live** sections |
+| Theatre, stacked or floating chat | The button, Alt key and Esc, on a YouTube stream, a Kick stream, a Twitch stream and a Twitch video. The video shouldn't restart |
 | Floating chat | Also dragging, resizing, the slider, typing a message, and double-clicking the video to leave fullscreen |
-| Stream quality | Each choice on a Twitch and a YouTube stream, and a size the stream doesn't offer |
+| Stream quality | Each choice on a Twitch, a YouTube and a Kick stream, and a size the stream doesn't offer |
 | Chat settings | Twitch chat, chat on a Twitch video and YouTube chat, with and without [7TV](https://7tv.app) |
 | Sidebar previews | Hovering a live and an offline channel, near the top and bottom of the window, in the expanded and collapsed sidebar, on Twitch and YouTube channels, and each stream of a YouTube channel with several |
 | Hide settings | Turning each on and off in the expanded and collapsed sidebar, in chat, or on a channel with extensions over the video, hovering the player |

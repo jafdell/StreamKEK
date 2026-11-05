@@ -1,6 +1,6 @@
 // The theatre, stacked and floating chat shortcuts, and Esc to leave them. Keys pressed inside
-// YouTube's player or chat stop at that frame, so this passes them to the Twitch page, where
-// twitch/player-view.js handles them.
+// YouTube's or Kick's player or chat stop at that frame, so this passes them to the Twitch page,
+// where twitch/player-view.js handles them.
 (() => {
   'use strict';
 

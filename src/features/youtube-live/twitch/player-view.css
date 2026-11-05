@@ -94,6 +94,8 @@ html[data-skek-theme='light'] .skek-view {
 .skek-info__actions { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; }
 .skek-button--youtube { background: #ff0000; }
 .skek-button--youtube:hover { background: #cc0000; }
+.skek-button--kick { background: #53fc18; color: #0b0e0f !important; }
+.skek-button--kick:hover { background: #45d414; }
 .skek-button--icon {
   justify-content: center;
   width: 32px;

@@ -6,7 +6,7 @@
 
   const yt = skek.youtube;
   const { el } = skek.helpers;
-  const { state, streamsOf, openStream, thumbnailUrl, compact } = yt;
+  const { state, streamsOf, openStream, siteOf, compact } = yt;
 
   let tip = null;
   let tipTimer = null;
@@ -17,12 +17,12 @@
       'a',
       {
         class: `skek-tip__stream${playing ? ' skek-tip__stream--playing' : ''}`,
-        href: `https://www.youtube.com/watch?v=${stream.videoId}`,
+        href: siteOf(channel).streamUrl(channel, stream),
         title: stream.title,
         on: {
           click: (event) => yt.openOnPlainClick(event, channel.id, stream.videoId),
           mouseenter: () => {
-            preview.src = thumbnailUrl(stream.videoId);
+            preview.src = siteOf(channel).previewUrl(stream);
           },
         },
       },
@@ -41,12 +41,11 @@
     const collapsed = !!anchor.closest('.side-nav--collapsed');
     const streams = streamsOf(live);
     const several = streams.length > 1;
-    const preview = el('img', {
-      class: 'skek-preview-img',
-      src: thumbnailUrl(live.videoId),
-      alt: '',
-      referrerPolicy: 'no-referrer',
-    });
+    const previewUrl = siteOf(channel).previewUrl(live);
+    // Kick only gives an image for channels you follow.
+    const preview = previewUrl
+      ? el('img', { class: 'skek-preview-img', src: previewUrl, alt: '', referrerPolicy: 'no-referrer' })
+      : null;
     tip = el(
       'div',
       {

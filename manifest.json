@@ -18,7 +18,8 @@
   ],
   "host_permissions": [
     "https://www.youtube.com/*",
-    "https://www.twitch.tv/*"
+    "https://www.twitch.tv/*",
+    "https://kick.com/*"
   ],
   "background": {
     "service_worker": "src/background/service-worker.js",
@@ -125,6 +126,53 @@
       "all_frames": true,
       "run_at": "document_start",
       "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://kick.com/popout/*"
+      ],
+      "js": [
+        "src/settings.js",
+        "src/features/youtube-live/frames/layout-keys.js",
+        "src/features/kick-live/frames/chat.js"
+      ],
+      "css": [
+        "src/features/kick-live/frames/chat.css"
+      ],
+      "all_frames": true,
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://kick.com/*"
+      ],
+      "exclude_matches": [
+        "https://kick.com/popout/*"
+      ],
+      "js": [
+        "src/settings.js",
+        "src/features/youtube-live/frames/layout-keys.js",
+        "src/features/kick-live/frames/watch.js"
+      ],
+      "css": [
+        "src/features/kick-live/frames/watch.css"
+      ],
+      "all_frames": true,
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://kick.com/*"
+      ],
+      "exclude_matches": [
+        "https://kick.com/popout/*"
+      ],
+      "js": [
+        "src/features/kick-live/frames/watch-start.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_start",
+      "world": "MAIN"
     }
   ],
   "web_accessible_resources": [
@@ -158,6 +206,11 @@
         "id": "youtube_guide_origin",
         "enabled": true,
         "path": "rules/youtube-guide-origin.json"
+      },
+      {
+        "id": "kick_api_origin",
+        "enabled": true,
+        "path": "rules/kick-api-origin.json"
       }
     ]
   }

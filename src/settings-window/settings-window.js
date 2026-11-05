@@ -14,9 +14,15 @@
   const CUSTOM_ITEMS = [
     {
       category: 'YouTube',
-      label: 'YouTube channels',
+      label: 'Your YouTube channels',
       hint: 'Add or remove channels by @handle, channel link or video link.',
-      build: channelManagerFrame,
+      build: () => channelManagerFrame('youtube', 'YouTube channels'),
+    },
+    {
+      category: 'Kick',
+      label: 'Your Kick channels',
+      hint: 'Add or remove channels by name or channel link.',
+      build: () => channelManagerFrame('kick', 'Kick channels'),
     },
     {
       category: 'Feedback',
@@ -47,9 +53,11 @@
     Feedback: '<path d="M3 20.5 22 12 3 3.5V10l12 2-12 2v6.5Z"/>',
     Player: '<path d="M8 5v14l11-7L8 5Z"/>',
     Sidebar: '<path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm1 2v10h4V7H5Zm6 0v10h8V7h-8Z"/>',
+    Kick: '<path d="M4 3h7v5h2V5h2V3h5v6h-2v2h-2v2h2v2h2v6h-5v-2h-2v-3h-2v5H4V3Z"/>',
     YouTube: '<path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.3 5 12 5 12 5s-6.3 0-7.8.4a2.5 2.5 0 0 0-1.8 1.8C2 8.7 2 12 2 12s0 3.3.4 4.8c.2.9.9 1.5 1.8 1.8 1.5.4 7.8.4 7.8.4s6.3 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.5.4-4.8.4-4.8s0-3.3-.4-4.8ZM10 15V9l5.2 3-5.2 3Z"/>',
   };
   const DEFAULT_CATEGORY_ICON = '<circle cx="12" cy="12" r="4"/>';
+  const SITE_CATEGORIES = ['Kick', 'YouTube'];
 
   const search = document.getElementById('search');
   const categoryLinks = document.getElementById('categories');
@@ -183,11 +191,11 @@
     return item.build ? customCard(item) : settingRow(item, saved[item.key]);
   }
 
-  function channelManagerFrame() {
+  function channelManagerFrame(site, title) {
     const frame = document.createElement('iframe');
     frame.className = 'manager-frame';
-    frame.title = 'YouTube channels';
-    frame.src = chrome.runtime.getURL('src/features/youtube-live/manager/manager.html?embedded');
+    frame.title = title;
+    frame.src = chrome.runtime.getURL(`src/features/youtube-live/manager/manager.html?embedded&site=${site}`);
     // Keys pressed inside a frame never reach this page's listener.
     frame.addEventListener('load', () => frame.contentWindow.addEventListener('keydown', closeOnEscape));
     return frame;
@@ -281,8 +289,16 @@
   });
 
   chrome.storage.local.get(settingDefaults).then((saved) => {
+    // The other sites sit together under a divider, each group still in alphabetical order.
     // Feedback sits apart at the bottom, so it isn't mistaken for a group of settings.
-    categoryLinks.append(...categories.filter((category) => category !== 'Feedback').map(categoryLink));
+    const settingCategories = categories.filter((category) => category !== 'Feedback' && !SITE_CATEGORIES.includes(category));
+    const divider = document.createElement('hr');
+    divider.className = 'categories__divider';
+    categoryLinks.append(
+      ...settingCategories.map(categoryLink),
+      divider,
+      ...categories.filter((category) => SITE_CATEGORIES.includes(category)).map(categoryLink),
+    );
     feedbackLink.append(categoryLink('Feedback'));
     // Rows are built with their saved state, so switches don't slide on every open.
     groups.append(...categories.map((category) => categoryGroup(category, saved)));

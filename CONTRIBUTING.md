@@ -4,7 +4,7 @@ Bugs and feature requests go in issues. To send a change: fork the repo, make a 
 
 ## How it fits together
 
-- **Service worker** (`src/background/service-worker.js`, feature code in `background/` folders): works out what's live on YouTube, for all tabs at once. It also allows YouTube's cookies on Twitch, and `rules/youtube-watch-frame.json` lets YouTube's watch page load in a frame, and `rules/youtube-guide-origin.json` lets it read which subscriptions are live.
+- **Service worker** (`src/background/service-worker.js`, feature code in `background/` folders): works out what's live on YouTube and Kick, for all tabs at once. It also allows both sites' cookies on Twitch, `rules/youtube-watch-frame.json` lets YouTube's watch page load in a frame, and `rules/youtube-guide-origin.json` and `rules/kick-api-origin.json` let it read what's live.
 - **Twitch page scripts** (the first `content_scripts` entry in `manifest.json`): run in every Twitch tab and share one global, `skek`.
 - **Stream view:** the `/yt/<channel>` page those scripts draw over Twitch's. It holds two YouTube frames, the player and the chat. Twitch's own page stays alive behind it, with its video paused and the address showing `/yt/...`, so a Twitch feature's scripts and shortcuts keep running there. Check for `#skek-view` where that matters, as `player-modes.js` does.
 - **Frame scripts** (`frames/` folders): load on YouTube itself too, wherever their manifest entry matches, and switch themselves on only inside those two frames.
@@ -25,6 +25,7 @@ Each feature is a folder in `src/features/`. This table lists only what its name
 | The settings page: categories, search, rows. Also the toolbar popup | `src/settings-window/`. `src/shared/` holds what it shares with the channel manager: `page.css` and `page-theme.js` |
 | The Theme setting's colors | Twitch's values for each theme, wherever `src/` matches `data-theme` or `data-skek-theme`, plus `READABLE` in `youtube-live/frames/chat.js` (chatters' name colors) |
 | YouTube Live | `src/features/youtube-live/`: `background/` (polling, reading YouTube pages), `twitch/` (sidebar, stream view, address, Following page), `frames/` (chat, player), `manager/` (channel manager) |
+| Kick Live | `src/features/kick-live/`: `background/` (polling, Kick's API) and `frames/` (chat, player). Its sidebar section, stream view, address and Following page share YouTube Live's code in `youtube-live/twitch/`, where `SITES` in `format.js` holds what differs, and its channels are in `youtube-live/manager/` |
 | Chat: font size, timestamps, what sits over chat | `src/features/chat-font-size/`, `chat-timestamps/`, `chat-sections/`. YouTube's chat is styled in `youtube-live/frames/chat.css` |
 | Stream quality | `src/features/stream-quality/` (Twitch) and `youtube-live/frames/watch-start.js` (YouTube) |
 | Theatre, stacked and floating chat modes | `src/features/player-modes/` (Twitch, plus `floating-window.js` and `.css`, which both use) and `youtube-live/twitch/player-view.js` and `.css` (YouTube). `frames/layout-keys.js` forwards the shortcuts from inside YouTube's frames, and `frames/chat.js` and `.css` make floating chat see-through. Theatre on Twitch is Twitch's own. Stacked and floating exist twice, so change both |
@@ -35,7 +36,7 @@ Each feature is a folder in `src/features/`. This table lists only what its name
 
 - Load unpacked from the repo root. There's no build step and there are no runtime dependencies; please open an issue before adding either.
 - **Use the Reload button on the extensions page.** Remove and Load unpacked is an uninstall and wipes `chrome.storage.local`. Moving the folder changes the extension ID, which has the same effect. Reload open Twitch tabs after reloading the extension.
-- After a reload, check the extensions page for service worker errors. A bad import stops the whole worker. After background changes, also run `node -e "import('./src/features/youtube-live/background/index.js')"`, because the tests don't load that file or `poller.js`.
+- After a reload, check the extensions page for service worker errors. A bad import stops the whole worker. After background changes, also run `node -e "import('./src/features/youtube-live/background/index.js');import('./src/features/kick-live/background/index.js')"`, because the tests don't load those files or their `poller.js`.
 - Run tests with plain `node --test`, not `node --test tests/`.
 - **Debugging:** Twitch page and page-world scripts log to the Twitch tab's console. Frame scripts log there too, once you pick the frame in the console's context dropdown. The service worker has its own console, linked from the extensions page.
 
@@ -125,5 +126,10 @@ All in `chrome.storage.local`. A key in `SETTINGS` is written by the settings wi
 | `live` | see the comment at the top of `src/features/youtube-live/background/poller.js` | background |
 | `status` | `{checkedAt,consentRequired,signedOut}` | background |
 | `showSubscriptions` | boolean, default true | background |
+| `kickChannels` | `[{id,platform,slug,name,handle,avatar}]` | background |
+| `kickFollowed`, `kickHidden` | `{[id]:{id,platform,slug,name,handle,avatar}}` | background |
+| `kickLive` | like `live`, and each stream also has `thumbnail` | background |
+| `kickStatus` | `{checkedAt,signedOut,failed}` | background |
+| `showKickFollows` | boolean, default true | background |
 | `chatHidden` | boolean | Twitch page |
 | `floatingChat` | `{x,y,width,height,opacity}`, each optional | Twitch page |

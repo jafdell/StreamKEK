@@ -24,7 +24,7 @@
     const rect = event.currentTarget.getBoundingClientRect();
     manager = el('iframe', {
       class: 'skek-manager',
-      title: 'Manage YouTube channels',
+      title: 'Manage channels',
       src: chrome.runtime.getURL('src/features/youtube-live/manager/manager.html'),
     });
     manager.style.left = `${Math.min(rect.right + 8, innerWidth - FRAME_WIDTH_WITH_MARGIN)}px`;

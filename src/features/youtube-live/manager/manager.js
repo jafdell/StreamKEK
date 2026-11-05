@@ -1,23 +1,48 @@
-// The channel manager: add and remove channels, the subscriptions switch, and showing
-// hidden subscriptions again.
+// The channel manager, for YouTube and Kick: add and remove channels, the subscriptions and
+// follows switches, and showing hidden channels again.
 (() => {
   'use strict';
 
-  // Inside the settings window, which has the heading and subscriptions switch already.
-  const embedded = new URLSearchParams(location.search).has('embedded');
-  document.documentElement.toggleAttribute('data-embedded', embedded);
+  // A channel's messages go to whichever feature's background owns it.
+  const messagePrefix = (channel) => (channel.platform === 'kick' ? 'kick-live' : 'youtube-live');
+  const isKickLink = (value) => /^(https?:\/\/)?([\w-]+\.)?kick\.com\//i.test(value);
+
+  // Inside the settings window, which has the heading and the switches already.
+  const params = new URLSearchParams(location.search);
+  document.documentElement.toggleAttribute('data-embedded', params.has('embedded'));
+  // Each of the settings window's tabs shows one site. The sidebar's + button shows both.
+  const site = params.get('site');
+  const PLACEHOLDERS = { youtube: '@handle or channel link', kick: 'Channel name or link' };
 
   const form = document.getElementById('add');
   const input = document.getElementById('input');
+  if (site) input.placeholder = PLACEHOLDERS[site];
   const submit = document.getElementById('submit');
   const message = document.getElementById('message');
   const list = document.getElementById('list');
   const empty = document.getElementById('empty');
   const subsToggle = document.getElementById('subs-toggle');
   const subsState = document.getElementById('subs-state');
+  const kickToggle = document.getElementById('kick-toggle');
+  const kickState = document.getElementById('kick-state');
   const hiddenSection = document.getElementById('hidden');
   const hiddenTitle = document.getElementById('hidden-title');
   const hiddenList = document.getElementById('hidden-list');
+
+  const WATCHED_KEYS = [
+    'channels',
+    'subChannels',
+    'live',
+    'status',
+    'showSubscriptions',
+    'hiddenChannels',
+    'kickChannels',
+    'kickFollowed',
+    'kickLive',
+    'kickStatus',
+    'kickHidden',
+    'showKickFollows',
+  ];
 
   function say(text, isError) {
     message.hidden = !text;
@@ -58,7 +83,7 @@
     remove.textContent = '×';
     remove.title = `Remove ${channel.name}`;
     remove.setAttribute('aria-label', remove.title);
-    remove.addEventListener('click', () => chrome.runtime.sendMessage({ type: 'youtube-live:remove', id: channel.id }));
+    remove.addEventListener('click', () => chrome.runtime.sendMessage({ type: `${messagePrefix(channel)}:remove`, id: channel.id }));
 
     return channelRow(channel, state, remove);
   }
@@ -70,7 +95,7 @@
     show.textContent = 'Show';
     show.title = `Show ${channel.name} again`;
     show.setAttribute('aria-label', show.title);
-    show.addEventListener('click', () => chrome.runtime.sendMessage({ type: 'youtube-live:unhide', id: channel.id }));
+    show.addEventListener('click', () => chrome.runtime.sendMessage({ type: `${messagePrefix(channel)}:unhide`, id: channel.id }));
     return channelRow(channel, null, show);
   }
 
@@ -82,14 +107,35 @@
       status,
       showSubscriptions = skek.settingDefaults.showSubscriptions,
       hiddenChannels = {},
-    } = await chrome.storage.local.get(['channels', 'subChannels', 'live', 'status', 'showSubscriptions', 'hiddenChannels']);
-    list.replaceChildren(...channels.map((c) => row(c, live[c.id])));
-    empty.hidden = channels.length > 0;
+      kickChannels = [],
+      kickFollowed = {},
+      kickLive = {},
+      kickStatus,
+      kickHidden = {},
+      showKickFollows = skek.settingDefaults.showKickFollows,
+    } = await chrome.storage.local.get(WATCHED_KEYS);
+    const allLive = { ...live, ...kickLive };
+    const own = [...(site === 'kick' ? [] : channels), ...(site === 'youtube' ? [] : kickChannels)];
+    list.replaceChildren(...own.map((c) => row(c, allLive[c.id])));
+    empty.hidden = own.length > 0;
 
-    const hidden = Object.values(hiddenChannels).sort((a, b) => a.name.localeCompare(b.name));
+    const hidden = [
+      ...(site === 'kick' ? [] : Object.values(hiddenChannels)),
+      ...(site === 'youtube' ? [] : Object.values(kickHidden)),
+    ].sort((a, b) => a.name.localeCompare(b.name));
     hiddenSection.hidden = !hidden.length;
-    hiddenTitle.textContent = `Hidden subscriptions (${hidden.length})`;
+    hiddenTitle.textContent = `Hidden channels (${hidden.length})`;
     hiddenList.replaceChildren(...hidden.map(hiddenRow));
+
+    kickToggle.checked = showKickFollows;
+    const liveFollows = Object.keys(kickFollowed).filter((id) => kickLive[id]).length;
+    kickState.textContent = !showKickFollows
+      ? 'Off'
+      : kickStatus?.signedOut
+        ? 'Sign in to Kick in this browser to use this'
+        : kickStatus?.failed
+          ? "Couldn't reach Kick. Trying again every minute"
+          : `${liveFollows} live right now`;
 
     subsToggle.checked = showSubscriptions;
     const liveSubs = Object.keys(subChannels).filter((id) => live[id]).length;
@@ -108,7 +154,9 @@
 
     submit.disabled = true;
     say('Looking up channel…');
-    const result = await chrome.runtime.sendMessage({ type: 'youtube-live:add', input: value });
+    const toKick = site ? site === 'kick' : isKickLink(value);
+    const type = toKick ? 'kick-live:add' : 'youtube-live:add';
+    const result = await chrome.runtime.sendMessage({ type, input: value });
     submit.disabled = false;
 
     if (result?.ok) {
@@ -122,8 +170,9 @@
   subsToggle.addEventListener('change', () => {
     chrome.runtime.sendMessage({ type: 'youtube-live:showSubscriptions', enabled: subsToggle.checked });
   });
-
-  const WATCHED_KEYS = ['channels', 'subChannels', 'live', 'status', 'showSubscriptions', 'hiddenChannels'];
+  kickToggle.addEventListener('change', () => {
+    chrome.runtime.sendMessage({ type: 'kick-live:showFollows', enabled: kickToggle.checked });
+  });
 
   chrome.storage.onChanged.addListener((changes, area) => {
     // Other keys (settings, theme) would rebuild the list for nothing.
@@ -131,4 +180,5 @@
   });
   render();
   chrome.runtime.sendMessage({ type: 'youtube-live:refresh' });
+  chrome.runtime.sendMessage({ type: 'kick-live:refresh' });
 })();

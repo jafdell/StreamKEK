@@ -11,8 +11,11 @@
       if (area !== 'local') return;
       if (changes.channels) state.own = changes.channels.newValue ?? [];
       if (changes.subChannels) state.subs = changes.subChannels.newValue ?? {};
+      if (changes.live) state.youtubeLive = changes.live.newValue ?? {};
+      if (changes.kickChannels) state.kickOwn = changes.kickChannels.newValue ?? [];
+      if (changes.kickFollowed) state.kickFollowed = changes.kickFollowed.newValue ?? {};
+      if (changes.kickLive) state.kickLive = changes.kickLive.newValue ?? {};
       mergeChannels();
-      if (changes.live) state.live = changes.live.newValue ?? {};
       yt.renderSidebar();
       if (state.openId && !state.channels.some((c) => c.id === state.openId)) {
         yt.navigateTo(null); // the open channel was just removed or hidden
@@ -22,11 +25,15 @@
       yt.syncWithUrl();
     });
 
-    chrome.storage.local.get(['channels', 'subChannels', 'live', 'chatHidden']).then((saved) => {
+    const keys = ['channels', 'subChannels', 'live', 'kickChannels', 'kickFollowed', 'kickLive', 'chatHidden'];
+    chrome.storage.local.get(keys).then((saved) => {
       state.own = saved.channels ?? [];
       state.subs = saved.subChannels ?? {};
+      state.youtubeLive = saved.live ?? {};
+      state.kickOwn = saved.kickChannels ?? [];
+      state.kickFollowed = saved.kickFollowed ?? {};
+      state.kickLive = saved.kickLive ?? {};
       mergeChannels();
-      state.live = saved.live ?? {};
       state.chatHidden = !!saved.chatHidden;
       state.channelsLoaded = true;
       yt.renderSidebar(true);
@@ -45,8 +52,9 @@
     addEventListener('resize', yt.placeView);
 
     send({ type: 'youtube-live:refresh' });
+    send({ type: 'kick-live:refresh' });
   }
 
-  // Runs at document_start to read the /yt/ address before Twitch shortens it.
+  // Runs at document_start to read the /yt/ or /kick/ address before Twitch shortens it.
   onBodyReady(init);
 })();

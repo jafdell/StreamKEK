@@ -1,25 +1,37 @@
-// The "YouTube Live" section of Twitch's sidebar.
+// The "YouTube Live" and "Kick Live" sections of Twitch's sidebar.
 (() => {
   'use strict';
 
   const yt = skek.youtube;
   const { el, icon, send } = skek.helpers;
-  const { state, liveChannels, streamsOf, avatarImg, compact } = yt;
+  const { state, channelsOn, liveChannels, platformOf, siteOf, streamsOf, avatarImg, compact } = yt;
 
-  const SECTION_ID = 'skek-section';
-  let lastRender = '';
+  // Twitch's channels first, then YouTube, then Kick.
+  const SECTIONS = [
+    { platform: 'youtube', id: 'skek-section', title: 'YouTube Live', glyph: 'youtube' },
+    { platform: 'kick', id: 'skek-kick-section', title: 'Kick Live', glyph: 'kick' },
+  ];
+  const lastRender = {};
 
   function sidebarHost() {
     return document.querySelector('[data-a-target="side-nav-bar"] .side-bar-contents nav') ||
       document.querySelector('[data-a-target="side-nav-bar"] .side-bar-contents');
   }
 
-  // Only for subscriptions: channels you added are removed in the manager. Not on the
-  // stream open in this tab, because hiding it would close it. Another tab can still close
-  // its stream this way, like removing the channel does.
+  function canHide(channel) {
+    if (state.openId === channel.id) return false;
+    return platformOf(channel) === 'kick'
+      ? !!state.kickFollowed[channel.id] && !state.kickOwn.some((c) => c.id === channel.id)
+      : !!state.subs[channel.id] && !state.own.some((c) => c.id === channel.id);
+  }
+
+  // Only for subscriptions and followed channels: channels you added are removed in the manager.
+  // Not on the stream open in this tab, because hiding it would close it. Another tab can still
+  // close its stream this way, like removing the channel does.
   function hideButton(channel) {
-    if (state.openId === channel.id || !state.subs[channel.id] || state.own.some((c) => c.id === channel.id)) return null;
+    if (!canHide(channel)) return null;
     const label = `Hide ${channel.name}`;
+    const type = platformOf(channel) === 'kick' ? 'kick-live:hide' : 'youtube-live:hide';
     return el(
       'button',
       {
@@ -35,7 +47,7 @@
             // The next card moves under the cursor, so a double-click would hide that too.
             if (event.detail > 1) return;
             yt.hideTip();
-            send({ type: 'youtube-live:hide', id: channel.id });
+            send({ type, id: channel.id });
           },
           // A middle click would open the link.
           auxclick: (event) => event.preventDefault(),
@@ -51,7 +63,7 @@
       'a',
       {
         class: `skek-card${state.openId === channel.id ? ' skek-card--active' : ''}`,
-        href: `https://www.youtube.com/watch?v=${live.videoId}`,
+        href: siteOf(channel).streamUrl(channel, live),
         on: {
           click: (event) => yt.openOnPlainClick(event, channel.id),
           mouseenter: (event) => yt.showTip(event.currentTarget, channel, live),
@@ -80,57 +92,69 @@
     );
   }
 
-  // Directly under Followed Channels, so Twitch channels stay first.
-  function placeSection(section, host) {
+  // YouTube goes directly under Followed Channels, so Twitch channels stay first. Kick goes
+  // under YouTube, which stays in the page even when its setting hides it.
+  function placeSection(section, host, previous) {
+    if (previous) {
+      if (previous.nextElementSibling !== section) previous.after(section);
+      return;
+    }
     const native = [...host.querySelectorAll('.side-nav-section')];
     const followed = native.find((s) => s.querySelector('[data-test-selector="followed-channel"]'));
     if (followed) {
       if (followed.nextElementSibling !== section) followed.after(section);
     } else if (native[0]) {
-      if (native[0].previousElementSibling !== section) native[0].before(section);
+      // Kick sits between this section and Twitch's. Moving past it would make it move back,
+      // which counts as a page change and renders again, forever.
+      const before = native[0].previousElementSibling;
+      const beforeKick = before?.id === 'skek-kick-section' ? before.previousElementSibling : before;
+      if (beforeKick !== section) native[0].before(section);
     } else if (!section.isConnected) {
       host.prepend(section);
     }
   }
 
-  function renderSidebar(force) {
-    const host = sidebarHost();
-    if (!host) return;
-
-    let section = document.getElementById(SECTION_ID);
-    if (!section) {
-      section = el(
+  function buildSection({ id, title, glyph }) {
+    return el(
+      'div',
+      { id, class: 'skek-section' },
+      el(
         'div',
-        { id: SECTION_ID, class: 'skek-section' },
+        { class: 'skek-section__head' },
+        el('h3', { class: 'skek-section__title' }, title),
+        el('span', { class: 'skek-section__glyph' }, icon(glyph)),
         el(
-          'div',
-          { class: 'skek-section__head' },
-          el('h3', { class: 'skek-section__title' }, 'YouTube Live'),
-          el('span', { class: 'skek-section__glyph' }, icon('youtube')),
-          el(
-            'button',
-            {
-              class: 'skek-iconbtn skek-section__add skek-manager-toggle',
-              type: 'button',
-              title: 'Manage YouTube channels',
-              ariaLabel: 'Manage YouTube channels',
-              on: { click: yt.toggleManager },
-            },
-            icon('plus'),
-          ),
+          'button',
+          {
+            class: 'skek-iconbtn skek-section__add skek-manager-toggle',
+            type: 'button',
+            title: 'Manage channels',
+            ariaLabel: 'Manage channels',
+            on: { click: yt.toggleManager },
+          },
+          icon('plus'),
         ),
-        el('div', { class: 'skek-section__list' }),
-      );
-      force = true;
-    }
-    placeSection(section, host);
+      ),
+      el('div', { class: 'skek-section__list' }),
+    );
+  }
 
-    const signature = JSON.stringify([state.own, state.channels, state.live, state.openId]);
-    if (!force && signature === lastRender) return;
-    lastRender = signature;
+  function renderSection(config, host, previous, force) {
+    let section = document.getElementById(config.id);
+    let rebuilt = force;
+    if (!section) {
+      section = buildSection(config);
+      rebuilt = true;
+    }
+    placeSection(section, host, previous);
+
+    const { platform } = config;
+    const signature = JSON.stringify([state.own, state.kickOwn, channelsOn(platform), state.live, state.openId]);
+    if (!rebuilt && signature === lastRender[platform]) return section;
+    lastRender[platform] = signature;
 
     yt.hideTipUnlessHovered();
-    const cards = liveChannels().map(renderCard);
+    const cards = liveChannels(platform).map(renderCard);
     const list = section.querySelector('.skek-section__list');
     if (cards.length) list.replaceChildren(...cards);
     else {
@@ -138,10 +162,18 @@
         el(
           'p',
           { class: 'skek-section__empty' },
-          state.channels.length ? 'No channels live right now' : 'Press + to add a channel',
+          channelsOn(platform).length ? 'No channels live right now' : 'Press + to add a channel',
         ),
       );
     }
+    return section;
+  }
+
+  function renderSidebar(force) {
+    const host = sidebarHost();
+    if (!host) return;
+    let previous = null;
+    for (const config of SECTIONS) previous = renderSection(config, host, previous, force);
   }
 
   Object.assign(yt, { renderSidebar });

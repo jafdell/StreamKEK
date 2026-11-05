@@ -9,18 +9,25 @@
     <script src="../../../shared/page-theme.js"></script>
   </head>
   <body>
-    <h1>YouTube channels</h1>
+    <h1>YouTube and Kick channels</h1>
     <form id="add">
-      <input id="input" type="text" placeholder="@handle or channel link" autocomplete="off" spellcheck="false" />
+      <input id="input" type="text" placeholder="YouTube @handle or link, or Kick link" autocomplete="off" spellcheck="false" />
       <button id="submit" type="submit">Add</button>
     </form>
     <p id="message" role="status" hidden></p>
-    <label id="subs">
+    <label class="subs">
       <span>
         <span class="subs-title">Show my live YouTube subscriptions</span>
         <span id="subs-state" class="state"></span>
       </span>
       <input id="subs-toggle" class="skek-switch" type="checkbox" role="switch" checked />
+    </label>
+    <label class="subs">
+      <span>
+        <span class="subs-title">Show my live Kick follows</span>
+        <span id="kick-state" class="state"></span>
+      </span>
+      <input id="kick-toggle" class="skek-switch" type="checkbox" role="switch" checked />
     </label>
     <ul id="list"></ul>
     <p id="empty" hidden>Add a channel and it will appear in Twitch's sidebar whenever it goes live.</p>

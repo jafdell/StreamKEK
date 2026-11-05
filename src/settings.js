@@ -41,6 +41,13 @@
       default: false,
     },
     {
+      key: 'hideKickLive',
+      category: 'Sidebar',
+      label: 'Hide Kick Live',
+      hint: 'Removes the Kick Live section from the sidebar. The Following page still shows your streams.',
+      default: false,
+    },
+    {
       key: 'chatFontSize',
       category: 'Chat',
       label: 'Chat font size',
@@ -105,7 +112,7 @@
       key: 'streamQuality',
       category: 'Player',
       label: 'Stream quality',
-      hint: "What streams start at on both Twitch and YouTube. If a stream doesn't offer it, the next size down plays. The player's own quality menu still works.",
+      hint: "What streams start at on Twitch, YouTube and Kick. If a stream doesn't offer it, the next size down plays. The player's own quality menu still works.",
       default: '1440',
       dropdown: true,
       // A new choice also needs an entry in HIGHEST_FOR_SETTING in youtube-live/frames/watch-start.js.
@@ -121,6 +128,14 @@
       hint: "Lists your subscriptions while they're live. Needs you signed in to YouTube in this browser.",
       default: true,
       message: 'youtube-live:showSubscriptions',
+    },
+    {
+      key: 'showKickFollows',
+      category: 'Kick',
+      label: 'Show my live Kick follows',
+      hint: "Lists the channels you follow on Kick while they're live. Needs you signed in to Kick in this browser.",
+      default: true,
+      message: 'kick-live:showFollows',
     },
     {
       key: 'theme',

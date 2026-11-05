@@ -1,8 +1,9 @@
-// Formatting helpers for YouTube Live cards.
+// Formatting helpers for YouTube Live and Kick Live cards.
 (() => {
   'use strict';
 
   const { el } = skek.helpers;
+  const { platformOf } = skek.youtube;
 
   function avatarImg(channel, className) {
     return el('img', { class: className, src: channel.avatar || '', alt: '', referrerPolicy: 'no-referrer' });
@@ -10,6 +11,28 @@
 
   function thumbnailUrl(videoId) {
     return `https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault_live.jpg`;
+  }
+
+  // What differs between the two sites when linking to a channel or showing its stream.
+  const SITES = {
+    youtube: {
+      name: 'YouTube',
+      routePrefix: 'yt',
+      channelUrl: (channel) => `https://www.youtube.com/channel/${channel.id}`,
+      streamUrl: (channel, stream) => `https://www.youtube.com/watch?v=${stream.videoId}`,
+      previewUrl: (stream) => thumbnailUrl(stream.videoId),
+    },
+    kick: {
+      name: 'Kick',
+      routePrefix: 'kick',
+      channelUrl: (channel) => `https://kick.com/${channel.slug}`,
+      streamUrl: (channel) => `https://kick.com/${channel.slug}`,
+      previewUrl: (stream) => stream.thumbnail ?? '',
+    },
+  };
+
+  function siteOf(channel) {
+    return SITES[platformOf(channel)];
   }
 
   function compact(n) {
@@ -26,5 +49,5 @@
     return `${Math.floor(seconds / 3600)}:${pad(Math.floor(seconds / 60) % 60)}:${pad(seconds % 60)}`;
   }
 
-  Object.assign(skek.youtube, { avatarImg, thumbnailUrl, compact, uptime });
+  Object.assign(skek.youtube, { avatarImg, thumbnailUrl, siteOf, compact, uptime });
 })();

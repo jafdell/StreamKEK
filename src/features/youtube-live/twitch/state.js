@@ -1,14 +1,20 @@
-// What the Twitch page knows. Kept in sync with chrome.storage by main.js.
+// What the Twitch page knows. Kept in sync with chrome.storage by main.js. Kick Live shares all of
+// this page's code with YouTube Live: a Kick channel has `platform: 'kick'` and an id of kick:<slug>.
 (() => {
   'use strict';
 
-  // channels = yours plus subscriptions seen live; offline ones are only listed if yours.
+  // channels = yours plus subscriptions seen live, on both sites; offline ones are only listed if yours.
+  // live = both sites' live streams, from youtubeLive and kickLive.
   // routeVideoId = the stream named in the address, if any.
   // pinnedVideoId = what's playing, so it doesn't change when viewer counts shift.
   const state = {
     channels: [],
     own: [],
     subs: {},
+    kickOwn: [],
+    kickFollowed: {},
+    youtubeLive: {},
+    kickLive: {},
     live: {},
     openId: null,
     routeVideoId: null,
@@ -18,12 +24,26 @@
   };
 
   function mergeChannels() {
-    const ownIds = new Set(state.own.map((c) => c.id));
-    state.channels = [...state.own, ...Object.values(state.subs).filter((c) => !ownIds.has(c.id))];
+    const ownIds = new Set([...state.own, ...state.kickOwn].map((c) => c.id));
+    state.channels = [
+      ...state.own,
+      ...Object.values(state.subs).filter((c) => !ownIds.has(c.id)),
+      ...state.kickOwn,
+      ...Object.values(state.kickFollowed).filter((c) => !ownIds.has(c.id)),
+    ];
+    state.live = { ...state.youtubeLive, ...state.kickLive };
   }
 
-  function liveChannels() {
-    return state.channels
+  function platformOf(channel) {
+    return channel?.platform ?? 'youtube';
+  }
+
+  function channelsOn(platform) {
+    return state.channels.filter((c) => platformOf(c) === platform);
+  }
+
+  function liveChannels(platform) {
+    return channelsOn(platform)
       .filter((c) => state.live[c.id])
       .sort((a, b) => (state.live[b.id].viewers ?? 0) - (state.live[a.id].viewers ?? 0));
   }
@@ -39,5 +59,5 @@
     return streams.find((s) => s.videoId === wanted) ?? streams[0] ?? null;
   }
 
-  skek.youtube = { state, mergeChannels, liveChannels, streamsOf, openStream };
+  skek.youtube = { state, mergeChannels, platformOf, channelsOn, liveChannels, streamsOf, openStream };
 })();

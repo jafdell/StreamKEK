@@ -1,11 +1,12 @@
-// The Twitch-style stream view: player, info bar and chat. Its theatre, stacked and floating chat
-// modes are here too; the same modes on Twitch's own player are in features/player-modes/.
+// The Twitch-style stream view for YouTube and Kick: player, info bar and chat. Its theatre, stacked
+// and floating chat modes are here too; the same modes on Twitch's own player are in
+// features/player-modes/.
 (() => {
   'use strict';
 
   const yt = skek.youtube;
   const { el, icon, theme, send } = skek.helpers;
-  const { state, openStream, uptime } = yt;
+  const { state, openStream, platformOf, siteOf, uptime } = yt;
 
   const VIEW_ID = 'skek-view';
   const OVERLAY_MS = 3000;
@@ -104,9 +105,9 @@
                   'external',
                   el(
                     'a',
-                    { class: 'skek-button skek-button--youtube', target: '_blank', rel: 'noopener', 'data-skek-tooltip': 'StreamKEK' },
+                    { class: 'skek-button', target: '_blank', rel: 'noopener', 'data-skek-tooltip': 'StreamKEK' },
                     icon('external'),
-                    el('span', {}, 'Watch on YouTube'),
+                    ref('externalLabel', el('span', {})),
                   ),
                 ),
               ),
@@ -193,9 +194,28 @@
     }
   }
 
+  // The player and chat addresses for a stream.
+  function frameUrls(channel, stream) {
+    const settings = `#skek-theme=${theme()}&skek-twitch-font=${twitchChatFontSize()}`;
+    if (platformOf(channel) === 'kick') {
+      const slug = encodeURIComponent(channel.slug);
+      return {
+        // The channel page offers every quality; the embed player, player.kick.com, stops at a low one.
+        player: `https://kick.com/${slug}`,
+        chat: `https://kick.com/popout/${slug}/chat${settings}`,
+      };
+    }
+    const id = encodeURIComponent(stream.videoId);
+    // The watch page offers every quality; the embedded player often stops at 1080p.
+    return {
+      player: `https://www.youtube.com/watch?v=${id}`,
+      chat: `https://www.youtube.com/live_chat?v=${id}&embed_domain=${location.hostname}${settings}`,
+    };
+  }
+
   function loadStream(channel, stream) {
     const { refs } = view;
-    const key = stream?.videoId ?? null;
+    const key = stream ? `${channel?.id}/${stream.videoId}` : null;
     if (view.streamKey === key) return;
     view.streamKey = key;
 
@@ -207,29 +227,19 @@
       return;
     }
 
-    const id = encodeURIComponent(stream.videoId);
-    // The watch page offers every quality; the embedded player often stops at 1080p.
+    const urls = frameUrls(channel, stream);
     refs.player.replaceChildren(
-      frame(
-        'skek-player__frame',
-        `https://www.youtube.com/watch?v=${id}`,
-        'autoplay; encrypted-media; picture-in-picture; fullscreen',
-      ),
+      frame('skek-player__frame', urls.player, 'autoplay; encrypted-media; picture-in-picture; fullscreen'),
     );
-    const chatFrame = frame(
-      'skek-chat__frame',
-      `https://www.youtube.com/live_chat?v=${id}&embed_domain=${location.hostname}#skek-theme=${theme()}&skek-twitch-font=${twitchChatFontSize()}`,
-      'clipboard-write',
-    );
+    const chatFrame = frame('skek-chat__frame', urls.chat, 'clipboard-write');
     chatFrame.addEventListener('load', syncChatFrame);
     refs.chat.replaceChildren(chatFrame);
   }
 
   // In floating chat the window draws the background, so the frame has to stop drawing its own.
   function syncChatFrame() {
-    view?.refs.chat
-      .querySelector('iframe')
-      ?.contentWindow.postMessage({ skekChatTransparent: view.layout === 'floating' }, 'https://www.youtube.com');
+    const chatFrame = view?.refs.chat.querySelector('iframe');
+    chatFrame?.contentWindow.postMessage({ skekChatTransparent: view.layout === 'floating' }, new URL(chatFrame.src).origin);
   }
 
   const detailsRequested = new Set();
@@ -249,25 +259,29 @@
     state.pinnedVideoId = stream?.videoId ?? null;
     loadStream(channel, stream);
 
-    if (stream && !stream.startedAt && !detailsRequested.has(stream.videoId)) {
+    // Kick's streams come with these details.
+    const isKick = platformOf(channel) === 'kick';
+    if (!isKick && stream && !stream.startedAt && !detailsRequested.has(stream.videoId)) {
       detailsRequested.add(stream.videoId);
       send({ type: 'youtube-live:loadStreamDetails', channelId: state.openId, videoId: stream.videoId });
     }
 
-    const youtubeUrl = stream
-      ? `https://www.youtube.com/watch?v=${stream.videoId}`
-      : `https://www.youtube.com/channel/${state.openId}`;
+    const site = siteOf(channel);
+    const channelUrl = channel ? site.channelUrl(channel) : '';
     refs.avatar.src = channel?.avatar || '';
     refs.name.textContent = channel?.name ?? '';
-    refs.name.href = `https://www.youtube.com/channel/${state.openId}`;
-    refs.external.href = youtubeUrl;
+    refs.name.href = channelUrl;
+    refs.external.href = stream && channel ? site.streamUrl(channel, stream) : channelUrl;
+    refs.external.classList.toggle('skek-button--youtube', !isKick);
+    refs.external.classList.toggle('skek-button--kick', isKick);
+    refs.externalLabel.textContent = `Watch on ${site.name}`;
     refs.title.textContent = stream?.title ?? 'Offline';
     refs.title.title = stream?.title ?? '';
     refs.category.textContent = stream?.category ?? live?.category ?? '';
     refs.viewers.textContent = stream?.viewers == null ? '' : stream.viewers.toLocaleString();
     refs.uptime.textContent = uptime(stream?.startedAt);
     view.root.classList.toggle('skek-view--offline', !stream);
-    view.title = `${channel?.name ?? 'YouTube'} - Twitch`;
+    view.title = `${channel?.name ?? site.name} - Twitch`;
     document.title = view.title;
   }
 
