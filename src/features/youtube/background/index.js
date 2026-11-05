@@ -1,7 +1,7 @@
 // Wires the YouTube background code to browser events. What every site shares is in
 // streams/background/site-background.js.
 
-import { allowCookiesOnTwitch } from '../../streams/background/site-background.js';
+import { allowCookiesOnTwitch, sendRequestsAsSite } from '../../streams/background/site-background.js';
 import { addChannel, removeChannel } from './channels.js';
 import { background } from './poller.js';
 import { loadStreamDetails } from './live-entry.js';
@@ -25,5 +25,6 @@ export const messageHandlers = {
 
 export function startBackground() {
   allowCookiesOnTwitch('https://*.youtube.com/*');
+  sendRequestsAsSite(1, '||www.youtube.com/youtubei/v1/guide', [{ header: 'origin', operation: 'set', value: 'https://www.youtube.com' }]);
   background.startPolling('youtube-live:poll');
 }

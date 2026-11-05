@@ -51,7 +51,8 @@
   function navigateTo(id, videoId = null) {
     const channel = id && state.channels.find((c) => c.id === id);
     if (channel) {
-      if (!location.pathname.match(STREAM_PATH)) returnUrl = location.pathname + location.search;
+      // Twitch accepts an address like //example.com/x, which would leave Twitch if sent back to.
+      if (!location.pathname.match(STREAM_PATH)) returnUrl = location.pathname.replace(/^\/+/, '/') + location.search;
       const route = routeFor(channel, videoId);
       history.pushState(stateWithRoute(route), '', `/${route}`);
     } else if (twitchPageLost) {

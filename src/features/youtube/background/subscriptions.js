@@ -36,13 +36,14 @@ async function authorizationHeader() {
 }
 
 // `html` is any signed-in YouTube page. A brand account only gets its own subscriptions
-// with the page ID. rules/youtube-guide-origin.json makes the request come from YouTube.
+// with the page ID. sendRequestsAsSite in index.js makes the request come from YouTube.
 async function fetchGuideChannels(html) {
   const config = (name) => html.match(new RegExp(`"${name}":"?([\\w.]+)`))?.[1];
   const pageId = html.match(/"DELEGATED_SESSION_ID":"(\d+)"/)?.[1];
   const res = await fetch(`${YT}/youtubei/v1/guide?prettyPrint=false`, {
     method: 'POST',
     credentials: 'include',
+    redirect: 'error', // the sign-in header is only for YouTube
     headers: {
       'Content-Type': 'application/json',
       Authorization: await authorizationHeader(),

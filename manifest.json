@@ -210,16 +210,6 @@
         "id": "youtube_watch_frame",
         "enabled": true,
         "path": "rules/youtube-watch-frame.json"
-      },
-      {
-        "id": "youtube_guide_origin",
-        "enabled": true,
-        "path": "rules/youtube-guide-origin.json"
-      },
-      {
-        "id": "kick_api_origin",
-        "enabled": true,
-        "path": "rules/kick-api-origin.json"
       }
     ]
   }

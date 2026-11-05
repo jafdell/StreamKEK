@@ -1,5 +1,5 @@
 // Reads Kick's site API with your own sign-in. Kick's own pages make these same requests.
-// rules/kick-api-origin.json makes them come from Kick rather than from the extension.
+// sendRequestsAsSite in index.js makes them come from Kick rather than from the extension.
 
 const KICK = 'https://kick.com';
 
@@ -28,14 +28,17 @@ function toEntry(stream) {
   return { ...top, streams: [top] };
 }
 
+// A channel's name goes into addresses, so only trust what looks like one.
+const isSlug = (slug) => /^[\w-]+$/.test(slug ?? '');
+
 export function followedStreamToLive(item) {
   const slug = item.channel?.slug;
-  if (!slug || item.id == null) return null;
+  if (!isSlug(slug) || item.id == null) return null;
   return { channel: toChannel(slug, item.channel.user?.username, item.channel.user?.profilepic), entry: toEntry(item) };
 }
 
 export function channelPageToLive(page) {
-  if (!page.slug) return null;
+  if (!isSlug(page.slug)) return null;
   return {
     channel: toChannel(page.slug, page.user?.username, page.user?.profile_pic),
     entry: page.livestream?.is_live ? toEntry(page.livestream) : null,
@@ -66,6 +69,7 @@ async function sessionToken() {
 async function request(path, token) {
   return fetch(`${KICK}${path}`, {
     credentials: 'include',
+    redirect: 'error', // the token is only for Kick
     headers: { Accept: 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
   });
 }

@@ -4,7 +4,7 @@ Bugs and feature requests go in issues. To send a change: fork the repo, make a 
 
 ## How it fits together
 
-- **Service worker** (`src/background/service-worker.js`, feature code in `background/` folders): works out what's live on YouTube and Kick, for all tabs at once. It also allows both sites' cookies on Twitch, `rules/youtube-watch-frame.json` lets YouTube's watch page load in a frame, and `rules/youtube-guide-origin.json` and `rules/kick-api-origin.json` let it read what's live.
+- **Service worker** (`src/background/service-worker.js`, feature code in `background/` folders): works out what's live on YouTube and Kick, for all tabs at once. It also allows both sites' cookies on Twitch, `rules/youtube-watch-frame.json` lets YouTube's watch page load in a frame, and `sendRequestsAsSite` in `streams/background/site-background.js` lets it read what's live.
 - **Twitch page scripts** (the first `content_scripts` entry in `manifest.json`): run in every Twitch tab and share one global, `skek`.
 - **Stream view:** the `/yt/<channel>` or `/kick/<channel>` page those scripts draw over Twitch's. It holds two frames from that site, the player and the chat. Twitch's own page stays alive behind it, with its video paused and the address showing `/yt/...` or `/kick/...`, so a Twitch feature's scripts and shortcuts keep running there. Check for `#skek-view` where that matters, as `player/modes.js` does.
 - **Frame scripts** (`frames/` folders): load on the site itself too, wherever their manifest entry matches, and switch themselves on only inside those two frames.
@@ -122,7 +122,7 @@ Sites like YouTube and Kick share everything on Twitch's side, so a new one is m
 - New permissions need a stated reason in the PR.
 - Leave `version` in `manifest.json` alone; the maintainer sets it.
 - Don't lower `minimum_chrome_version` below 145. The `topDomains` limit in `rules/youtube-watch-frame.json` only exists from Chrome 145.
-- Test YouTube's player in a real browser before tightening `rules/youtube-watch-frame.json`. Adding `initiatorDomains` and narrowing `topDomains` to `www.twitch.tv`, tried together, made the browser refuse the player.
+- Test YouTube's player in a real browser before tightening `rules/youtube-watch-frame.json`. Its `initiatorDomains` limit is fine alone, but adding it and narrowing `topDomains` to `www.twitch.tv`, tried together, made the browser refuse the player.
 
 ## Storage keys
 

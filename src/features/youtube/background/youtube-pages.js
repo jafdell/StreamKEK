@@ -35,7 +35,9 @@ export class ConsentRequired extends Error {
 
 export async function fetchPage(url) {
   const res = await fetch(url, { credentials: 'include' });
-  if (new URL(res.url).hostname.startsWith('consent.')) throw new ConsentRequired();
+  const { hostname } = new URL(res.url);
+  if (hostname.startsWith('consent.')) throw new ConsentRequired();
+  if (!/(^|\.)youtube\.com$/.test(hostname)) throw new Error('YouTube sent us somewhere else');
   if (!res.ok) throw new Error(`YouTube answered ${res.status}`);
   return { html: await res.text(), finalUrl: res.url };
 }

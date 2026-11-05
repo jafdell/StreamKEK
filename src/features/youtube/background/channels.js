@@ -1,5 +1,9 @@
 // Channels you add yourself.
 
+// Links this will look up, so a pasted link can't make it visit any other page while signed in.
+const CHANNEL_OR_VIDEO_PATH = /^\/(channel\/UC[\w-]{22}|@[^/]+|c\/[^/]+|user\/[^/]+|watch|live\/[\w-]+|shorts\/[\w-]+)(\/|$)/;
+const CHANNEL_ID = /^UC[\w-]{22}$/;
+
 import { ConsentRequired, YT, extractJson, fetchPage, watchPageSections } from './youtube-pages.js';
 import { buildLiveEntry } from './live-entry.js';
 
@@ -44,8 +48,8 @@ export function inputToUrl(raw) {
     return null;
   }
   const host = url.hostname.replace(/^(www|m)\./, '');
-  if (host === 'youtu.be') return `${YT}/watch?v=${url.pathname.slice(1)}`;
-  if (host !== 'youtube.com') return null;
+  if (host === 'youtu.be') return /^\/[\w-]+$/.test(url.pathname) ? `${YT}/watch?v=${url.pathname.slice(1)}` : null;
+  if (host !== 'youtube.com' || !CHANNEL_OR_VIDEO_PATH.test(url.pathname)) return null;
   return `${YT}${url.pathname}${url.search}`;
 }
 
@@ -65,12 +69,12 @@ async function resolveChannel(input) {
   if (!id) {
     // A video link: use the channel that owns it.
     id = extractJson(page.html, 'ytInitialPlayerResponse = ')?.videoDetails?.channelId;
-    if (!id) throw new Error('Could not find that channel on YouTube.');
+    if (!CHANNEL_ID.test(id ?? '')) throw new Error('Could not find that channel on YouTube.');
     page = await fetchPage(`${YT}/channel/${id}`);
   }
 
   const meta = extractJson(page.html, 'ytInitialData = ')?.metadata?.channelMetadataRenderer;
-  if (!meta?.externalId) throw new Error('Could not find that channel on YouTube.');
+  if (!CHANNEL_ID.test(meta?.externalId ?? '')) throw new Error('Could not find that channel on YouTube.');
   const vanityHandle = meta.vanityChannelUrl?.match(/@[^/]+$/)?.[0];
   return {
     id: meta.externalId,

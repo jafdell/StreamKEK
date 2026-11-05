@@ -136,6 +136,20 @@ test('inputToUrl accepts YouTube links', () => {
   assert.equal(inputToUrl('https://www.youtube.com/watch?v=abc&t=1'), 'https://www.youtube.com/watch?v=abc&t=1');
 });
 
+test('inputToUrl only looks up channel and video links', () => {
+  assert.equal(inputToUrl('https://www.youtube.com/logout'), null);
+  assert.equal(inputToUrl('youtube.com/@x/../logout'), null);
+  // The browser tidies this to /logout, which is only ever treated as a video id.
+  assert.equal(inputToUrl('https://youtu.be/../logout'), 'https://www.youtube.com/watch?v=logout');
+  assert.equal(inputToUrl('https://www.youtube.com/channel/UCabcdefghijklmnopqrstuv/streams'), 'https://www.youtube.com/channel/UCabcdefghijklmnopqrstuv/streams');
+  assert.equal(inputToUrl('https://www.youtube.com/live/abc123'), 'https://www.youtube.com/live/abc123');
+});
+
+test('Kick channels with a name that isn\'t one are ignored', () => {
+  assert.equal(channelPageToLive({ slug: '../logout' }), null);
+  assert.equal(followedStreamToLive({ id: 1, channel: { slug: 'a/b' } }), null);
+});
+
 test('inputToUrl rejects other hosts and empty input', () => {
   assert.equal(inputToUrl('https://example.com/x'), null);
   assert.equal(inputToUrl(''), null);
