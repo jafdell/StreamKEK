@@ -1,15 +1,17 @@
 // The Stream quality setting, for Kick's player in the stream view. Twitch's is in
 // features/player/. Picks the best size at or under the setting when a stream starts or the
 // setting changes, so the player's own quality menu still works afterwards. Kick's saved quality is
-// left alone: it only knows some sizes by name, and goes back to Automatic for the others. Runs in
-// the page itself, because reaching the player means going through React's internals, and does
-// nothing if Kick changes them. watch.js sets the attribute.
+// left alone: it only knows some sizes by name, and goes back to Automatic for the others. Also
+// starts each player at full volume, leaving a muted one muted, since browsers can pause a video
+// that's unmuted without a click. Runs in the page itself, because reaching the player means going through
+// React's internals, and does nothing if Kick changes them. watch.js sets the attribute.
 (() => {
   'use strict';
 
   if (!location.ancestorOrigins[0]?.endsWith('.twitch.tv')) return;
 
   const CHECK_MS = 1000;
+  const SLIDER_UPDATE_MS = 50;
 
   let player = null;
   let applied = '';
@@ -39,6 +41,16 @@
     return null;
   }
 
+  // Once per player, so a volume you choose afterwards stays. Kick's slider only reads the volume
+  // again when mute changes, and not if it changes straight back. A muted stream needs nothing more,
+  // since unmuting it does that.
+  function startAtFullVolume(found) {
+    found.setVolume(1);
+    if (found.isMuted()) return;
+    found.setMuted(true);
+    setTimeout(() => found.setMuted(false), SLIDER_UPDATE_MS);
+  }
+
   function applyQuality(qualities, setting) {
     if (setting === 'auto') {
       player.setAutoQualityMode(true);
@@ -57,7 +69,10 @@
     if (!isPlaying(player)) {
       const found = findPlayer();
       if (!found) return;
-      if (found !== player) applied = '';
+      if (found !== player) {
+        applied = '';
+        startAtFullVolume(found);
+      }
       player = found;
     }
     const qualities = player.getQualities();
