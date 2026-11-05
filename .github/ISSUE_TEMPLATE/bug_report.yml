@@ -1,0 +1,36 @@
+name: Bug report
+description: Something doesn't work as it should.
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What you expected, what happened instead, and how to make it happen again.
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: Brave 1.80
+    validations:
+      required: true
+  - type: dropdown
+    id: watching
+    attributes:
+      label: What were you watching?
+      options:
+        - A Twitch stream
+        - A Twitch video
+        - A YouTube stream
+        - Something else
+    validations:
+      required: true
+  - type: checkboxes
+    id: other-extensions
+    attributes:
+      label: Other extensions
+      options:
+        - label: It still happens with my other Twitch extensions turned off.
+          required: true

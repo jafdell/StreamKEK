@@ -1,0 +1,8 @@
+_metadata/
+*.pem
+*.crx
+*.zip
+AGENTS.md
+.claude/
+Thumbs.db
+desktop.ini

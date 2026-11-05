@@ -1,0 +1,155 @@
+{
+  "manifest_version": 3,
+  "name": "StreamKEK",
+  "version": "1.0.0",
+  "minimum_chrome_version": "145",
+  "description": "Gives you more control over watching and chatting on Twitch, and brings YouTube live streams and their chat there too.",
+  "icons": {
+    "16": "icons/16.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "permissions": [
+    "storage",
+    "alarms",
+    "contentSettings",
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://www.twitch.tv/*"
+  ],
+  "background": {
+    "service_worker": "src/background/service-worker.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "StreamKEK",
+    "default_popup": "src/settings-window/settings-window.html",
+    "default_icon": {
+      "16": "icons/16.png",
+      "48": "icons/48.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.twitch.tv/*"
+      ],
+      "js": [
+        "src/settings.js",
+        "src/twitch/helpers.js",
+        "src/twitch/page-sync.js",
+        "src/twitch/settings-button.js",
+        "src/features/youtube-live/twitch/state.js",
+        "src/features/youtube-live/twitch/format.js",
+        "src/features/youtube-live/twitch/stream-tip.js",
+        "src/features/youtube-live/twitch/manager-frame.js",
+        "src/features/youtube-live/twitch/sidebar.js",
+        "src/features/youtube-live/twitch/player-view.js",
+        "src/features/youtube-live/twitch/routes.js",
+        "src/features/youtube-live/twitch/following.js",
+        "src/features/youtube-live/twitch/main.js",
+        "src/features/claim-points/claim-points.js",
+        "src/features/player-modes/floating-window.js",
+        "src/features/player-modes/player-modes.js"
+      ],
+      "css": [
+        "src/twitch/base.css",
+        "src/twitch/settings-button.css",
+        "src/features/sidebar-sections/sidebar-sections.css",
+        "src/features/chat-font-size/chat-font-size.css",
+        "src/features/chat-timestamps/chat-timestamps.css",
+        "src/features/chat-sections/chat-sections.css",
+        "src/features/player-modes/player-modes.css",
+        "src/features/player-modes/floating-window.css",
+        "src/features/youtube-live/twitch/sidebar.css",
+        "src/features/youtube-live/twitch/stream-tip.css",
+        "src/features/youtube-live/twitch/manager-frame.css",
+        "src/features/youtube-live/twitch/player-view.css",
+        "src/features/youtube-live/twitch/following.css"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://www.twitch.tv/*"
+      ],
+      "js": [
+        "src/features/stream-quality/stream-quality.js"
+      ],
+      "run_at": "document_idle",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://www.youtube.com/live_chat*"
+      ],
+      "js": [
+        "src/settings.js",
+        "src/features/youtube-live/frames/layout-keys.js",
+        "src/features/youtube-live/frames/chat.js"
+      ],
+      "css": [
+        "src/features/youtube-live/frames/chat.css"
+      ],
+      "all_frames": true,
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://www.youtube.com/watch*"
+      ],
+      "js": [
+        "src/settings.js",
+        "src/features/youtube-live/frames/layout-keys.js",
+        "src/features/youtube-live/frames/watch.js"
+      ],
+      "css": [
+        "src/features/youtube-live/frames/watch.css"
+      ],
+      "all_frames": true,
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://www.youtube.com/watch*"
+      ],
+      "js": [
+        "src/features/youtube-live/frames/watch-start.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/48.png",
+        "src/settings-window/settings-window.html",
+        "src/features/youtube-live/manager/manager.html"
+      ],
+      "matches": [
+        "https://www.twitch.tv/*"
+      ]
+    },
+    {
+      "resources": [
+        "fonts/inter-latin.woff2"
+      ],
+      "matches": [
+        "https://www.youtube.com/*"
+      ]
+    }
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "youtube_watch_frame",
+        "enabled": true,
+        "path": "rules/youtube-watch-frame.json"
+      }
+    ]
+  }
+}

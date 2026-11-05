@@ -1,0 +1,35 @@
+html.skek-watch,
+html.skek-watch body { overflow: hidden !important; background: #000 !important; }
+
+html.skek-watch #watch-page-skeleton,
+html.skek-watch #masthead-container,
+html.skek-watch #secondary,
+html.skek-watch #below,
+html.skek-watch #chat,
+html.skek-watch ytd-consent-bump-v2-lightbox,
+html.skek-watch tp-yt-app-drawer { display: none !important; }
+
+html.skek-watch ytd-app,
+html.skek-watch ytd-page-manager,
+html.skek-watch ytd-watch-flexy { margin: 0 !important; padding: 0 !important; background: #000 !important; }
+
+html.skek-watch #movie_player {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 100000 !important;
+}
+html.skek-watch #movie_player .html5-video-container {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+html.skek-watch #movie_player video {
+  width: 100% !important;
+  height: 100% !important;
+  left: 0 !important;
+  top: 0 !important;
+  object-fit: contain;
+}

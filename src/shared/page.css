@@ -1,0 +1,76 @@
+/* Shared by the extension's own pages (settings window, channel manager). Not loaded on Twitch. */
+@font-face {
+  font-family: Inter;
+  src: url('../../fonts/inter-latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+/* Twitch's own values for each theme. Set by page-theme.js from the Theme setting. */
+:root {
+  color-scheme: dark;
+  --bg: #18181b;
+  --bg-alt: #0e0e10;
+  --card: rgba(83, 83, 95, 0.24);
+  --selected: rgba(145, 71, 255, 0.2);
+  --accent: #bf94ff;
+  --input-border: rgba(222, 222, 227, 0.95);
+  --focus: #a970ff;
+  --hover: rgba(83, 83, 95, 0.48);
+  --text: #efeff1;
+  --muted: #d3d3d9;
+  --error: #ff8280;
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --bg-alt: #f7f7f8;
+  --card: rgba(173, 173, 184, 0.2);
+  --selected: rgba(145, 71, 255, 0.14);
+  --accent: #5c16c5;
+  --input-border: rgba(50, 50, 57, 0.62);
+  --focus: #9147ff;
+  --hover: rgba(173, 173, 184, 0.35);
+  --text: #0e0e10;
+  --muted: #3b3b44;
+  --error: #971311;
+}
+:root:not([data-theme]) body { visibility: hidden; }
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.4 Inter, Roobert, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* <input type="checkbox" role="switch" class="skek-switch"> */
+.skek-switch {
+  appearance: none;
+  position: relative;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 20px;
+  margin: 0;
+  border-radius: 9000px;
+  background: var(--hover);
+  box-shadow: inset 0 0 0 2px var(--input-border);
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+.skek-switch::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--text);
+  transition: transform 0.1s ease;
+}
+.skek-switch:checked { background: #9147ff; box-shadow: none; }
+.skek-switch:checked::before { background: #fff; transform: translateX(16px); }
+.skek-switch:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }

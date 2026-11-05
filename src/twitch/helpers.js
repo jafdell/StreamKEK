@@ -1,0 +1,88 @@
+// Small DOM helpers shared by every feature on Twitch pages.
+(() => {
+  'use strict';
+
+  const ICONS = {
+    plus: '<path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6Z"/>',
+    external: '<path d="M14 4h6v6h-2V7.4l-7.3 7.3-1.4-1.4L16.6 6H14V4ZM5 6h5v2H6v10h10v-4h2v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z"/>',
+    collapse: '<path d="M4 11h10.6l-3.3-3.3 1.4-1.4 5.7 5.7-5.7 5.7-1.4-1.4 3.3-3.3H4v-2Zm15-6h2v14h-2V5Z"/>',
+    expand: '<path d="M20 11H9.4l3.3-3.3-1.4-1.4L5.6 12l5.7 5.7 1.4-1.4L9.4 13H20v-2ZM3 5h2v14H3V5Z"/>',
+    theatre: '<path fill-rule="evenodd" d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm1 2v10h11V7H4Zm13 0v10h3V7h-3Z"/>',
+    stacked: '<path fill-rule="evenodd" d="M3 3h18a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm1 2v9h16V5H4Zm0 11v3h16v-3H4Z"/>',
+    floating: '<path fill-rule="evenodd" d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm1 2v10h16V7H4Zm9 2h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1Z"/>',
+    person: '<path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8c0-3.3 3.1-6 7-6s7 2.7 7 6H5Z"/>',
+    clock: '<path d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm0 2a6 6 0 1 1 0 12 6 6 0 0 1 0-12Zm-1 2v5l4 2 .9-1.8-2.9-1.4V8h-2Z"/>',
+    youtube: '<path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.3 5 12 5 12 5s-6.3 0-7.8.4a2.5 2.5 0 0 0-1.8 1.8C2 8.7 2 12 2 12s0 3.3.4 4.8c.2.9.9 1.5 1.8 1.8 1.5.4 7.8.4 7.8.4s6.3 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.5.4-4.8.4-4.8s0-3.3-.4-4.8ZM10 15V9l5.2 3-5.2 3Z"/>',
+  };
+
+  function el(tag, props = {}, ...children) {
+    const node = document.createElement(tag);
+    for (const [key, value] of Object.entries(props)) {
+      if (key === 'class') node.className = value;
+      else if (key === 'on') for (const [type, fn] of Object.entries(value)) node.addEventListener(type, fn);
+      else if (key in node) node[key] = value;
+      else node.setAttribute(key, value);
+    }
+    node.append(...children.filter((c) => c != null));
+    return node;
+  }
+
+  function icon(name) {
+    const span = el('span', { class: 'skek-icon' });
+    // Only ever fed from the constant ICONS table above.
+    span.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">${ICONS[name]}</svg>`;
+    return span;
+  }
+
+  // The extension's Theme setting, which page-sync.js keeps on <html>. Not Twitch's own theme.
+  function theme() {
+    return document.documentElement.dataset.skekTheme ?? skek.settingDefaults.theme;
+  }
+
+  function send(message) {
+    return chrome.runtime.sendMessage(message).catch(() => null);
+  }
+
+  // Ctrl, cmd, shift and middle clicks keep their normal link behaviour.
+  function isPlainClick(event) {
+    return !(event.ctrlKey || event.metaKey || event.shiftKey || event.button !== 0);
+  }
+
+  // Scripts run at document_start, before <body> exists.
+  function onBodyReady(fn) {
+    if (document.body) fn();
+    else addEventListener('DOMContentLoaded', fn, { once: true });
+  }
+
+  const pageChangeListeners = [];
+
+  function runPageChangeListeners() {
+    for (const listener of pageChangeListeners) {
+      // One feature failing shouldn't stop the others.
+      try {
+        listener();
+      } catch (e) {
+        console.error('StreamKEK:', e);
+      }
+    }
+  }
+
+  // Twitch re-renders parts of the page and swaps pages without reloading, so anything
+  // added to its page has to be checked again. Needs <body>; runs fn at most every 200ms.
+  // Every feature shares one observer, because this fires for each chat message.
+  function onPageChange(fn) {
+    pageChangeListeners.push(fn);
+    if (pageChangeListeners.length > 1) return;
+    let scheduled = false;
+    new MutationObserver(() => {
+      if (scheduled) return;
+      scheduled = true;
+      setTimeout(() => {
+        scheduled = false;
+        runPageChangeListeners();
+      }, 200);
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+
+  skek.helpers = { el, icon, theme, send, isPlainClick, onBodyReady, onPageChange };
+})();

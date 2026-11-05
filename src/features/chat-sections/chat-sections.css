@@ -1,0 +1,34 @@
+/* Hides what Twitch puts over its chat, gated by settings from src/settings.js. Nothing here has
+   a translated label to go by, so each is recognised by its class names or its position.
+   The :not() part means a Twitch markup change can't hide the chat itself. */
+
+/* The strip with top gifters, top cheerers and sub goals. Twitch gives it no name of its own,
+   but it's always the first thing in the chat room, even while empty. */
+html[data-skek-on~='hideChatTopStrip'] .chat-room__content > :first-child:not(:has([class*='chat-list--'], .community-highlight, .chat-input)) {
+  display: none !important;
+}
+
+/* A Kappa Train uses the same banner and still shows. Only its label tells them apart. Labels are
+   translated, but Kappa is a name, and if a language writes it differently the banner just hides. */
+html[data-skek-on~='hideChatHypeTrain'] [class*='hypeTrainBanner']:not(:has([aria-label*='Kappa'])) {
+  display: none !important;
+}
+
+/* Drops and pinned messages are cards in one stack, where Twitch hides all but the front card.
+   So hiding the front card also has to show the next one, or both would be gone. These only
+   need to beat Twitch's rule, and must lose to the hide rules below when both are on. */
+:where(html[data-skek-on~='hideChatDrops'] .tw-transition:first-child:has(> .community-highlight [class*='dropsHighlight']) + .tw-transition) > .community-highlight.community-highlight,
+:where(html[data-skek-on~='hideChatPinned'] .tw-transition:first-child:has(> .community-highlight .pinned-chat__highlight-card) + .tw-transition) > .community-highlight.community-highlight {
+  display: block !important;
+}
+
+html[data-skek-on~='hideChatDrops'] .community-highlight:has([class*='dropsHighlight']),
+html[data-skek-on~='hideChatPinned'] .community-highlight:has(.pinned-chat__highlight-card) {
+  display: none !important;
+}
+
+/* The empty card Twitch draws behind the front one when there are several. */
+html[data-skek-on~='hideChatDrops'] .community-highlight-stack__backlog-card,
+html[data-skek-on~='hideChatPinned'] .community-highlight-stack__backlog-card {
+  display: none !important;
+}

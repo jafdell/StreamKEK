@@ -1,0 +1,72 @@
+/* Everything uses Twitch's own design tokens, so what sits among Twitch's content matches
+   Twitch's theme. Floating popups and the stream view follow the Theme setting instead; for
+   the stream view, see the top of player-view.css. */
+
+html {
+  --skek-popup-bg: #26262c;
+  --skek-popup-text: #efeff1;
+  --skek-popup-shadow: rgba(0, 0, 0, 0.5);
+  --skek-popup-scrollbar: rgba(83, 83, 95, 0.48);
+  /* Stacked mode's stream: its width at 16:9, leaving room for chat in a wide window. */
+  --skek-stacked-player-height: min(56.25vw, calc(100vh - 240px));
+}
+html[data-skek-theme='light'] {
+  --skek-popup-bg: #ffffff;
+  --skek-popup-text: #0e0e10;
+  --skek-popup-shadow: rgba(0, 0, 0, 0.25);
+  --skek-popup-scrollbar: rgba(173, 173, 184, 0.35);
+}
+
+.skek-icon { display: inline-flex; align-items: center; justify-content: center; }
+
+/* Twitch's tooltip shape, in the Theme setting's colors, opening above. */
+[data-skek-tooltip] { position: relative; }
+[data-skek-tooltip]:hover::after {
+  content: attr(data-skek-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: var(--skek-popup-bg);
+  color: var(--skek-popup-text);
+  box-shadow: 0 2px 8px var(--skek-popup-shadow);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.1;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.skek-iconbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 9000px;
+  background: transparent;
+  color: var(--color-text-base);
+  cursor: pointer;
+}
+.skek-iconbtn:hover { background: var(--color-background-interactable-hover); }
+
+.skek-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 9000px;
+  background: var(--color-background-button-primary-default, #9147ff);
+  color: var(--color-text-button-primary, #fff) !important;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+.skek-button:hover { background: var(--color-background-button-primary-hover, #772ce8); }
+
+.skek-hidden { display: none !important; }

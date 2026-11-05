@@ -1,0 +1,349 @@
+/* Restyles YouTube's chat to read like Twitch's. Scoped to html.skek, which
+   chat.js only sets when the chat is framed inside Twitch. */
+
+@font-face {
+  font-family: Inter;
+  src: url('chrome-extension://__MSG_@@extension_id__/fonts/inter-latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+html.skek[data-skek-theme='dark'] {
+  --skek-bg: #18181b;
+  --skek-alt: #26262c;
+  --skek-hover: rgba(83, 83, 95, 0.48);
+  --skek-text: #efeff1;
+  --skek-muted: #d3d3d9;
+  --skek-input: rgba(83, 83, 95, 0.38);
+  --skek-focus: #a970ff;
+  --skek-link: #bf94ff;
+  --skek-border: rgba(83, 83, 95, 0.48);
+  --skek-shadow: rgba(0, 0, 0, 0.5);
+}
+html.skek[data-skek-theme='light'] {
+  --skek-bg: #ffffff;
+  --skek-alt: #efeff1;
+  --skek-hover: rgba(173, 173, 184, 0.35);
+  --skek-text: #0e0e10;
+  --skek-muted: #3b3b44;
+  --skek-input: rgba(173, 173, 184, 0.24);
+  --skek-focus: #9147ff;
+  --skek-link: #5c16c5;
+  --skek-border: rgba(173, 173, 184, 0.35);
+  --skek-shadow: rgba(0, 0, 0, 0.2);
+}
+
+/* chat.js sets the real size. */
+html.skek { --skek-chat-size: 14px; }
+
+html.skek,
+html.skek body,
+html.skek yt-live-chat-app,
+html.skek yt-live-chat-renderer,
+html.skek #contents,
+html.skek #chat,
+html.skek #item-offset,
+html.skek #items {
+  background: var(--skek-bg) !important;
+  --yt-live-chat-background-color: var(--skek-bg);
+  --yt-live-chat-header-background-color: var(--skek-bg);
+  --yt-live-chat-action-manager-background-color: var(--skek-bg);
+  --yt-live-chat-primary-text-color: var(--skek-text);
+  --yt-live-chat-secondary-text-color: var(--skek-muted);
+}
+
+html.skek * {
+  font-family: Inter, Roobert, 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+}
+
+/* Twitch's frame draws the header; YouTube's would just duplicate it. */
+html.skek yt-live-chat-header-renderer,
+html.skek #manager-pages > #ticker-bar,
+html.skek yt-live-chat-restricted-participation-renderer #icon {
+  display: none !important;
+}
+
+/* --- messages: "Name: text" with no avatars or timestamps ------------------- */
+
+html.skek yt-live-chat-text-message-renderer {
+  display: block !important;
+  padding: 4px 16px !important;
+  font-size: var(--skek-chat-size) !important;
+  line-height: 1.5 !important;
+  border-radius: 4px;
+}
+html.skek yt-live-chat-text-message-renderer:hover { background: var(--skek-hover) !important; }
+html.skek yt-live-chat-text-message-renderer #author-photo,
+html.skek yt-live-chat-text-message-renderer #timestamp,
+html.skek yt-live-chat-text-message-renderer #before-content-buttons,
+html.skek yt-live-chat-text-message-renderer #menu { display: none !important; }
+
+html.skek yt-live-chat-text-message-renderer #content {
+  display: block !important;
+  overflow: visible !important;
+}
+html.skek yt-live-chat-text-message-renderer yt-live-chat-author-chip {
+  display: inline-flex !important;
+  align-items: center;
+  vertical-align: top;
+  margin: 0 !important;
+}
+/* Badges sit in front of the name, like on Twitch. */
+html.skek yt-live-chat-text-message-renderer #prepend-chat-badges,
+html.skek yt-live-chat-text-message-renderer #chat-badges { order: -1; }
+html.skek yt-live-chat-author-badge-renderer { margin: 0 3px 0 0 !important; }
+html.skek yt-live-chat-text-message-renderer #author-name {
+  font-size: var(--skek-chat-size) !important;
+  font-weight: 700 !important;
+  line-height: 1.5 !important;
+  background: none !important;
+  padding: 0 !important;
+}
+html.skek yt-live-chat-text-message-renderer #author-name::after {
+  content: ':';
+  color: var(--skek-text);
+  font-weight: 400;
+}
+html.skek yt-live-chat-text-message-renderer #author-name #chip-badges { display: none !important; }
+html.skek yt-live-chat-text-message-renderer #message {
+  display: inline !important;
+  margin-left: 4px;
+  color: var(--skek-text) !important;
+  font-size: var(--skek-chat-size) !important;
+  line-height: 1.5 !important;
+  word-break: break-word;
+}
+html.skek yt-live-chat-text-message-renderer #message img.emoji {
+  width: 24px !important;
+  height: 24px !important;
+  margin: -2px 1px !important;
+  vertical-align: middle;
+}
+
+/* --- input: one soft rounded box holding the text and the emoji button ------ */
+
+html.skek yt-live-chat-message-input-renderer {
+  background: var(--skek-bg) !important;
+  padding: 8px 10px 10px !important;
+  border-top: 0 !important;
+}
+/* The character count and send button appear beside the box; they shouldn't stretch it. */
+html.skek yt-live-chat-message-input-renderer #top { align-items: flex-end !important; }
+html.skek yt-live-chat-message-input-renderer #input-container {
+  flex-wrap: nowrap !important;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 2px 0 12px;
+  border-radius: 8px;
+  background: var(--skek-input);
+}
+html.skek yt-live-chat-message-input-renderer #input-container:focus-within {
+  background: var(--skek-bg);
+  box-shadow: inset 0 0 0 2px var(--skek-focus);
+}
+html.skek yt-live-chat-message-input-renderer #emoji-picker-button { margin: 0 0 0 6px !important; }
+html.skek yt-live-chat-message-input-renderer :is(#emoji-picker-button, #picker-buttons-container) :is(button, yt-icon, svg) {
+  color: var(--skek-muted) !important;
+  fill: currentColor !important;
+}
+/* YouTube only gives these a background in its dark mode. */
+html.skek :is(#jewels-gifts-button button, #product-picker #button, #fab-container) {
+  background: var(--skek-input) !important;
+}
+html.skek yt-live-chat-message-input-renderer #input-manager,
+html.skek yt-live-chat-message-input-renderer #top { background: transparent !important; }
+html.skek yt-live-chat-message-input-renderer #author-photo,
+html.skek yt-live-chat-message-input-renderer #author-name,
+html.skek yt-live-chat-message-input-renderer #author { display: none !important; }
+html.skek yt-live-chat-text-input-field-renderer {
+  flex: 1 1 0 !important;
+  width: auto !important;
+  min-width: 0;
+  background: transparent !important;
+  padding: 8px 0 !important;
+  box-sizing: border-box;
+}
+html.skek yt-live-chat-text-input-field-renderer #underline { display: none !important; }
+html.skek yt-live-chat-text-input-field-renderer #label {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: 1.5 !important;
+}
+/* Up to four whole rows, then it scrolls. YouTube's limit assumes its smaller text. */
+html.skek yt-live-chat-text-input-field-renderer #input {
+  padding: 0 !important;
+  max-height: calc(var(--skek-chat-size) * 1.5 * 4) !important;
+  line-height: 1.5 !important;
+}
+html.skek yt-live-chat-text-input-field-renderer #input,
+html.skek yt-live-chat-text-input-field-renderer #label {
+  color: var(--skek-text) !important;
+  font-size: var(--skek-chat-size) !important;
+}
+html.skek yt-live-chat-text-input-field-renderer #label { color: var(--skek-muted) !important; }
+html.skek yt-live-chat-message-input-renderer #send-button yt-button-renderer,
+html.skek yt-live-chat-message-input-renderer #send-button button {
+  background: #9147ff !important;
+  color: #fff !important;
+  border-radius: 9000px !important;
+}
+html.skek yt-live-chat-message-input-renderer #send-button yt-icon { color: #fff !important; fill: #fff !important; }
+
+/* --- emoji picker: YouTube's own grays, and white search text in either theme -- */
+
+html.skek yt-emoji-picker-renderer #search-panel { background: var(--skek-input) !important; }
+html.skek yt-emoji-picker-renderer #search-panel input { color: var(--skek-text) !important; }
+html.skek yt-emoji-picker-renderer #title {
+  background: var(--skek-bg) !important;
+  color: var(--skek-muted) !important;
+}
+
+/* --- donations: the chips along the top, cards and gifts in the feed --------- */
+
+html.skek yt-live-chat-ticker-renderer { background: var(--skek-bg) !important; }
+html.skek yt-live-chat-ticker-renderer #ticker-bar { padding-left: 16px !important; }
+html.skek yt-live-chat-ticker-renderer #ticker-items { margin-top: 4px; }
+html.skek #contents > #separator { background: var(--skek-border) !important; }
+
+html.skek :is(yt-live-chat-paid-message-renderer, yt-live-chat-paid-sticker-renderer, yt-live-chat-membership-item-renderer) {
+  display: block !important;
+  width: auto !important;
+  max-width: none !important;
+  margin: 4px 8px !important;
+}
+html.skek :is(yt-live-chat-paid-message-renderer, yt-live-chat-paid-sticker-renderer, yt-live-chat-membership-item-renderer) #card {
+  width: auto !important;
+  max-width: none !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+}
+html.skek yt-live-chat-paid-message-renderer #message {
+  font-size: var(--skek-chat-size) !important;
+  line-height: 1.5 !important;
+}
+
+html.skek yt-gift-message-view-model { padding: 4px 16px !important; }
+html.skek yt-gift-message-view-model yt-img-shadow { display: none !important; }
+html.skek yt-gift-message-view-model span {
+  font-size: var(--skek-chat-size) !important;
+  line-height: 1.5 !important;
+}
+html.skek yt-gift-message-view-model yt-attributed-string:first-of-type span { font-weight: 700 !important; }
+
+/* The card a chip opens. YouTube makes it 384px wide, sometimes in the normal page flow,
+   which pushes the chat aside. Here it always floats over the chat and fits the column. */
+html.skek tp-yt-paper-dialog:has(ytd-engagement-panel-section-list-renderer) {
+  position: fixed !important;
+  top: 48px !important;
+  left: 8px !important;
+  right: 8px !important;
+  z-index: 2202 !important;
+  width: auto !important;
+  max-width: none !important;
+  max-height: calc(100vh - 56px) !important;
+  margin: 0 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  background: var(--skek-bg) !important;
+  box-shadow: 0 0 0 1px var(--skek-border), 0 8px 24px var(--skek-shadow) !important;
+}
+html.skek tp-yt-paper-dialog :is(
+  ytd-engagement-panel-section-list-renderer,
+  ytd-section-list-renderer,
+  ytd-section-list-renderer > div,
+  yt-live-chat-item-display-renderer,
+  yt-live-chat-item-display-list-renderer
+) {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+html.skek tp-yt-paper-dialog :is(
+  ytd-engagement-panel-section-list-renderer,
+  ytd-engagement-panel-section-list-renderer > div,
+  ytd-section-list-renderer,
+  ytd-section-list-renderer > div,
+  yt-live-chat-item-display-list-renderer,
+  yt-live-chat-item-display-list-renderer #items
+) {
+  background: var(--skek-bg) !important;
+}
+
+/* "Sign in to chat", subscribers-only etc. */
+html.skek yt-live-chat-restricted-participation-renderer,
+html.skek yt-live-chat-viewer-engagement-message-renderer {
+  background: var(--skek-bg) !important;
+  color: var(--skek-muted) !important;
+  font-size: 14px !important;
+}
+html.skek yt-live-chat-viewer-engagement-message-renderer a { color: var(--skek-link) !important; }
+
+/* The welcome notice and pinned messages, on Twitch's gray instead of YouTube's. */
+html.skek yt-live-chat-viewer-engagement-message-renderer #card,
+html.skek yt-live-chat-banner-renderer { background: var(--skek-alt) !important; }
+/* It's called #contents too, so it picks up the chat's own background from the rule at the top. */
+html.skek yt-live-chat-banner-renderer #contents { background: transparent !important; }
+
+html.skek #action-manager,
+html.skek #manager-pages,
+html.skek yt-live-chat-renderer #input-manager {
+  background: var(--skek-bg) !important;
+  border-top: 0 !important;
+}
+
+/* YouTube keeps its chat at least 320px tall, which would push the message box out of a
+   shorter frame, like stacked mode's in a wide window. */
+html.skek yt-live-chat-app { min-height: 0 !important; }
+
+/* Floating chat: chat.js sets this while the window behind the frame draws the background. It
+   comes after the rules it overrides. The colour scheme has to be set here and on the frame in
+   player-view.css, or the browser paints the frame white. The message box keeps its own
+   background, so typing stays readable. */
+html.skek[data-skek-transparent] {
+  color-scheme: light !important;
+  --yt-live-chat-background-color: transparent;
+  --yt-live-chat-header-background-color: transparent;
+  --yt-live-chat-action-manager-background-color: transparent;
+}
+html.skek[data-skek-transparent],
+html.skek[data-skek-transparent] body,
+html.skek[data-skek-transparent] yt-live-chat-app,
+html.skek[data-skek-transparent] yt-live-chat-renderer,
+html.skek[data-skek-transparent] #contents,
+html.skek[data-skek-transparent] #chat,
+html.skek[data-skek-transparent] #item-offset,
+html.skek[data-skek-transparent] #items,
+html.skek[data-skek-transparent] yt-live-chat-ticker-renderer,
+html.skek[data-skek-transparent] yt-live-chat-viewer-engagement-message-renderer,
+html.skek[data-skek-transparent] yt-live-chat-viewer-engagement-message-renderer #card,
+html.skek[data-skek-transparent] yt-live-chat-message-input-renderer,
+html.skek[data-skek-transparent] #action-manager,
+html.skek[data-skek-transparent] #manager-pages,
+html.skek[data-skek-transparent] yt-live-chat-renderer #input-manager {
+  background: transparent !important;
+}
+html.skek[data-skek-transparent] #items {
+  text-shadow: 0 0 3px var(--skek-halo), 0 1px 2px var(--skek-halo);
+}
+/* The message box and what's under it show only while using the window, so chat can fill it. */
+html.skek[data-skek-transparent]:not(:hover, :focus-within) #panel-pages { display: none !important; }
+/* The scrollbar shows only when scrolled up from the newest messages. See player-modes.css. */
+@keyframes skek-float-scrollbar {
+  from, to { scrollbar-color: rgba(128, 128, 128, 0.6) transparent; }
+}
+html.skek[data-skek-transparent] #item-scroller {
+  scrollbar-color: transparent transparent;
+  animation: skek-float-scrollbar linear;
+  animation-timeline: scroll(self);
+  animation-range: 0 calc(100% - 30px);
+}
+html.skek[data-skek-theme='dark'] { --skek-halo: #000; }
+html.skek[data-skek-theme='light'] { --skek-halo: #fff; }
+
+/* Twitch-style thin scrollbar */
+html.skek #item-scroller { scrollbar-width: thin; scrollbar-color: var(--skek-border) transparent; }

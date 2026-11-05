@@ -1,0 +1,85 @@
+/* Floating chat, for both Twitch's chat and the stream view's. floating-window.js sets the
+   position, size and opacity on <html>. Each chat sits right under the window's bar, over the
+   video and below Twitch's modals (5000). Only the background fades, so the text stays readable. */
+
+html {
+  --skek-float-bar-height: 32px;
+  --skek-float-rgb: 24 24 27;
+  --skek-float-halo: #000;
+}
+html.tw-root--theme-light {
+  --skek-float-rgb: 255 255 255;
+  --skek-float-halo: #fff;
+}
+/* The stream view follows the Theme setting, not Twitch's theme. */
+html[data-skek-theme='dark'] .skek-view {
+  --skek-float-rgb: 24 24 27;
+  --skek-float-halo: #000;
+}
+html[data-skek-theme='light'] .skek-view {
+  --skek-float-rgb: 255 255 255;
+  --skek-float-halo: #fff;
+}
+
+/* !important because Twitch sizes its column with inline styles and fixed widths. */
+html[data-skek-player-mode='floating'] .right-column--theatre,
+.skek-view--floating .skek-chat {
+  position: fixed !important;
+  z-index: 3001;
+  left: var(--skek-float-left) !important;
+  right: auto !important;
+  top: calc(var(--skek-float-top) + var(--skek-float-bar-height)) !important;
+  width: var(--skek-float-width) !important;
+  height: calc(var(--skek-float-height) - var(--skek-float-bar-height)) !important;
+  border: 0 !important;
+  background: rgb(var(--skek-float-rgb) / var(--skek-float-opacity)) !important;
+}
+
+.skek-float {
+  position: fixed;
+  z-index: 3002;
+  left: var(--skek-float-left);
+  top: var(--skek-float-top);
+  width: var(--skek-float-width);
+  height: var(--skek-float-height);
+  pointer-events: none; /* only the bar and edges; the chat under the rest stays usable */
+}
+
+/* Over the video, so it's light on dark whichever theme is on. */
+.skek-float__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--skek-float-bar-height);
+  padding: 0 8px;
+  box-sizing: border-box;
+  border-radius: 6px 6px 0 0;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: move;
+  user-select: none;
+  touch-action: none;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.skek-float__bar:hover,
+html[data-skek-float-moving] .skek-float__bar,
+html:has(.right-column--theatre:hover, .skek-view--floating .skek-chat:hover) .skek-float__bar {
+  opacity: 1;
+}
+.skek-float__title { flex: 1 1 auto; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.skek-float__opacity { flex: 0 0 90px; width: 90px; margin: 0; accent-color: #9147ff; cursor: pointer; }
+
+.skek-float__edge { position: absolute; touch-action: none; pointer-events: auto; }
+.skek-float__edge--e { top: var(--skek-float-bar-height); bottom: 0; right: -4px; width: 8px; cursor: ew-resize; }
+.skek-float__edge--w { top: var(--skek-float-bar-height); bottom: 0; left: -4px; width: 8px; cursor: ew-resize; }
+.skek-float__edge--s { left: 0; right: 0; bottom: -4px; height: 8px; cursor: ns-resize; }
+.skek-float__edge--se { right: -4px; bottom: -4px; width: 14px; height: 14px; cursor: nwse-resize; }
+.skek-float__edge--sw { left: -4px; bottom: -4px; width: 14px; height: 14px; cursor: nesw-resize; }
+
+/* Frames and video would otherwise take the pointer as it crosses them. */
+html[data-skek-float-moving] :is(iframe, video) { pointer-events: none !important; }
+html[data-skek-float-moving] { cursor: move; user-select: none; }

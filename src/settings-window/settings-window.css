@@ -1,0 +1,156 @@
+/* A fixed size as the toolbar popup, because Chrome sizes popups from their content. 800x600
+   is the largest popup Chrome allows. Framed in the window on Twitch, it fills whatever size
+   the frame is. */
+body {
+  display: flex;
+  width: 800px;
+  height: 600px;
+  overflow: hidden;
+}
+html.framed,
+html.framed body { width: 100%; height: 100%; }
+
+[hidden] { display: none !important; }
+
+/* --- left column: name, search and categories ------------------------------ */
+
+.nav {
+  flex: 0 0 240px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 16px 12px 12px;
+  background: var(--bg-alt);
+}
+
+.brand { display: flex; align-items: center; gap: 8px; padding: 0 4px 14px; font-weight: 600; }
+.brand img { width: 24px; height: 24px; border-radius: 6px; }
+
+.search {
+  flex: 0 0 auto;
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  outline: 0;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+}
+.search::placeholder { color: var(--muted); }
+.search:focus { background: var(--bg); box-shadow: inset 0 0 0 2px var(--focus); }
+
+.categories { flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: thin; margin-top: 12px; }
+
+.category-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 36px;
+  margin-bottom: 2px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.category-link:hover { background: var(--card); }
+.category-link:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.category-link[aria-current='true'] { background: var(--selected); color: var(--accent); }
+.category-link svg { flex: 0 0 auto; }
+
+.version { flex: 0 0 auto; margin: 8px 0 0; padding: 0 4px; color: var(--muted); font-size: 12px; }
+
+/* --- right column: the selected category, or search results ----------------- */
+
+.content { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+
+.content__head {
+  flex: 0 0 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px 0 20px;
+}
+.content__head h1 { margin: 0; font-size: 18px; font-weight: 600; }
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 9000px;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+}
+.close:hover { background: var(--hover); }
+.close:focus-visible { outline: 2px solid var(--focus); }
+
+.groups { flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: thin; padding: 0 20px 12px; }
+
+/* The heading already names the category, except when results span several. */
+.category__title { display: none; margin: 0; padding: 8px 0; color: var(--muted); font-size: 12px; font-weight: 600; }
+.groups--searching .category__title { display: block; }
+
+.card { margin-bottom: 8px; padding: 12px 14px; border-radius: 8px; background: var(--card); }
+
+.setting { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+label.setting { cursor: pointer; }
+label.setting:hover { background: var(--hover); }
+.card__text { min-width: 0; display: flex; flex-direction: column; }
+.card__label { font-weight: 600; }
+.card__hint { color: var(--muted); }
+
+/* Pick one of a few values: radio buttons drawn as one joined control. */
+.choices { flex: 0 0 auto; display: flex; gap: 2px; padding: 2px; border-radius: 8px; background: var(--card); }
+.choice { position: relative; }
+.choice input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.choice span { display: block; padding: 4px 14px; border-radius: 6px; font-weight: 600; }
+.choice input:hover + span { background: var(--hover); }
+.choice input:checked + span { background: #9147ff; color: #fff; }
+.choice input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 1px; }
+
+.dropdown { position: relative; flex: 0 0 auto; }
+.dropdown::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+.dropdown__select {
+  appearance: none;
+  display: block;
+  height: 32px;
+  padding: 0 32px 0 12px;
+  border: 0;
+  border-radius: 6px;
+  outline: 0;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.dropdown__select:hover { background: var(--hover); }
+.dropdown__select:focus-visible { box-shadow: inset 0 0 0 2px var(--focus); }
+.dropdown__select option { background: var(--bg); color: var(--text); font-weight: 400; }
+
+.manager-frame { display: block; width: 100%; height: 340px; margin-top: 10px; border: 0; }
+
+.no-results { flex: 1 1 auto; margin: 0; padding: 0 20px; color: var(--muted); }

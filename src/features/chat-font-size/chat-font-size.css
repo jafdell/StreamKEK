@@ -1,0 +1,17 @@
+/* The Chat font size setting, for Twitch's own chat. Twitch sets its size on these elements and
+   everything inside inherits it, including 7TV's messages. src/twitch/page-sync.js sets the
+   attribute and the variable. YouTube's chat is sized in youtube-live/frames/. */
+
+html[data-skek-chat-font] [class*='chat-list--'],
+html[data-skek-chat-font] .video-chat__message-list-wrapper {
+  font-size: var(--skek-chat-font-size) !important;
+}
+
+/* Chat on videos has a separate list with a fixed line height and timestamp size, which
+   would overlap or look tiny at bigger sizes. 1.5 is the line height of live chat. */
+html[data-skek-chat-font] .video-chat__message-list-wrapper {
+  line-height: 1.5 !important;
+}
+html[data-skek-chat-font] .vod-message__header p {
+  font-size: 0.85em !important;
+}

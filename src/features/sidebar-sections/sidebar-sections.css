@@ -1,0 +1,16 @@
+/* Hides Twitch's own sidebar sections, gated by settings from src/settings.js.
+   aria-label is translated, so sections are recognised by what's inside them.
+   The sections stay in the DOM, so features can still position things against them.
+   The :not() parts mean a Twitch markup change can't hide a section nobody asked to hide. */
+
+html[data-skek-on~='hideLiveChannels'] [data-a-target='side-nav-bar'] .side-nav-section:has([data-test-selector='recommended-channel']):not(:has([data-test-selector='followed-channel'], [data-test-selector='similarity-channel'])) {
+  display: none !important;
+}
+
+html[data-skek-on~='hideRecommendedCategories'] [data-a-target='side-nav-bar'] .side-nav-section:has(a[href^='/directory/category/']):not(:has([data-test-selector='followed-channel'], [data-test-selector='similarity-channel'], [data-test-selector='recommended-channel'])) {
+  display: none !important;
+}
+
+html[data-skek-on~='hideViewersAlsoWatch'] [data-a-target='side-nav-bar'] .side-nav-section:has([data-test-selector='similarity-channel']):not(:has([data-test-selector='followed-channel'], [data-test-selector='recommended-channel'])) {
+  display: none !important;
+}

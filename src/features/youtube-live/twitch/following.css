@@ -1,0 +1,97 @@
+#skek-following-tab a { position: relative; }
+
+/* Twitch still marks its own tab active underneath, so hand the look over to ours. */
+html.skek-youtube-tab-open ul[role='tablist'] li:not(#skek-following-tab) [class*='ScTabIndicatorLayout'] { display: none; }
+html.skek-youtube-tab-open ul[role='tablist'] li:not(#skek-following-tab) [class*='ScTitle'] { color: var(--color-text-base) !important; }
+html.skek-youtube-tab-open #skek-following-tab [class*='ScTitle'] { color: var(--color-text-link) !important; }
+html.skek-youtube-tab-open #skek-following-tab a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--color-text-link);
+}
+
+.skek-following { padding: 16px 0 40px; }
+.skek-following__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.skek-following__title { margin: 0; font-size: 18px; font-weight: 500; line-height: 1.1; color: var(--color-text-base); }
+.skek-following__title--spaced { margin: 28px 0 8px; }
+.skek-following__empty { margin: 8px 0; font-size: 14px; color: var(--color-text-alt-2); }
+.skek-following .skek-button { border: 0; cursor: pointer; font-family: inherit; }
+.skek-following__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px 10px;
+}
+
+.skek-stream { display: block; min-width: 0; color: var(--color-text-base) !important; text-decoration: none !important; }
+.skek-stream__thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  background: var(--color-background-alt);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.skek-stream:hover .skek-stream__thumb { transform: translate(6px, -6px); box-shadow: -6px 6px 0 var(--color-background-button-primary-default, #9147ff); }
+.skek-stream__img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.skek-stream__badge,
+.skek-stream__uptime,
+.skek-stream__viewers { position: absolute; color: #fff; }
+.skek-stream__badge {
+  top: 10px;
+  left: 8px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--color-fill-live, #eb0400);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.skek-stream__uptime,
+.skek-stream__viewers {
+  padding: 0 4px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.6);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.skek-stream__uptime { top: 10px; right: 8px; }
+.skek-stream__viewers { bottom: 8px; left: 8px; }
+.skek-stream__info { display: flex; gap: 8px; padding-top: 8px; }
+.skek-stream__avatar,
+.skek-offline-card__avatar {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--color-background-alt);
+}
+.skek-stream__text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.skek-stream__title,
+.skek-stream__line { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.skek-stream__title { font-size: 14px; font-weight: 600; line-height: 1.4; }
+.skek-stream__line { font-size: 14px; line-height: 1.4; color: var(--color-text-alt-2); }
+
+/* Section on the Overview and Live pages */
+.skek-inline { margin-bottom: 20px; }
+.skek-inline__title { line-height: 20px; margin-bottom: 7px; }
+.skek-inline__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--skek-card-width, minmax(280px, 1fr)));
+  gap: 16px 10px;
+}
+
+.skek-offline-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 6px;
+  border-radius: 4px;
+  color: var(--color-text-base) !important;
+  text-decoration: none !important;
+}
+.skek-offline-card:hover { background: var(--color-background-interactable-hover); }
