@@ -4,9 +4,11 @@
 import {
   messageHandlers as youtubeLiveHandlers,
   startBackground as startYoutubeLive,
-} from '../features/youtube-live/background/index.js';
+} from '../features/youtube/background/index.js';
+import { messageHandlers as kickLiveHandlers, startBackground as startKickLive } from '../features/kick/background/index.js';
+import { moveRenamedSettings } from './renamed-settings.js';
 
-const handlers = { __proto__: null, ...youtubeLiveHandlers }; // so 'constructor' etc. stay unknown types
+const handlers = { __proto__: null, ...youtubeLiveHandlers, ...kickLiveHandlers }; // so 'constructor' etc. stay unknown types
 
 chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
   const run = async () => {
@@ -19,4 +21,6 @@ chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
   return true; // keeps the channel open for the async reply
 });
 
+moveRenamedSettings();
 startYoutubeLive();
+startKickLive();

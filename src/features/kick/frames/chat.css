@@ -1,0 +1,35 @@
+/* Kick's chat on Twitch's dark background. Its buttons keep Kick's own colours. Kick has no light
+   theme to switch to, so this stays dark whatever the Theme setting says. Only applies while framed
+   on Twitch: see chat.js. */
+html[data-skek-kick-chat] body,
+html[data-skek-kick-chat] #channel-chatroom,
+html[data-skek-kick-chat] .bg-surface-bg-lowest {
+  background: #18181b !important;
+}
+html[data-skek-kick-chat] #channel-chatroom { --chatroom-font-size: var(--skek-chat-size) !important; }
+
+/* The stream view has its own Stream Chat heading. */
+html[data-skek-kick-chat] #channel-chatroom > .contents > div:first-child:has(> span.absolute) { display: none !important; }
+
+/* Floating chat. The color-scheme has to be set here and in stream-view.css, or the browser paints
+   the frame white instead of showing the window's background through it. */
+html[data-skek-kick-chat][data-skek-transparent] { color-scheme: light !important; }
+html[data-skek-kick-chat][data-skek-transparent],
+html[data-skek-kick-chat][data-skek-transparent] body,
+html[data-skek-kick-chat][data-skek-transparent] #channel-chatroom,
+html[data-skek-kick-chat][data-skek-transparent] .bg-surface-bg-lowest {
+  background: transparent !important;
+}
+html[data-skek-kick-chat][data-skek-transparent] #channel-chatroom { text-shadow: 0 0 3px #000, 0 1px 2px #000; }
+/* The message box and what's under it show only while using the window, so chat can fill it. */
+html[data-skek-kick-chat][data-skek-transparent]:not(:hover, :focus-within) #chatroom-footer { display: none !important; }
+/* The scrollbar shows only when scrolled up from the newest messages. See player/modes.css. */
+@keyframes skek-float-scrollbar {
+  from, to { scrollbar-color: rgba(128, 128, 128, 0.6) transparent; }
+}
+html[data-skek-kick-chat][data-skek-transparent] #chatroom-messages {
+  scrollbar-color: transparent transparent;
+  animation: skek-float-scrollbar linear;
+  animation-timeline: scroll(self);
+  animation-range: 0 calc(100% - 30px);
+}

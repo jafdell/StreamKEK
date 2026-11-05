@@ -1,0 +1,7 @@
+/* Hides what streamers' Twitch extensions put over the video, like Prime Benefits and the
+   icons on its right edge. Twitch's own controls and the panels under the stream stay. */
+html[data-skek-on~='hidePlayerExtensions'] .video-player .extensions-video-overlay-size-container,
+html[data-skek-on~='hidePlayerExtensions'] .video-player .extensions-dock__layout,
+html[data-skek-on~='hidePlayerExtensions'] .video-player .extensions-notifications {
+  display: none !important;
+}

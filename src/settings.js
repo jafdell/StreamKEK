@@ -34,17 +34,31 @@
       default: false,
     },
     {
-      key: 'hideYouTubeLive',
+      key: 'showYouTubeLive',
       category: 'Sidebar',
-      label: 'Hide YouTube Live',
-      hint: 'Removes the YouTube Live section from the sidebar. The Following page still shows your streams.',
-      default: false,
+      label: 'Show YouTube Live',
+      hint: 'Shows the YouTube Live section in the sidebar. The Following page shows your streams either way.',
+      default: true,
+    },
+    {
+      key: 'showKickLive',
+      category: 'Sidebar',
+      label: 'Show Kick Live',
+      hint: 'Shows the Kick Live section in the sidebar. The Following page shows your streams either way.',
+      default: true,
+    },
+    {
+      key: 'sidebarPreviews',
+      category: 'Sidebar',
+      label: 'Show stream previews',
+      hint: 'Shows an image of the stream when you hover a live channel in the sidebar, on Twitch, YouTube and Kick.',
+      default: true,
     },
     {
       key: 'chatFontSize',
       category: 'Chat',
       label: 'Chat font size',
-      hint: "Text size in both Twitch and YouTube chat. Twitch's setting uses the size from Twitch's own chat settings.",
+      hint: "Text size in Twitch, YouTube and Kick chat. Twitch's setting uses the size from Twitch's own chat settings.",
       default: 'twitch',
       dropdown: true,
       choices: [
@@ -95,13 +109,20 @@
       default: false,
     },
     {
+      key: 'hidePlayerExtensions',
+      category: 'Player',
+      label: 'Hide extensions over the video',
+      hint: "Removes what streamers' Twitch extensions show over the video, like Prime Benefits and the icons on its right edge. Twitch's own player controls stay.",
+      default: false,
+    },
+    {
       key: 'streamQuality',
       category: 'Player',
       label: 'Stream quality',
-      hint: "What streams start at on both Twitch and YouTube. If a stream doesn't offer it, the next size down plays. The player's own quality menu still works.",
+      hint: "What streams start at on Twitch, YouTube and Kick. If a stream doesn't offer it, the next size down plays. The player's own quality menu still works.",
       default: '1440',
       dropdown: true,
-      // A new choice also needs an entry in HIGHEST_FOR_SETTING in youtube-live/frames/watch-start.js.
+      // A new choice also needs an entry in HIGHEST_FOR_SETTING in youtube/frames/watch-start.js.
       choices: [
         ...[1440, 1080, 720, 480, 360].map((height) => ({ value: String(height), label: `${height}p` })),
         { value: 'auto', label: 'Automatic' },
@@ -116,10 +137,18 @@
       message: 'youtube-live:showSubscriptions',
     },
     {
+      key: 'showKickFollows',
+      category: 'Kick',
+      label: 'Show my live Kick follows',
+      hint: "Lists the channels you follow on Kick while they're live. Needs you signed in to Kick in this browser.",
+      default: true,
+      message: 'kick-live:showFollows',
+    },
+    {
       key: 'theme',
       category: 'Appearance',
       label: 'Theme',
-      hint: 'Used by this window, popups, the stream view and its chat. The rest of Twitch keeps its own theme.',
+      hint: "Used by this window, popups, the stream view and YouTube's chat. Kick's chat stays dark, and the rest of Twitch keeps its own theme.",
       default: 'dark',
       choices: [
         { value: 'dark', label: 'Dark' },

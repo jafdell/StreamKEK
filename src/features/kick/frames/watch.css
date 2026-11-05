@@ -1,0 +1,31 @@
+/* Kick's channel page reduced to its player, filling the frame. Only applies while framed on
+   Twitch: see watch.js. */
+html[data-skek-kick-watch],
+html[data-skek-kick-watch] body { overflow: hidden !important; background: #000 !important; }
+/* The page shows before the player does, so it's hidden from the start. Menus and dialogs, like a
+   mature content warning, are outside the player. */
+html[data-skek-kick-watch] body { visibility: hidden !important; }
+html[data-skek-kick-watch] #injected-channel-player,
+html[data-skek-kick-watch] [data-radix-popper-content-wrapper],
+html[data-skek-kick-watch] [role='dialog'],
+html[data-skek-kick-watch] [role='alertdialog'] {
+  visibility: visible !important;
+}
+html[data-skek-kick-watch] #injected-channel-player {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483000 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  aspect-ratio: auto !important;
+  background: #000 !important;
+}
+html[data-skek-kick-watch] #injected-channel-player .aspect-video {
+  height: 100% !important;
+  aspect-ratio: auto !important;
+}
+html[data-skek-kick-watch] #injected-channel-player > div > div { height: 100% !important; }
+html[data-skek-kick-watch] #injected-channel-player video { object-fit: contain !important; }

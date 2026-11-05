@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>StreamKEK</title>
+    <link rel="stylesheet" href="../../../extension-pages/page.css" />
+    <link rel="stylesheet" href="manager.css" />
+    <script src="../../../settings.js"></script>
+    <script src="../sites.js"></script>
+    <script src="../../../extension-pages/page-theme.js"></script>
+  </head>
+  <body>
+    <h1>YouTube and Kick channels</h1>
+    <form id="add">
+      <input id="input" type="text" placeholder="YouTube @handle or link, or Kick link" autocomplete="off" spellcheck="false" />
+      <button id="submit" type="submit">Add</button>
+    </form>
+    <p id="message" role="status" hidden></p>
+    <div id="switches"></div>
+    <ul id="list"></ul>
+    <p id="empty" hidden>Add a channel and it will appear in Twitch's sidebar whenever it goes live.</p>
+    <details id="hidden" hidden>
+      <summary id="hidden-title"></summary>
+      <ul id="hidden-list"></ul>
+    </details>
+    <script src="manager.js"></script>
+  </body>
+</html>

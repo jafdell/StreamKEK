@@ -1,0 +1,21 @@
+/* Over Twitch's top bar (1000), below its balloons and modals (5000). */
+.skek-preview {
+  position: fixed;
+  z-index: 4000;
+  width: 320px;
+  padding: 4px;
+  border-radius: 4px;
+  background: var(--skek-popup-bg);
+  box-shadow: 0 2px 8px var(--skek-popup-shadow);
+  pointer-events: none;
+}
+
+/* Also used by the YouTube tip in streams/twitch/stream-tip.js. Keeps its shape while loading. */
+.skek-preview-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 2px;
+  background: rgba(128, 128, 128, 0.22);
+  object-fit: cover;
+}

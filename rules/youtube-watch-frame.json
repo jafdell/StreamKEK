@@ -12,7 +12,8 @@
     "condition": {
       "urlFilter": "||www.youtube.com/watch",
       "resourceTypes": ["sub_frame"],
-      "topDomains": ["twitch.tv"]
+      "topDomains": ["twitch.tv"],
+      "initiatorDomains": ["www.twitch.tv", "www.youtube.com"]
     }
   }
 ]

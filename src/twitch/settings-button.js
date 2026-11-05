@@ -22,7 +22,7 @@
       title: 'StreamKEK settings',
       src: chrome.runtime.getURL('src/settings-window/settings-window.html'),
     });
-    // So the search box inside can take typing straight away.
+    // So Escape and Tab work inside the window straight away.
     settingsFrame.addEventListener('load', () => settingsFrame?.focus());
     overlay = el(
       'div',

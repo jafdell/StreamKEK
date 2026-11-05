@@ -1,0 +1,6 @@
+/* The same look as .skek-card:hover and .skek-card--active in streams/twitch/sidebar.css, for Twitch's
+   own cards. Twitch's own hover colour is much fainter. */
+[data-test-selector='side-nav'] .side-nav-card a[data-skek-current],
+[data-test-selector='side-nav'] .side-nav-card a:hover {
+  background: var(--color-background-interactable-hover);
+}

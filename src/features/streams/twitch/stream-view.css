@@ -1,0 +1,223 @@
+/* The stream view follows the extension's Theme setting, not Twitch's theme, so it sets
+   the tokens it uses to Twitch's values for that theme. */
+.skek-view {
+  --color-background-body: #0e0e10;
+  --color-background-base: #18181b;
+  --color-background-interactable-hover: rgba(83, 83, 95, 0.48);
+  --color-border-base: rgba(83, 83, 95, 0.48);
+  --color-text-base: #efeff1;
+  --color-text-alt-2: #d3d3d9;
+  --color-text-link: #bf94ff;
+  --color-text-link-hover: #a970ff;
+  --color-text-live: #ff8280;
+}
+html[data-skek-theme='light'] .skek-view {
+  --color-background-body: #f7f7f8;
+  --color-background-base: #ffffff;
+  --color-background-interactable-hover: rgba(173, 173, 184, 0.35);
+  --color-border-base: rgba(173, 173, 184, 0.35);
+  --color-text-base: #0e0e10;
+  --color-text-alt-2: #3b3b44;
+  --color-text-link: #5c16c5;
+  --color-text-link-hover: #772ce8;
+  --color-text-live: #971311;
+}
+
+.skek-view {
+  position: fixed;
+  z-index: 500; /* above Twitch's chat column (11), below its top nav menus (1000) */
+  display: flex;
+  background: var(--color-background-body);
+  color: var(--color-text-base);
+}
+
+.skek-main { position: relative; flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+
+.skek-player { flex: 1 1 auto; min-height: 0; background: #000; }
+.skek-player__frame { display: block; width: 100%; height: 100%; border: 0; }
+
+.skek-offline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.skek-info {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+  padding: 16px;
+  background: var(--color-background-body);
+}
+.skek-info__avatar { position: relative; flex: 0 0 64px; width: 64px; height: 64px; }
+.skek-info__img {
+  display: block;
+  width: 64px;
+  height: 64px;
+  padding: 2px;
+  box-sizing: border-box;
+  border: 2px solid var(--color-fill-live, #eb0400);
+  border-radius: 50%;
+  object-fit: cover;
+}
+.skek-info__badge {
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  transform: translateX(-50%);
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--color-fill-live, #eb0400);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.skek-view--offline .skek-info__badge { display: none; }
+.skek-view--offline .skek-info__img { border-color: var(--color-border-base); }
+.skek-view--offline .skek-info__stats { display: none; }
+
+.skek-info__body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.skek-info__row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.skek-info__name {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 32px;
+  color: var(--color-text-base) !important;
+  text-decoration: none !important;
+}
+.skek-info__name:hover { color: var(--color-text-link-hover, #9147ff) !important; }
+.skek-info__actions { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; }
+.skek-button--youtube { background: #ff0000; }
+.skek-button--youtube:hover { background: #cc0000; }
+.skek-button--kick { background: #53fc18; color: #0b0e0f !important; }
+.skek-button--kick:hover { background: #45d414; }
+.skek-button--icon {
+  justify-content: center;
+  width: 32px;
+  padding: 0;
+  border: 0;
+  background: var(--color-background-interactable-hover);
+  color: var(--color-text-base) !important;
+  cursor: pointer;
+}
+.skek-button--icon:hover { background: var(--color-border-base); }
+
+.skek-info__text { min-width: 0; }
+.skek-info__title {
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.skek-info__category { margin: 0; font-size: 14px; line-height: 1.4; color: var(--color-text-link, #9147ff); }
+
+.skek-info__stats { flex: 0 0 auto; display: flex; gap: 12px; font-size: 14px; font-variant-numeric: tabular-nums; }
+.skek-stat { display: inline-flex; align-items: center; gap: 4px; }
+.skek-stat--viewers { color: var(--color-text-live, #ff8280); font-weight: 600; }
+
+/* chat */
+
+.skek-chat {
+  flex: 0 0 340px;
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--color-border-base);
+  background: var(--color-background-base);
+  box-sizing: border-box;
+}
+.skek-chat__head {
+  flex: 0 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--color-border-base);
+}
+.skek-chat__title { margin: 0; font-size: 14px; font-weight: 600; line-height: 1.4; }
+.skek-chat__spacer { width: 32px; }
+.skek-chat__body { flex: 1 1 auto; min-height: 0; }
+.skek-chat__frame { display: block; width: 100%; height: 100%; border: 0; }
+.skek-chat__empty { margin: 0; padding: 20px; text-align: center; font-size: 14px; color: var(--color-text-alt-2); }
+
+.skek-reopen {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+}
+.skek-reopen:hover { background: rgba(0, 0, 0, 0.8); }
+.skek-view--chat-hidden .skek-chat { display: none; }
+.skek-view--chat-hidden .skek-reopen { display: inline-flex; }
+
+/* theatre, stacked and floating modes: over Twitch's top bar (1000) and sidebar, below its modals (5000).
+   The info bar sits over the video, so it's light on dark whichever theme is on. */
+
+.skek-view--full-window { z-index: 2000; background: #000; }
+.skek-view--full-window .skek-info {
+  --color-background-interactable-hover: rgba(255, 255, 255, 0.18);
+  --color-border-base: rgba(255, 255, 255, 0.3);
+  --color-text-base: #fff;
+  --color-text-link: #bf94ff;
+  --color-text-link-hover: #a970ff;
+  --color-text-live: #ff8280;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  padding-bottom: 32px;
+  background: linear-gradient(rgba(0, 0, 0, 0.85), transparent);
+  color: var(--color-text-base);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.skek-view--controls .skek-info,
+.skek-view--full-window .skek-info:hover { opacity: 1; pointer-events: auto; }
+.skek-view--full-window .skek-info__row { flex-wrap: wrap; }
+/* The buttons are at the top of the window here, so their tooltips open downwards. */
+.skek-view--full-window [data-skek-tooltip]:hover::after { top: calc(100% + 6px); bottom: auto; }
+.skek-view--full-window .skek-reopen { z-index: 2; }
+.skek-view--full-window:not(.skek-view--controls) .skek-reopen { opacity: 0; }
+.skek-view--full-window.skek-view--chat-hidden .skek-info { padding-right: 56px; }
+
+@media (max-width: 900px) {
+  .skek-chat { display: none; }
+}
+
+/* stacked mode: the stream full width on top with chat under it, for a narrow window. These come
+   after the rules above because chat always shows here, however narrow or collapsed. */
+
+.skek-view--stacked { flex-direction: column; }
+.skek-view--stacked .skek-main { flex: 0 0 var(--skek-stacked-player-height); }
+.skek-view--stacked .skek-chat {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  border-left: 0;
+}
+.skek-view--stacked .skek-chat__head,
+.skek-view--stacked .skek-reopen { display: none; }
+.skek-view--stacked.skek-view--chat-hidden .skek-info { padding-right: 16px; }
+
+/* floating chat: chat always shows here too. Its window is in features/player/floating-window.css,
+   whose bar replaces the head. The color-scheme has to be set here and in frames/chat.css, or the
+   browser paints the frame white instead of showing the window's background through it. */
+
+.skek-view--floating .skek-chat { display: flex; }
+.skek-view--floating .skek-chat__head,
+.skek-view--floating .skek-reopen { display: none; }
+.skek-view--floating.skek-view--chat-hidden .skek-info { padding-right: 16px; }
+.skek-view--floating .skek-chat__frame { color-scheme: light; }

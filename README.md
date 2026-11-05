@@ -1,6 +1,6 @@
 # StreamKEK
 
-StreamKEK gives you more control over watching and chatting on Twitch, and brings YouTube live streams and their chat there too.
+StreamKEK gives you more control over watching and chatting on Twitch, and brings YouTube and Kick live streams and their chat there too.
 
 Unofficial: not affiliated with or endorsed by Twitch or YouTube. It changes how their pages work, which their terms may not allow, so use it at your own risk.
 
@@ -18,23 +18,27 @@ Open the settings from the extension's icon in Twitch's top bar or the browser t
 
 ## Features
 
-- **YouTube live streams on Twitch:** watch them with chat in a Twitch-style view, from the sidebar or the Following page. Add channels with the **+** button in the sidebar. Your subscriptions appear on their own if you're signed in to YouTube in the same browser.
-- **Floating chat (Alt+C):** watch Twitch or YouTube fullscreen with chat in a window you can move, resize and make see-through.
-- **Stacked mode (Alt+S):** Twitch or YouTube full width with chat under it, for narrow windows.
-- **Theatre mode (Alt+T)** on YouTube streams, like Twitch's own.
-- **Stream quality:** choose what streams start at on Twitch and YouTube, up to 1440p.
-- **Chat font size** for both Twitch and YouTube chat.
+- **YouTube live streams on Twitch:** watch them with chat in a Twitch-style view, from the sidebar or the Following page. Add channels with the **+** button in the sidebar. Your subscriptions appear on their own if you're signed in to YouTube in the same browser, and you can hide the ones you don't want.
+- **Kick live streams on Twitch:** the channels you follow on Kick get their own Kick Live section, with the same view as YouTube streams, if you're signed in to Kick in the same browser. Add other channels and hide the ones you don't want, the same way. Streams start at full volume.
+- **Floating chat (Alt+C):** watch Twitch, YouTube or Kick fullscreen with chat in a window you can move, resize and make see-through.
+- **Stacked mode (Alt+S):** Twitch, YouTube or Kick full width with chat under it, for narrow windows.
+- **Theatre mode (Alt+T)** on YouTube and Kick streams, like Twitch's own.
+- **Stream quality:** choose what streams start at on Twitch, YouTube and Kick, up to 1440p.
+- **Chat font size** for Twitch, YouTube and Kick chat.
 - **Cleaner Twitch chat:** hide timestamps, the top strip, drops, pinned messages and the Hype Train.
-- **Stream previews:** hover a live channel in the sidebar to see an image of the stream, on Twitch and YouTube.
-- **Cleaner sidebar:** hide Live Channels, Recommended Categories, Viewers Also Watch and YouTube Live.
+- **Stream previews:** hover a live channel in the sidebar to see an image of the stream, on Twitch, YouTube and Kick. You can turn this off.
+- **Cleaner sidebar:** hide Live Channels, Recommended Categories, Viewers Also Watch, and turn off YouTube Live and Kick Live.
+- **Cleaner player:** hide what streamers' Twitch extensions show over the video.
 - **Auto-claim channel points**, only in a tab where the stream is playing. Off by default.
-- **Dark or light theme** for the settings window and the YouTube stream view.
+- **Dark or light theme** for the settings window and the YouTube and Kick stream view. Kick's chat stays dark.
 
 ## Good to know
 
 - **YouTube access:** the extension checks what's live every minute while a Twitch tab is open, using your YouTube sign-in. To play streams inside Twitch, it allows YouTube cookies on twitch.tv, which is why the browser warns about cookie settings, and removes YouTube's anti-framing and content security headers for `/watch` frames opened from twitch.tv.
-- **Brave:** if chat says "Sign in to chat" while you're signed in to YouTube, open Brave Shields on twitch.tv and allow cross-site cookies.
-- **Site updates:** this relies on how Twitch and YouTube build their pages, so their updates can break parts of it.
+- **Kick access:** the extension checks what's live every minute while a Twitch tab is open, using your Kick sign-in, which only goes to Kick. To let you chat inside Twitch, it allows Kick cookies on twitch.tv and keeps a copy of your Kick sign-in and your answer to its cookie prompt, which browsers only send to Kick under Twitch. Your real Kick cookies aren't changed, and the copy lasts a day at most once the extension is removed or turned off. If a Kick stream keeps loading, open kick.com and answer its cookie prompt once.
+- **What Twitch can see:** your live YouTube subscriptions and Kick follows, the channels you added, the stream you're watching and your StreamKEK settings are all in Twitch's page, so Twitch and scripts running on its page could read them. The stream you're watching is also in the address, which reaches Twitch's servers if you reload. Your sign-ins can't be read this way.
+- **Brave:** if chat says "Sign in to chat" while you're signed in to YouTube or Kick, open Brave Shields on twitch.tv and allow cross-site cookies.
+- **Site updates:** this relies on how Twitch, YouTube and Kick build their pages, so their updates can break parts of it.
 - **Updating:** replace the files in the same folder (or `git pull`), then use **Reload** on the extensions page. Removing the extension, or loading it from a different folder, loses your saved channels and settings.
 
 ## Feedback and contributing

@@ -1,6 +1,6 @@
 /* Everything uses Twitch's own design tokens, so what sits among Twitch's content matches
    Twitch's theme. Floating popups and the stream view follow the Theme setting instead; for
-   the stream view, see the top of player-view.css. */
+   the stream view, see the top of stream-view.css. */
 
 html {
   --skek-popup-bg: #26262c;
