@@ -16,6 +16,19 @@ const COPIED = [
   'OptanonConsent',
   'eupubconsent-v2',
 ];
+// Nothing can delete a copy once the extension is removed or turned off, so each one only lasts a day.
+// The service worker saves them again every time it wakes.
+const COPY_LIFETIME_SECONDS = 24 * 60 * 60;
+
+export function copyExpiry(realExpiry, nowSeconds) {
+  return Math.min(realExpiry ?? Infinity, nowSeconds + COPY_LIFETIME_SECONDS);
+}
+
+// Only the real cookies count, not the copies this file writes. A copy is told apart by its partition,
+// not its SameSite: a real cookie marked SameSite=None still has to remove its copy on sign-out.
+export function isRealCookie(cookie) {
+  return COPIED.includes(cookie.name) && cookie.domain.replace(/^\./, '') === 'kick.com' && !cookie.partitionKey;
+}
 
 function saveCopy(cookie) {
   chrome.cookies
@@ -28,7 +41,7 @@ function saveCopy(cookie) {
       secure: true,
       httpOnly: cookie.httpOnly,
       sameSite: 'no_restriction',
-      expirationDate: cookie.expirationDate,
+      expirationDate: copyExpiry(cookie.expirationDate, Date.now() / 1000),
       storeId: cookie.storeId,
       partitionKey: TWITCH_ONLY,
     })
@@ -43,9 +56,7 @@ function removeCopy(name, storeId) {
 
 export function startTwitchFrameCookies() {
   chrome.cookies.onChanged.addListener(({ removed, cause, cookie }) => {
-    if (!COPIED.includes(cookie.name) || cookie.domain.replace(/^\./, '') !== 'kick.com') return;
-    // Only the real cookie counts, not the copy this file writes.
-    if (cookie.partitionKey || cookie.sameSite === 'no_restriction') return;
+    if (!isRealCookie(cookie)) return;
     if (!removed) saveCopy(cookie);
     else if (cause !== 'overwrite') removeCopy(cookie.name, cookie.storeId); // you signed out, or it expired
   });

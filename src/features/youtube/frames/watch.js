@@ -3,7 +3,9 @@
 (() => {
   'use strict';
 
-  if (window === window.top || !location.ancestorOrigins[0]?.endsWith('.twitch.tv')) return;
+  // By the top of the frame chain, not the parent: rules/youtube-watch-frame.json applies to any /watch
+  // frame Twitch opens, so a frame in between mustn't bring back the full page, with its Subscribe button.
+  if (window === window.top || !location.ancestorOrigins[location.ancestorOrigins.length - 1]?.endsWith('.twitch.tv')) return;
 
   const root = document.documentElement;
   root.classList.add('skek-watch');

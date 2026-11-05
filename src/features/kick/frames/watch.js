@@ -3,7 +3,9 @@
 (() => {
   'use strict';
 
-  if (!location.ancestorOrigins[0]?.endsWith('.twitch.tv')) return;
+  // By the top of the frame chain, not the parent: your sign-in reaches any Kick frame under Twitch,
+  // so a frame in between mustn't bring back the full page, with its Subscribe button.
+  if (!location.ancestorOrigins[location.ancestorOrigins.length - 1]?.endsWith('.twitch.tv')) return;
 
   const root = document.documentElement;
   root.toggleAttribute('data-skek-kick-watch', true);

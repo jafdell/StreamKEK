@@ -38,7 +38,8 @@ export function inputToUrl(raw) {
   const input = raw.trim();
   if (!input) return null;
   if (/^UC[\w-]{22}$/.test(input)) return `${YT}/channel/${input}`;
-  if (/^@[^\s/]+$/.test(input)) return `${YT}/${input}`;
+  // No backslashes: browsers read them as slashes in an address, so @x\..\logout would be /logout.
+  if (/^@[^\s/\\]+$/.test(input)) return `${YT}/${input}`;
   if (/^[\w.-]+$/.test(input)) return `${YT}/@${input}`;
 
   let url;

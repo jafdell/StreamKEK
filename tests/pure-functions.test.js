@@ -12,6 +12,7 @@ import { inputToUrl } from '../src/features/youtube/background/channels.js';
 import { liveChannelsFromGuide } from '../src/features/youtube/background/subscriptions.js';
 import { flippedSettings } from '../src/background/renamed-settings.js';
 import { channelPageToLive, followedStreamToLive, slugFromInput, startedAtIso } from '../src/features/kick/background/kick-api.js';
+import { copyExpiry, isRealCookie } from '../src/features/kick/background/twitch-frame-cookies.js';
 
 // format.js is a classic content script, so it runs in a context holding the globals it expects.
 const context = { skek: { helpers: { el() {} }, streams: {} } };
@@ -71,6 +72,52 @@ test('slugFromInput reads Kick links and refuses anything else', () => {
   assert.equal(slugFromInput('https://kick.com/'), null);
   assert.equal(slugFromInput('https://notkick.com/odablock'), null);
 });
+
+test('copies of Kick cookies last a day at most', () => {
+  const now = 1_000_000;
+  const day = 24 * 60 * 60;
+  assert.equal(copyExpiry(now + 60, now), now + 60);
+  assert.equal(copyExpiry(now + 30 * day, now), now + day);
+  assert.equal(copyExpiry(undefined, now), now + day);
+});
+
+test('isRealCookie tells a copy by its partition, not its SameSite', () => {
+  const real = { name: 'session_token', domain: 'kick.com', sameSite: 'lax' };
+  assert.ok(isRealCookie(real));
+  assert.ok(isRealCookie({ ...real, domain: '.kick.com', sameSite: 'no_restriction' }));
+  assert.ok(!isRealCookie({ ...real, partitionKey: { topLevelSite: 'https://twitch.tv', hasCrossSiteAncestor: true } }));
+  assert.ok(!isRealCookie({ ...real, name: 'other' }));
+  assert.ok(!isRealCookie({ ...real, domain: 'kick.com.example.com' }));
+});
+
+// Runs a site's watch.js with stubs for the browser, and says whether it reduced the page to its player.
+function reducesPage(path, ancestorOrigins) {
+  const root = {
+    reduced: false,
+    classList: { add: () => (root.reduced = true) },
+    toggleAttribute: () => (root.reduced = true),
+    dataset: {},
+  };
+  vm.runInNewContext(readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'), {
+    location: { ancestorOrigins },
+    window: { top: {} },
+    document: { documentElement: root },
+    skek: { settingDefaults: {} },
+    chrome: { storage: { local: { get: async () => ({}) }, onChanged: { addListener() {} } } },
+  });
+  return root.reduced;
+}
+
+for (const path of ['src/features/kick/frames/watch.js', 'src/features/youtube/frames/watch.js']) {
+  test(`${path} goes by the top of the frame chain`, () => {
+    assert.ok(reducesPage(path, ['https://www.twitch.tv']));
+    assert.ok(reducesPage(path, ['null', 'https://www.twitch.tv']));
+    assert.ok(reducesPage(path, ['https://example.com', 'https://www.twitch.tv']));
+    assert.ok(!reducesPage(path, []));
+    assert.ok(!reducesPage(path, ['https://www.twitch.tv', 'https://example.com']));
+    assert.ok(!reducesPage(path, ['https://nottwitch.tv']));
+  });
+}
 
 test('startedAtIso treats Kick times as UTC', () => {
   assert.equal(startedAtIso('2026-11-05 11:21:54'), '2026-11-05T11:21:54.000Z');
@@ -139,6 +186,8 @@ test('inputToUrl accepts YouTube links', () => {
 test('inputToUrl only looks up channel and video links', () => {
   assert.equal(inputToUrl('https://www.youtube.com/logout'), null);
   assert.equal(inputToUrl('youtube.com/@x/../logout'), null);
+  // Browsers read a backslash as a slash in an address, so this would become /logout.
+  assert.equal(inputToUrl('@x\\..\\logout'), null);
   // The browser tidies this to /logout, which is only ever treated as a video id.
   assert.equal(inputToUrl('https://youtu.be/../logout'), 'https://www.youtube.com/watch?v=logout');
   assert.equal(inputToUrl('https://www.youtube.com/channel/UCabcdefghijklmnopqrstuv/streams'), 'https://www.youtube.com/channel/UCabcdefghijklmnopqrstuv/streams');

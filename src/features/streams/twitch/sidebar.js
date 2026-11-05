@@ -74,8 +74,9 @@
       { class: 'skek-card skek-card--confirm', on: { mouseleave: () => askToHide(null) } },
       el('span', { class: 'skek-card__confirm-text', title: channel.name }, `Hide ${channel.name}?`),
       confirmButton('skek-card__confirm-button--hide', 'Hide', (event) => {
-        // The next card moves under the cursor, so a double-click would act on that too.
-        if (event.detail > 1) return;
+        // Only a real click, because scripts on Twitch's page can press this too. And the next card
+        // moves under the cursor, so a double-click would act on that as well.
+        if (!event.isTrusted || event.detail > 1) return;
         askToHide(null);
         send({ type: `${siteOf(channel).messagePrefix}:hide`, id: channel.id });
       }),
