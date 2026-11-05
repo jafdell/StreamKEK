@@ -79,7 +79,5 @@ export async function streamDetails(videoId) {
   return {
     startedAt: micro?.liveBroadcastDetails?.startTimestamp ?? null,
     category: gameTitle(secondary) || micro?.category || null,
-    avatar: secondary?.owner?.videoOwnerRenderer?.thumbnail?.thumbnails?.at(-1)?.url ?? null,
-    handle: micro?.ownerProfileUrl?.match(/@[^/]+$/)?.[0] ?? null,
   };
 }

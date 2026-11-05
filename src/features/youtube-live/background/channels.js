@@ -14,7 +14,7 @@ export async function checkChannel(channelId, known) {
   const viewers = primary?.viewCount?.videoViewCountRenderer?.originalViewCount;
   const thumbs = secondary?.owner?.videoOwnerRenderer?.thumbnail?.thumbnails;
 
-  const { entry } = await buildLiveEntry(
+  const entry = await buildLiveEntry(
     channelId,
     [
       {

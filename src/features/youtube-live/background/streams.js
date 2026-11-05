@@ -11,7 +11,7 @@ export function viewerCount(text) {
   return Math.round(Number(match[1].trim().replace(',', '.')) * scale);
 }
 
-export function collectVideoItems(node, found = []) {
+function collectVideoItems(node, found = []) {
   if (Array.isArray(node)) node.forEach((x) => collectVideoItems(x, found));
   else if (node && typeof node === 'object') {
     for (const [key, value] of Object.entries(node)) {
@@ -22,11 +22,11 @@ export function collectVideoItems(node, found = []) {
   return found;
 }
 
-export function isLiveItem(item) {
+function isLiveItem(item) {
   return JSON.stringify(item.contentImage ?? {}).includes('THUMBNAIL_OVERLAY_BADGE_STYLE_LIVE');
 }
 
-export function itemMetadataParts(item) {
+function itemMetadataParts(item) {
   const rows = item.metadata?.lockupMetadataViewModel?.metadata?.contentMetadataViewModel?.metadataRows ?? [];
   return rows.flatMap((row) => row.metadataParts ?? []);
 }
@@ -74,15 +74,14 @@ export async function buildLiveEntry(channelId, found, known) {
     .sort((a, b) => (b.viewers ?? -1) - (a.viewers ?? -1));
 
   const top = streams[0];
-  let details = {};
   if (!top.startedAt) {
-    details = await streamDetails(top.videoId).catch(() => ({}));
+    const details = await streamDetails(top.videoId).catch(() => ({}));
     if (details.startedAt) top.startedAt = details.startedAt;
     if (details.category) top.category = details.category;
   }
   top.category ||= 'YouTube';
 
-  return { entry: { ...top, streams }, details };
+  return { ...top, streams };
 }
 
 // Polls overwrite `live`, so keep details fetched while a poll was running.

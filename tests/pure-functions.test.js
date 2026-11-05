@@ -9,6 +9,7 @@ import vm from 'node:vm';
 import { extractJson } from '../src/features/youtube-live/background/youtube-pages.js';
 import { viewerCount } from '../src/features/youtube-live/background/streams.js';
 import { inputToUrl } from '../src/features/youtube-live/background/channels.js';
+import { liveChannelsFromGuide } from '../src/features/youtube-live/background/subscriptions.js';
 
 // format.js is a classic content script, so it runs in a context holding the globals it expects.
 const context = { skek: { helpers: { el() {} }, youtube: {} } };
@@ -18,6 +19,21 @@ const { compact, thumbnailUrl } = context.skek.youtube;
 test('thumbnailUrl points at the stream and escapes its id', () => {
   assert.equal(thumbnailUrl('abc_-1'), 'https://i.ytimg.com/vi/abc_-1/hqdefault_live.jpg');
   assert.equal(thumbnailUrl('a/b'), 'https://i.ytimg.com/vi/a%2Fb/hqdefault_live.jpg');
+});
+
+test('liveChannelsFromGuide keeps only live channels, once each', () => {
+  const entry = (id, live) => ({
+    guideEntryRenderer: {
+      entryData: { guideEntryData: { guideEntryId: id } },
+      formattedTitle: { simpleText: 'Lofi Girl' },
+      navigationEndpoint: { browseEndpoint: { canonicalBaseUrl: '/@LofiGirl' } },
+      thumbnail: { thumbnails: [{ url: 'small' }, { url: 'large' }] },
+      ...(live ? { badges: { liveBroadcasting: true } } : {}),
+    },
+  });
+  const lofi = 'UCSJ4gkVC6NrvII8umztf0Ow';
+  const guide = { items: [entry(lofi, true), entry(lofi, true), entry('UCc5afI6aaaaaaaaaaaaaaaa', false), entry('FEwhat_to_watch', true)] };
+  assert.deepEqual(liveChannelsFromGuide(guide), [{ id: lofi, name: 'Lofi Girl', handle: '@LofiGirl', avatar: 'large' }]);
 });
 
 test('viewerCount reads plain numbers', () => {

@@ -4,7 +4,7 @@
 // The other keys are in CONTRIBUTING.md.
 
 import { ConsentRequired, forEachLimited } from './youtube-pages.js';
-import { buildLiveEntry, carryStreamDetails } from './streams.js';
+import { carryStreamDetails } from './streams.js';
 import { checkChannel } from './channels.js';
 import { fetchLiveSubscriptions } from './subscriptions.js';
 
@@ -17,7 +17,7 @@ export function poll() {
   return polling;
 }
 
-async function checkOwnChannels(channels, previous) {
+async function checkChannels(channels, previous) {
   const result = { live: {}, avatars: {}, consentRequired: false };
   await forEachLimited(channels, async (channel) => {
     try {
@@ -39,24 +39,23 @@ async function checkOwnChannels(channels, previous) {
 async function checkSubscriptions(live, previous, previousSubs) {
   const result = { subChannels: { ...previousSubs }, signedOut: false, consentRequired: false };
   try {
-    const feed = await fetchLiveSubscriptions();
-    result.signedOut = feed.signedOut;
-    await forEachLimited(feed.channels, async ({ channel, found }) => {
-      let details = {};
-      if (!live[channel.id]) {
-        const built = await buildLiveEntry(channel.id, found, previous[channel.id]);
-        live[channel.id] = built.entry;
-        details = built.details;
-      }
+    const subs = await fetchLiveSubscriptions();
+    result.signedOut = subs.signedOut;
+    const checked = await checkChannels(subs.channels.filter((c) => !live[c.id]), previous);
+    Object.assign(live, checked.live);
+    result.consentRequired = checked.consentRequired;
+    for (const channel of subs.channels) {
+      if (!live[channel.id]) continue;
       result.subChannels[channel.id] = {
         ...channel,
-        avatar: channel.avatar ?? details.avatar ?? previousSubs[channel.id]?.avatar ?? null,
-        handle: channel.handle ?? details.handle ?? previousSubs[channel.id]?.handle ?? null,
+        avatar: channel.avatar ?? checked.avatars[channel.id] ?? previousSubs[channel.id]?.avatar ?? null,
+        handle: channel.handle ?? previousSubs[channel.id]?.handle ?? null,
       };
-    });
+    }
   } catch (e) {
     if (e instanceof ConsentRequired) result.consentRequired = true;
-    // A failed feed says nothing about those streams, so keep what we knew.
+    else console.warn('StreamKEK: could not read your live subscriptions', e);
+    // A failed check says nothing about those streams, so keep what we knew.
     for (const id of Object.keys(previousSubs)) if (previous[id]) live[id] ??= previous[id];
   }
   return result;
@@ -70,7 +69,7 @@ async function runPoll() {
     showSubscriptions = true,
   } = await chrome.storage.local.get(['channels', 'live', 'subChannels', 'showSubscriptions']);
 
-  const own = await checkOwnChannels(channels, previous);
+  const own = await checkChannels(channels, previous);
   const { live } = own;
   const subs = showSubscriptions
     ? await checkSubscriptions(live, previous, previousSubs)

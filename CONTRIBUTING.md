@@ -4,7 +4,7 @@ Bugs and feature requests go in issues. To send a change: fork the repo, make a 
 
 ## How it fits together
 
-- **Service worker** (`src/background/service-worker.js`, feature code in `background/` folders): works out what's live on YouTube, for all tabs at once. It also allows YouTube's cookies on Twitch, and `rules/youtube-watch-frame.json` lets YouTube's watch page load in a frame.
+- **Service worker** (`src/background/service-worker.js`, feature code in `background/` folders): works out what's live on YouTube, for all tabs at once. It also allows YouTube's cookies on Twitch, and `rules/youtube-watch-frame.json` lets YouTube's watch page load in a frame, and `rules/youtube-guide-origin.json` lets it read which subscriptions are live.
 - **Twitch page scripts** (the first `content_scripts` entry in `manifest.json`): run in every Twitch tab and share one global, `skek`.
 - **Stream view:** the `/yt/<channel>` page those scripts draw over Twitch's. It holds two YouTube frames, the player and the chat. Twitch's own page stays alive behind it, with its video paused and the address showing `/yt/...`, so a Twitch feature's scripts and shortcuts keep running there. Check for `#skek-view` where that matters, as `player-modes.js` does.
 - **Frame scripts** (`frames/` folders): load on YouTube itself too, wherever their manifest entry matches, and switch themselves on only inside those two frames.

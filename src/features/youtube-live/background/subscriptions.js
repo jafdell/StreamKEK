@@ -1,52 +1,65 @@
-// Live streams from your YouTube subscriptions.
+// Which of your YouTube subscriptions are live, read from the list in YouTube's left
+// sidebar (the guide). One request covers them all, however long they've been live.
 
-import { YT, extractJson, fetchPage } from './youtube-pages.js';
-import { collectVideoItems, isLiveItem, itemMetadataParts, viewerCount } from './streams.js';
+import { YT, fetchPage } from './youtube-pages.js';
 
-// The text is in the account's language: "126 watching", "3 513 tittare", "3.6K watching".
-function parseViewers(parts) {
-  return viewerCount(
-    parts
-      .slice(1)
-      .map((p) => p.text?.content ?? '')
-      .find((t) => /\d/.test(t)),
-  );
-}
-
-function feedItemToStream(item) {
-  if (!isLiveItem(item)) return null;
-  const meta = item.metadata?.lockupMetadataViewModel;
-  const text = JSON.stringify(meta ?? {});
-  const channelId = text.match(/"browseId":"(UC[\w-]{22})"/)?.[1];
-  if (!channelId || !item.contentId) return null;
-  const parts = itemMetadataParts(item);
-  const handle = text.match(/"canonicalBaseUrl":"\/(@[^"]+)"/)?.[1];
-  return {
-    channel: {
-      id: channelId,
-      name: parts[0]?.text?.content ?? 'YouTube channel',
-      handle: handle ? decodeURIComponent(handle) : null,
-      avatar: text.match(/"url":"(https:\/\/yt3\.[^"]+)"/)?.[1] ?? null,
-    },
-    videoId: item.contentId,
-    title: meta.title?.content ?? '',
-    viewers: parseViewers(parts),
-  };
-}
-
-// One request covers every subscription, whatever their number. The feed only reaches
-// back about a day, so a stream that has run longer may not be in it.
-export async function fetchLiveSubscriptions() {
-  const { html } = await fetchPage(`${YT}/feed/subscriptions`);
-  if (!html.includes('"LOGGED_IN":true')) return { signedOut: true, channels: [] };
-  const items = collectVideoItems(extractJson(html, 'ytInitialData = '));
-  if (!items.length) throw new Error('Subscriptions feed had no items');
-  const byChannel = new Map();
-  for (const stream of items.map(feedItemToStream)) {
-    if (!stream) continue;
-    const group = byChannel.get(stream.channel.id) ?? { channel: stream.channel, found: [] };
-    group.found.push({ videoId: stream.videoId, title: stream.title, viewers: stream.viewers });
-    byChannel.set(stream.channel.id, group);
+export function liveChannelsFromGuide(node, found = []) {
+  if (Array.isArray(node)) node.forEach((x) => liveChannelsFromGuide(x, found));
+  else if (node && typeof node === 'object') {
+    for (const [key, value] of Object.entries(node)) {
+      if (key !== 'guideEntryRenderer') {
+        liveChannelsFromGuide(value, found);
+        continue;
+      }
+      const id = value.entryData?.guideEntryData?.guideEntryId;
+      if (!value.badges?.liveBroadcasting || !/^UC[\w-]{22}$/.test(id ?? '')) continue;
+      if (found.some((c) => c.id === id)) continue;
+      const handle = value.navigationEndpoint?.browseEndpoint?.canonicalBaseUrl?.match(/^\/(@[^/]+)$/)?.[1];
+      found.push({
+        id,
+        name: value.formattedTitle?.simpleText ?? 'YouTube channel',
+        handle: handle ? decodeURIComponent(handle) : null,
+        avatar: value.thumbnail?.thumbnails?.at(-1)?.url ?? null,
+      });
+    }
   }
-  return { signedOut: false, channels: [...byChannel.values()] };
+  return found;
+}
+
+async function authorizationHeader() {
+  const cookie = await chrome.cookies.get({ url: YT, name: 'SAPISID' });
+  if (!cookie) throw new Error('No YouTube sign-in cookie');
+  const time = Math.floor(Date.now() / 1000);
+  const hash = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(`${time} ${cookie.value} ${YT}`));
+  const hex = [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  return `SAPISIDHASH ${time}_${hex}`;
+}
+
+// `html` is any signed-in YouTube page. A brand account only gets its own subscriptions
+// with the page ID. rules/youtube-guide-origin.json makes the request come from YouTube.
+async function fetchGuideChannels(html) {
+  const config = (name) => html.match(new RegExp(`"${name}":"?([\\w.]+)`))?.[1];
+  const pageId = html.match(/"DELEGATED_SESSION_ID":"(\d+)"/)?.[1];
+  const res = await fetch(`${YT}/youtubei/v1/guide?prettyPrint=false`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: await authorizationHeader(),
+      'X-Origin': YT,
+      'X-Goog-AuthUser': config('SESSION_INDEX') ?? '0',
+      ...(pageId ? { 'X-Goog-PageId': pageId } : {}),
+    },
+    body: JSON.stringify({
+      context: { client: { clientName: 'WEB', clientVersion: config('INNERTUBE_CLIENT_VERSION') } },
+    }),
+  });
+  if (!res.ok) throw new Error(`YouTube answered ${res.status}`);
+  return liveChannelsFromGuide(await res.json());
+}
+
+export async function fetchLiveSubscriptions() {
+  const { html } = await fetchPage(`${YT}/`);
+  if (!html.includes('"LOGGED_IN":true')) return { signedOut: true, channels: [] };
+  return { signedOut: false, channels: await fetchGuideChannels(html) };
 }
