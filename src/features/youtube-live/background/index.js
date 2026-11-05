@@ -1,7 +1,7 @@
 // Wires the YouTube Live background code to browser events.
 
 import { addChannel, removeChannel } from './channels.js';
-import { poll, pollIfTwitchOpen, setShowSubscriptions } from './poller.js';
+import { hideChannel, poll, pollIfTwitchOpen, setShowSubscriptions, unhideChannel } from './poller.js';
 import { loadStreamDetails } from './streams.js';
 
 const POLL_ALARM = 'youtube-live:poll';
@@ -12,6 +12,14 @@ export const messageHandlers = {
   'youtube-live:add': async (msg) => ({ ok: true, channel: await addChannel(msg.input) }),
   'youtube-live:remove': async (msg) => {
     await removeChannel(msg.id);
+    return { ok: true };
+  },
+  'youtube-live:hide': async (msg) => {
+    await hideChannel(msg.id);
+    return { ok: true };
+  },
+  'youtube-live:unhide': async (msg) => {
+    await unhideChannel(msg.id);
     return { ok: true };
   },
   'youtube-live:showSubscriptions': async (msg) => {

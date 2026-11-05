@@ -96,6 +96,24 @@ li img { flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; object-f
 
 #empty { margin: 14px 0 0; color: var(--muted); }
 
+#hidden { flex: 0 0 auto; margin-top: 10px; }
+#hidden summary { font-weight: 600; cursor: pointer; }
+#hidden ul { max-height: 135px; }
+
+.show {
+  flex: 0 0 auto;
+  height: 26px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 9000px;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.show:hover { background: var(--hover); }
+
 /* Inside the settings window: see manager.js. */
 html[data-embedded] h1,
 html[data-embedded] #subs { display: none; }

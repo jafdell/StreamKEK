@@ -3,7 +3,7 @@
   'use strict';
 
   const yt = skek.youtube;
-  const { el, icon } = skek.helpers;
+  const { el, icon, send } = skek.helpers;
   const { state, liveChannels, streamsOf, avatarImg, compact } = yt;
 
   const SECTION_ID = 'skek-section';
@@ -12,6 +12,37 @@
   function sidebarHost() {
     return document.querySelector('[data-a-target="side-nav-bar"] .side-bar-contents nav') ||
       document.querySelector('[data-a-target="side-nav-bar"] .side-bar-contents');
+  }
+
+  // Only for subscriptions: channels you added are removed in the manager. Not on the
+  // stream open in this tab, because hiding it would close it. Another tab can still close
+  // its stream this way, like removing the channel does.
+  function hideButton(channel) {
+    if (state.openId === channel.id || !state.subs[channel.id] || state.own.some((c) => c.id === channel.id)) return null;
+    const label = `Hide ${channel.name}`;
+    return el(
+      'button',
+      {
+        class: 'skek-iconbtn skek-card__hide',
+        type: 'button',
+        title: label,
+        ariaLabel: label,
+        on: {
+          click: (event) => {
+            // It's inside the card's link, which would open the stream.
+            event.preventDefault();
+            event.stopPropagation();
+            // The next card moves under the cursor, so a double-click would hide that too.
+            if (event.detail > 1) return;
+            yt.hideTip();
+            send({ type: 'youtube-live:hide', id: channel.id });
+          },
+          // A middle click would open the link.
+          auxclick: (event) => event.preventDefault(),
+        },
+      },
+      icon('hide'),
+    );
   }
 
   function renderCard(channel) {
@@ -45,6 +76,7 @@
         el('span', { class: 'skek-dot' }),
         el('span', {}, live.viewers == null ? 'Live' : compact(live.viewers)),
       ),
+      hideButton(channel),
     );
   }
 
@@ -93,7 +125,7 @@
     }
     placeSection(section, host);
 
-    const signature = JSON.stringify([state.channels, state.live, state.openId]);
+    const signature = JSON.stringify([state.own, state.channels, state.live, state.openId]);
     if (!force && signature === lastRender) return;
     lastRender = signature;
 

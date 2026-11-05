@@ -18,7 +18,7 @@ Open the settings from the extension's icon in Twitch's top bar or the browser t
 
 ## Features
 
-- **YouTube live streams on Twitch:** watch them with chat in a Twitch-style view, from the sidebar or the Following page. Add channels with the **+** button in the sidebar. Your subscriptions appear on their own if you're signed in to YouTube in the same browser.
+- **YouTube live streams on Twitch:** watch them with chat in a Twitch-style view, from the sidebar or the Following page. Add channels with the **+** button in the sidebar. Your subscriptions appear on their own if you're signed in to YouTube in the same browser, and you can hide the ones you don't want.
 - **Floating chat (Alt+C):** watch Twitch or YouTube fullscreen with chat in a window you can move, resize and make see-through.
 - **Stacked mode (Alt+S):** Twitch or YouTube full width with chat under it, for narrow windows.
 - **Theatre mode (Alt+T)** on YouTube streams, like Twitch's own.

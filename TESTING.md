@@ -13,6 +13,7 @@ In a pull request, say what you tried and what you couldn't.
 | --- | --- |
 | YouTube Live | The sidebar section, a channel with several streams, an offline channel, and reloading on `/yt/<channel>` |
 | Channel manager | Adding and removing a channel in the **+** frame and the settings window, and the subscriptions switch |
+| Hiding subscriptions | Hiding a live subscription from its sidebar card, that it stays hidden after a reload, and **Show** in the **+** frame and the settings window. The card you're watching, a channel you added and the collapsed sidebar shouldn't offer hiding. Hiding a stream that's open in another tab closes it there |
 | Following page | The **YouTube** tab and the **YouTube live** section |
 | Theatre, stacked or floating chat | The button, Alt key and Esc, on a YouTube stream, a Twitch stream and a Twitch video. The video shouldn't restart |
 | Floating chat | Also dragging, resizing, the slider, typing a message, and double-clicking the video to leave fullscreen |

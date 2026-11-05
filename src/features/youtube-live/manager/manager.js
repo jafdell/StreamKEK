@@ -1,4 +1,5 @@
-// The channel manager: add and remove channels, and the subscriptions switch.
+// The channel manager: add and remove channels, the subscriptions switch, and showing
+// hidden subscriptions again.
 (() => {
   'use strict';
 
@@ -14,6 +15,9 @@
   const empty = document.getElementById('empty');
   const subsToggle = document.getElementById('subs-toggle');
   const subsState = document.getElementById('subs-state');
+  const hiddenSection = document.getElementById('hidden');
+  const hiddenTitle = document.getElementById('hidden-title');
+  const hiddenList = document.getElementById('hidden-list');
 
   function say(text, isError) {
     message.hidden = !text;
@@ -21,7 +25,7 @@
     message.classList.toggle('error', !!isError);
   }
 
-  function row(channel, live) {
+  function channelRow(channel, details, action) {
     const li = document.createElement('li');
 
     const img = document.createElement('img');
@@ -34,12 +38,19 @@
     const name = document.createElement('span');
     name.className = 'name';
     name.textContent = channel.name;
+    text.append(name);
+    if (details) text.append(details);
+
+    li.append(img, text, action);
+    return li;
+  }
+
+  function row(channel, live) {
     const state = document.createElement('span');
     state.className = live ? 'state live' : 'state';
     state.textContent = live
       ? `Live${live.viewers == null ? '' : ` · ${live.viewers.toLocaleString()} watching`}`
       : 'Offline';
-    text.append(name, state);
 
     const remove = document.createElement('button');
     remove.className = 'remove';
@@ -49,8 +60,18 @@
     remove.setAttribute('aria-label', remove.title);
     remove.addEventListener('click', () => chrome.runtime.sendMessage({ type: 'youtube-live:remove', id: channel.id }));
 
-    li.append(img, text, remove);
-    return li;
+    return channelRow(channel, state, remove);
+  }
+
+  function hiddenRow(channel) {
+    const show = document.createElement('button');
+    show.className = 'show';
+    show.type = 'button';
+    show.textContent = 'Show';
+    show.title = `Show ${channel.name} again`;
+    show.setAttribute('aria-label', show.title);
+    show.addEventListener('click', () => chrome.runtime.sendMessage({ type: 'youtube-live:unhide', id: channel.id }));
+    return channelRow(channel, null, show);
   }
 
   async function render() {
@@ -60,9 +81,15 @@
       live = {},
       status,
       showSubscriptions = skek.settingDefaults.showSubscriptions,
-    } = await chrome.storage.local.get(['channels', 'subChannels', 'live', 'status', 'showSubscriptions']);
+      hiddenChannels = {},
+    } = await chrome.storage.local.get(['channels', 'subChannels', 'live', 'status', 'showSubscriptions', 'hiddenChannels']);
     list.replaceChildren(...channels.map((c) => row(c, live[c.id])));
     empty.hidden = channels.length > 0;
+
+    const hidden = Object.values(hiddenChannels).sort((a, b) => a.name.localeCompare(b.name));
+    hiddenSection.hidden = !hidden.length;
+    hiddenTitle.textContent = `Hidden subscriptions (${hidden.length})`;
+    hiddenList.replaceChildren(...hidden.map(hiddenRow));
 
     subsToggle.checked = showSubscriptions;
     const liveSubs = Object.keys(subChannels).filter((id) => live[id]).length;
@@ -96,7 +123,7 @@
     chrome.runtime.sendMessage({ type: 'youtube-live:showSubscriptions', enabled: subsToggle.checked });
   });
 
-  const WATCHED_KEYS = ['channels', 'subChannels', 'live', 'status', 'showSubscriptions'];
+  const WATCHED_KEYS = ['channels', 'subChannels', 'live', 'status', 'showSubscriptions', 'hiddenChannels'];
 
   chrome.storage.onChanged.addListener((changes, area) => {
     // Other keys (settings, theme) would rebuild the list for nothing.

@@ -121,6 +121,7 @@ All in `chrome.storage.local`. A key in `SETTINGS` is written by the settings wi
 | --- | --- | --- |
 | `channels` | `[{id,name,handle,avatar}]` | background |
 | `subChannels` | `{[id]:{id,name,handle,avatar}}` | background |
+| `hiddenChannels` | `{[id]:{id,name,handle,avatar}}` | background |
 | `live` | see the comment at the top of `src/features/youtube-live/background/poller.js` | background |
 | `status` | `{checkedAt,consentRequired,signedOut}` | background |
 | `showSubscriptions` | boolean, default true | background |

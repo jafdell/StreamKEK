@@ -36,15 +36,16 @@ async function checkChannels(channels, previous) {
 }
 
 // Adds live subscriptions to `live`. A channel you added yourself is already there.
-async function checkSubscriptions(live, previous, previousSubs) {
+async function checkSubscriptions(live, previous, previousSubs, hidden) {
   const result = { subChannels: { ...previousSubs }, signedOut: false, consentRequired: false };
   try {
     const subs = await fetchLiveSubscriptions();
     result.signedOut = subs.signedOut;
-    const checked = await checkChannels(subs.channels.filter((c) => !live[c.id]), previous);
+    const shown = subs.channels.filter((c) => !hidden[c.id]);
+    const checked = await checkChannels(shown.filter((c) => !live[c.id]), previous);
     Object.assign(live, checked.live);
     result.consentRequired = checked.consentRequired;
-    for (const channel of subs.channels) {
+    for (const channel of shown) {
       if (!live[channel.id]) continue;
       result.subChannels[channel.id] = {
         ...channel,
@@ -67,17 +68,23 @@ async function runPoll() {
     live: previous = {},
     subChannels: previousSubs = {},
     showSubscriptions = true,
-  } = await chrome.storage.local.get(['channels', 'live', 'subChannels', 'showSubscriptions']);
+    hiddenChannels = {},
+  } = await chrome.storage.local.get(['channels', 'live', 'subChannels', 'showSubscriptions', 'hiddenChannels']);
 
   const own = await checkChannels(channels, previous);
   const { live } = own;
   const subs = showSubscriptions
-    ? await checkSubscriptions(live, previous, previousSubs)
+    ? await checkSubscriptions(live, previous, previousSubs, hiddenChannels)
     : { subChannels: previousSubs, signedOut: false, consentRequired: false };
 
   // Re-read: things may have changed while we were fetching.
-  const { channels: current = [], showSubscriptions: stillShowing = true, live: latest = {} } =
-    await chrome.storage.local.get(['channels', 'showSubscriptions', 'live']);
+  const {
+    channels: current = [],
+    showSubscriptions: stillShowing = true,
+    live: latest = {},
+    hiddenChannels: stillHidden = {},
+  } = await chrome.storage.local.get(['channels', 'showSubscriptions', 'live', 'hiddenChannels']);
+  for (const id of Object.keys(stillHidden)) delete subs.subChannels[id];
   const ids = new Set(current.map((c) => c.id));
   if (stillShowing) for (const id of Object.keys(subs.subChannels)) ids.add(id);
   for (const id of Object.keys(live)) if (!ids.has(id)) delete live[id];
@@ -107,4 +114,33 @@ export async function setShowSubscriptions(enabled) {
   const { channels = [], live = {} } = await chrome.storage.local.get(['channels', 'live']);
   const kept = Object.fromEntries(channels.filter((c) => live[c.id]).map((c) => [c.id, live[c.id]]));
   await chrome.storage.local.set({ subChannels: {}, live: kept });
+}
+
+// A hidden subscription isn't checked or listed until you show it again. A channel you
+// added yourself can't be hidden: you remove it instead.
+export async function hideChannel(id) {
+  const { channels = [], subChannels = {}, live = {}, hiddenChannels = {} } = await chrome.storage.local.get([
+    'channels',
+    'subChannels',
+    'live',
+    'hiddenChannels',
+  ]);
+  const channel = subChannels[id];
+  if (!channel || channels.some((c) => c.id === id)) return;
+  const { [id]: _sub, ...otherSubs } = subChannels;
+  const { [id]: _live, ...otherLive } = live;
+  await chrome.storage.local.set({
+    subChannels: otherSubs,
+    live: otherLive,
+    hiddenChannels: { ...hiddenChannels, [id]: channel },
+  });
+}
+
+export async function unhideChannel(id) {
+  const { hiddenChannels = {} } = await chrome.storage.local.get('hiddenChannels');
+  const { [id]: _hidden, ...otherHidden } = hiddenChannels;
+  await chrome.storage.local.set({ hiddenChannels: otherHidden });
+  // A poll that's already running would still skip this channel, so run a fresh one.
+  await polling?.catch(() => {});
+  return poll();
 }

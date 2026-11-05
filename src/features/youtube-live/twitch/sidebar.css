@@ -30,6 +30,7 @@ html[data-skek-on~='hideYouTubeLive'] .skek-section { display: none; }
 }
 
 .skek-card {
+  position: relative;
   display: flex;
   align-items: center;
   height: 45px;
@@ -67,6 +68,21 @@ html[data-skek-on~='hideYouTubeLive'] .skek-section { display: none; }
   line-height: 1.1;
   color: var(--color-text-base);
 }
+/* Takes the viewer count's place while you hover the card, so the text doesn't move. */
+.skek-card__hide {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+.skek-card:hover .skek-card__hide,
+.skek-card__hide:focus-visible { opacity: 1; pointer-events: auto; }
+.skek-card:hover:has(.skek-card__hide) .skek-card__live,
+.skek-card:has(.skek-card__hide:focus-visible) .skek-card__live { visibility: hidden; }
 /* also used by stream-tip.js */
 .skek-dot {
   width: 8px;
@@ -80,6 +96,7 @@ html[data-skek-on~='hideYouTubeLive'] .skek-section { display: none; }
 .side-nav--collapsed .skek-section__title,
 .side-nav--collapsed .skek-card__text,
 .side-nav--collapsed .skek-card__live,
+.side-nav--collapsed .skek-card__hide,
 .side-nav--collapsed .skek-section__empty,
 .side-nav--collapsed .skek-section__add { display: none; }
 .side-nav--collapsed .skek-section__head { justify-content: center; padding: 0; }

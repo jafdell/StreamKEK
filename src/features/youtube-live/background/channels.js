@@ -91,8 +91,10 @@ export async function addChannel(input) {
     next[channel.id] = info.entry;
     if (info.avatar) channel.avatar = info.avatar;
   }
-  const { channels: latest = [] } = await chrome.storage.local.get('channels');
-  await chrome.storage.local.set({ channels: [...latest, channel], live: next });
+  const { channels: latest = [], hiddenChannels = {} } = await chrome.storage.local.get(['channels', 'hiddenChannels']);
+  // Adding a channel you'd hidden means you want to see it again.
+  const { [channel.id]: _hidden, ...otherHidden } = hiddenChannels;
+  await chrome.storage.local.set({ channels: [...latest, channel], live: next, hiddenChannels: otherHidden });
   return channel;
 }
 

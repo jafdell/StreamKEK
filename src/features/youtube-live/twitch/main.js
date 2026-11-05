@@ -15,7 +15,7 @@
       if (changes.live) state.live = changes.live.newValue ?? {};
       yt.renderSidebar();
       if (state.openId && !state.channels.some((c) => c.id === state.openId)) {
-        yt.navigateTo(null); // the open channel was just removed
+        yt.navigateTo(null); // the open channel was just removed or hidden
         return;
       }
       yt.updateInfo();
