@@ -172,5 +172,5 @@
     for (const config of SECTIONS) previous = renderSection(config, host, previous, force);
   }
 
-  Object.assign(yt, { renderSidebar });
+  Object.assign(shared, { renderSidebar });
 })();

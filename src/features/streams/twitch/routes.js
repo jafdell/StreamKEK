@@ -119,5 +119,5 @@
     syncWithUrl();
   }
 
-  Object.assign(yt, { navigateTo, syncWithUrl, stateWithRoute, forgetRouteVideo, openOnPlainClick, handlePopState });
+  Object.assign(shared, { navigateTo, syncWithUrl, stateWithRoute, forgetRouteVideo, openOnPlainClick, handlePopState });
 })();

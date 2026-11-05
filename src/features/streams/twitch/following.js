@@ -240,5 +240,5 @@
     for (const tab of SITE_TABS) renderPanel(content, tab, tab === activeTab);
   }
 
-  Object.assign(yt, { renderFollowing });
+  Object.assign(shared, { renderFollowing });
 })();

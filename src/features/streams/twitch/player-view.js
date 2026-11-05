@@ -384,5 +384,5 @@
     shared.renderSidebar();
   }
 
-  Object.assign(yt, { updateInfo, placeView, openView, closeView });
+  Object.assign(shared, { updateInfo, placeView, openView, closeView });
 })();

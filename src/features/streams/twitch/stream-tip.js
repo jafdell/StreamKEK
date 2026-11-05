@@ -85,5 +85,5 @@
     if (!tip?.matches(':hover')) hideTip();
   }
 
-  Object.assign(yt, { showTip, hideTip, hideTipSoon, hideTipUnlessHovered });
+  Object.assign(shared, { showTip, hideTip, hideTipSoon, hideTipUnlessHovered });
 })();

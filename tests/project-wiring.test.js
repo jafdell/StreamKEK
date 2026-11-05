@@ -125,3 +125,55 @@ test('the background uses the same storage keys as sites.js', () => {
   assert.deepEqual({ ...context.skek.sites.youtube.keys }, youtubeKeys);
   assert.deepEqual({ ...context.skek.sites.kick.keys }, kickKeys);
 });
+
+// Runs Twitch's page scripts in their manifest order, with stubs for the browser. This catches what
+// a syntax check can't: a name that doesn't exist, or a file that loads before something it needs.
+function loadTwitchScripts() {
+  const inert = () => new Proxy(function () {}, {
+    get: (_target, key) => (key === Symbol.toPrimitive ? () => '' : inert()),
+    apply: () => inert(),
+    construct: () => inert(),
+  });
+  const page = {
+    chrome: inert(),
+    document: { body: null, documentElement: inert(), querySelector: () => null, querySelectorAll: () => [], getElementById: () => null, createElement: inert(), addEventListener() {}, removeEventListener() {} },
+    location: { pathname: '/', search: '', hash: '', hostname: 'www.twitch.tv', ancestorOrigins: [] },
+    history: inert(),
+    localStorage: inert(),
+    addEventListener() {},
+    setInterval() {},
+    setTimeout() {},
+    clearTimeout() {},
+    clearInterval() {},
+    MutationObserver: class { observe() {} },
+    requestAnimationFrame() {},
+    innerWidth: 1000,
+    innerHeight: 1000,
+    console,
+  };
+  page.globalThis = page;
+  page.window = page;
+  vm.createContext(page);
+  for (const path of manifest.content_scripts[0].js) vm.runInContext(read(path), page, { filename: path });
+  return page;
+}
+
+test("Twitch's page scripts load in their manifest order", () => {
+  assert.doesNotThrow(loadTwitchScripts);
+});
+
+test('everything the streams files use from the shared object exists', () => {
+  const { skek } = loadTwitchScripts();
+  const files = filesIn('src/features/streams/twitch').filter((path) => path.endsWith('.js'));
+  for (const path of files) {
+    const text = read(path);
+    for (const [, name] of text.matchAll(/\bshared\.(\w+)/g)) {
+      assert.ok(name in skek.streams, `${path} uses shared.${name}, which nothing defines`);
+    }
+    for (const [, names] of text.matchAll(/const \{([^}]+)\} = shared;/g)) {
+      for (const name of names.split(',').map((part) => part.trim().split(':')[0].trim())) {
+        assert.ok(name in skek.streams, `${path} takes ${name} from shared, which nothing defines`);
+      }
+    }
+  }
+});
