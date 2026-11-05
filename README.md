@@ -27,6 +27,7 @@ Open the settings from the extension's icon in Twitch's top bar or the browser t
 - **Cleaner Twitch chat:** hide timestamps, the top strip, drops, pinned messages and the Hype Train.
 - **Stream previews:** hover a live channel in the sidebar to see an image of the stream, on Twitch and YouTube.
 - **Cleaner sidebar:** hide Live Channels, Recommended Categories, Viewers Also Watch and YouTube Live.
+- **Cleaner player:** hide what streamers' Twitch extensions show over the video.
 - **Auto-claim channel points**, only in a tab where the stream is playing. Off by default.
 - **Dark or light theme** for the settings window and the YouTube stream view.
 

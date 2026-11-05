@@ -20,7 +20,7 @@ In a pull request, say what you tried and what you couldn't.
 | Stream quality | Each choice on a Twitch and a YouTube stream, and a size the stream doesn't offer |
 | Chat settings | Twitch chat, chat on a Twitch video and YouTube chat, with and without [7TV](https://7tv.app) |
 | Sidebar previews | Hovering a live and an offline channel, near the top and bottom of the window, in the expanded and collapsed sidebar, on Twitch and YouTube channels, and each stream of a YouTube channel with several |
-| Hide settings | Turning each on and off in the expanded and collapsed sidebar or in chat |
+| Hide settings | Turning each on and off in the expanded and collapsed sidebar, in chat, or on a channel with extensions over the video, hovering the player |
 | Feedback links | Each link in the settings window and the toolbar popup opens the right GitHub page in a new tab, and the bug form has the version filled in |
 | Theme | Both themes, in the settings window, the stream view and its chat |
 | Auto-claim | A channel with channel points, with the stream playing and paused |

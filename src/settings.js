@@ -95,6 +95,13 @@
       default: false,
     },
     {
+      key: 'hidePlayerExtensions',
+      category: 'Player',
+      label: 'Hide extensions over the video',
+      hint: "Removes what streamers' Twitch extensions show over the video, like Prime Benefits and the icons on its right edge. Twitch's own player controls stay.",
+      default: false,
+    },
+    {
       key: 'streamQuality',
       category: 'Player',
       label: 'Stream quality',

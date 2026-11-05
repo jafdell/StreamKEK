@@ -64,6 +64,7 @@
         "src/features/chat-font-size/chat-font-size.css",
         "src/features/chat-timestamps/chat-timestamps.css",
         "src/features/chat-sections/chat-sections.css",
+        "src/features/player-extensions/player-extensions.css",
         "src/features/player-modes/player-modes.css",
         "src/features/player-modes/floating-window.css",
         "src/features/youtube-live/twitch/sidebar.css",
