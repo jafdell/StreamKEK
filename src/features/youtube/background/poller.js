@@ -4,19 +4,15 @@
 // The other keys are in CONTRIBUTING.md.
 
 import { forEachLimited } from '../../streams/background/for-each-limited.js';
+import { createSiteBackground } from '../../streams/background/site-background.js';
 import { ConsentRequired } from './youtube-pages.js';
 import { carryStreamDetails } from './streams.js';
 import { checkChannel } from './channels.js';
 import { fetchLiveSubscriptions } from './subscriptions.js';
 
-let polling = null;
+export const KEYS = { own: 'channels', followed: 'subChannels', live: 'live', status: 'status', hidden: 'hiddenChannels' };
 
-export function poll() {
-  polling ??= runPoll().finally(() => {
-    polling = null;
-  });
-  return polling;
-}
+export const background = createSiteBackground({ keys: KEYS, followsSetting: 'showSubscriptions', runPoll });
 
 async function checkChannels(channels, previous) {
   const result = { live: {}, avatars: {}, consentRequired: false };
@@ -102,46 +98,4 @@ async function runPoll() {
       signedOut: subs.signedOut,
     },
   });
-}
-
-export async function pollIfTwitchOpen() {
-  const tabs = await chrome.tabs.query({ url: 'https://www.twitch.tv/*' });
-  if (tabs.length) await poll();
-}
-
-export async function setShowSubscriptions(enabled) {
-  await chrome.storage.local.set({ showSubscriptions: enabled });
-  if (enabled) return poll();
-  const { channels = [], live = {} } = await chrome.storage.local.get(['channels', 'live']);
-  const kept = Object.fromEntries(channels.filter((c) => live[c.id]).map((c) => [c.id, live[c.id]]));
-  await chrome.storage.local.set({ subChannels: {}, live: kept });
-}
-
-// A hidden subscription isn't checked or listed until you show it again. A channel you
-// added yourself can't be hidden: you remove it instead.
-export async function hideChannel(id) {
-  const { channels = [], subChannels = {}, live = {}, hiddenChannels = {} } = await chrome.storage.local.get([
-    'channels',
-    'subChannels',
-    'live',
-    'hiddenChannels',
-  ]);
-  const channel = subChannels[id];
-  if (!channel || channels.some((c) => c.id === id)) return;
-  const { [id]: _sub, ...otherSubs } = subChannels;
-  const { [id]: _live, ...otherLive } = live;
-  await chrome.storage.local.set({
-    subChannels: otherSubs,
-    live: otherLive,
-    hiddenChannels: { ...hiddenChannels, [id]: channel },
-  });
-}
-
-export async function unhideChannel(id) {
-  const { hiddenChannels = {} } = await chrome.storage.local.get('hiddenChannels');
-  const { [id]: _hidden, ...otherHidden } = hiddenChannels;
-  await chrome.storage.local.set({ hiddenChannels: otherHidden });
-  // A poll that's already running would still skip this channel, so run a fresh one.
-  await polling?.catch(() => {});
-  return poll();
 }

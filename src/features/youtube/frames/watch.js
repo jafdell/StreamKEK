@@ -17,13 +17,4 @@
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local' && changes.streamQuality) setQuality(changes.streamQuality.newValue ?? settingDefaults.streamQuality);
   });
-
-  // The info bar on the Twitch page shows while the mouse moves, which stops at this frame.
-  const ACTIVITY_INTERVAL_MS = 500;
-  let lastActivity = 0;
-  addEventListener('mousemove', () => {
-    if (Date.now() - lastActivity < ACTIVITY_INTERVAL_MS) return;
-    lastActivity = Date.now();
-    parent.postMessage({ skekFrame: 'activity' }, location.ancestorOrigins[0]);
-  });
 })();

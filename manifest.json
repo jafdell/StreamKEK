@@ -94,6 +94,7 @@
       "js": [
         "src/settings.js",
         "src/features/streams/frames/layout-keys.js",
+        "src/features/streams/frames/chat-settings.js",
         "src/features/youtube/frames/chat.js"
       ],
       "css": [
@@ -109,6 +110,7 @@
       "js": [
         "src/settings.js",
         "src/features/streams/frames/layout-keys.js",
+        "src/features/streams/frames/mouse-activity.js",
         "src/features/youtube/frames/watch.js"
       ],
       "css": [
@@ -135,6 +137,7 @@
       "js": [
         "src/settings.js",
         "src/features/streams/frames/layout-keys.js",
+        "src/features/streams/frames/chat-settings.js",
         "src/features/kick/frames/chat.js"
       ],
       "css": [
@@ -153,6 +156,7 @@
       "js": [
         "src/settings.js",
         "src/features/streams/frames/layout-keys.js",
+        "src/features/streams/frames/mouse-activity.js",
         "src/features/kick/frames/watch.js"
       ],
       "css": [

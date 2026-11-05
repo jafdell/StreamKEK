@@ -1,33 +1,18 @@
-// Wires the Kick Live background code to browser events. The sidebar section, stream view and
-// Following page are shared with YouTube Live, in streams/twitch/.
+// Wires the Kick background code to browser events. What every site shares is in
+// streams/background/site-background.js.
 
-import { addChannel, hideChannel, poll, pollIfTwitchOpen, removeChannel, setShowFollows, unhideChannel } from './poller.js';
-
-const POLL_ALARM = 'kick-live:poll';
-const POLL_MINUTES = 1;
-const STALE_MS = 60_000;
+import { allowCookiesOnTwitch } from '../../streams/background/site-background.js';
+import { addChannel, background, removeChannel } from './poller.js';
 
 export const messageHandlers = {
+  ...background.messageHandlers('kick-live'),
   'kick-live:add': async (msg) => ({ ok: true, channel: await addChannel(msg.input) }),
   'kick-live:remove': async (msg) => {
     await removeChannel(msg.id);
     return { ok: true };
   },
-  'kick-live:hide': async (msg) => {
-    await hideChannel(msg.id);
-    return { ok: true };
-  },
-  'kick-live:unhide': async (msg) => {
-    await unhideChannel(msg.id);
-    return { ok: true };
-  },
   'kick-live:showFollows': async (msg) => {
-    await setShowFollows(msg.enabled);
-    return { ok: true };
-  },
-  'kick-live:refresh': async (msg) => {
-    const { kickStatus } = await chrome.storage.local.get('kickStatus');
-    if (msg.force || !kickStatus || Date.now() - kickStatus.checkedAt > STALE_MS) await poll();
+    await background.setShowFollowed(msg.enabled);
     return { ok: true };
   },
 };
@@ -56,16 +41,8 @@ function shareSignInWithFrames(cookie) {
 }
 
 export function startBackground() {
-  // Kick's chat needs your Kick sign-in while framed inside Twitch, which browsers block as a
-  // cross-site cookie. This allows only Kick cookies, and only on twitch.tv. Browsers remove the
-  // exception when the extension is uninstalled.
-  chrome.contentSettings.cookies
-    .set({
-      primaryPattern: 'https://*.kick.com/*',
-      secondaryPattern: 'https://www.twitch.tv/*',
-      setting: 'allow',
-    })
-    .catch((e) => console.error('StreamKEK: could not allow Kick cookies on Twitch', e));
+  allowCookiesOnTwitch('https://*.kick.com/*');
+  background.startPolling('kick-live:poll');
 
   chrome.cookies.onChanged.addListener(({ removed, cookie }) => {
     if (!removed && cookie.name === 'session_token' && cookie.domain.replace(/^\./, '') === 'kick.com') {
@@ -74,14 +51,5 @@ export function startBackground() {
   });
   chrome.cookies.get({ url: 'https://kick.com/', name: 'session_token' }).then((cookie) => {
     if (cookie) shareSignInWithFrames(cookie);
-  });
-
-  chrome.alarms.onAlarm.addListener((alarm) => {
-    if (alarm.name === POLL_ALARM) pollIfTwitchOpen();
-  });
-  // Creating an alarm restarts its countdown, and this runs each time the service worker
-  // wakes, so only create it when it's missing or has an old interval.
-  chrome.alarms.get(POLL_ALARM).then((alarm) => {
-    if (alarm?.periodInMinutes !== POLL_MINUTES) chrome.alarms.create(POLL_ALARM, { periodInMinutes: POLL_MINUTES });
   });
 }

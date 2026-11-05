@@ -8,6 +8,8 @@ import vm from 'node:vm';
 
 import { messageHandlers as kickHandlers } from '../src/features/kick/background/index.js';
 import { messageHandlers as youtubeHandlers } from '../src/features/youtube/background/index.js';
+import { KEYS as kickKeys } from '../src/features/kick/background/poller.js';
+import { KEYS as youtubeKeys } from '../src/features/youtube/background/poller.js';
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const exists = (path) => existsSync(new URL(`../${path}`, import.meta.url));
@@ -117,4 +119,9 @@ test('saved storage keys keep the names they were released with', () => {
   const { youtube, kick } = context.skek.sites;
   assert.deepEqual({ ...youtube.keys }, { own: 'channels', followed: 'subChannels', live: 'live', status: 'status', hidden: 'hiddenChannels' });
   assert.deepEqual({ ...kick.keys }, { own: 'kickChannels', followed: 'kickFollowed', live: 'kickLive', status: 'kickStatus', hidden: 'kickHidden' });
+});
+
+test('the background uses the same storage keys as sites.js', () => {
+  assert.deepEqual({ ...context.skek.sites.youtube.keys }, youtubeKeys);
+  assert.deepEqual({ ...context.skek.sites.kick.keys }, kickKeys);
 });
