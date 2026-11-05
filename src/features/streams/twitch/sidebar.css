@@ -1,6 +1,7 @@
 .skek-section { margin-bottom: 8px; }
-html[data-skek-on~='hideYouTubeLive'] #skek-section,
-html[data-skek-on~='hideKickLive'] #skek-kick-section { display: none; }
+/* data-skek-on is missing until the settings have loaded, so nothing hides before then. */
+html[data-skek-on]:not([data-skek-on~='showYouTubeLive']) #skek-section,
+html[data-skek-on]:not([data-skek-on~='showKickLive']) #skek-kick-section { display: none; }
 
 .skek-section__head {
   display: flex;
@@ -12,7 +13,7 @@ html[data-skek-on~='hideKickLive'] #skek-kick-section { display: none; }
 }
 /* Logged out there's no heading above us, so Twitch's collapse arrow sits on this row. */
 .skek-section:first-child .skek-section__head,
-html[data-skek-on~='hideYouTubeLive'] #skek-section:first-child + #skek-kick-section .skek-section__head { padding-right: 50px; }
+html[data-skek-on]:not([data-skek-on~='showYouTubeLive']) #skek-section:first-child + #skek-kick-section .skek-section__head { padding-right: 50px; }
 .skek-section__title {
   margin: 0;
   font-size: 14px;
@@ -85,6 +86,32 @@ html[data-skek-on~='hideYouTubeLive'] #skek-section:first-child + #skek-kick-sec
 .skek-card__hide:focus-visible { opacity: 1; pointer-events: auto; }
 .skek-card:hover:has(.skek-card__hide) .skek-card__live,
 .skek-card:has(.skek-card__hide:focus-visible) .skek-card__live { visibility: hidden; }
+/* The card asking whether to hide this channel. */
+.skek-card--confirm { gap: 6px; }
+.skek-card__confirm-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  font-weight: 600;
+}
+.skek-card__confirm-button {
+  flex: 0 0 auto;
+  height: 26px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 4px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.skek-card__confirm-button--hide { background: var(--color-background-button-primary-default, #9147ff); color: var(--color-text-button-primary, #fff); }
+.skek-card__confirm-button--hide:hover { background: var(--color-background-button-primary-hover, #772ce8); }
+.skek-card__confirm-button--cancel { background: var(--color-background-interactable-hover); color: var(--color-text-base); }
+.skek-card__confirm-button--cancel:hover { background: var(--color-border-base, rgba(83, 83, 95, 0.48)); }
 /* also used by stream-tip.js */
 .skek-dot {
   width: 8px;
@@ -103,7 +130,7 @@ html[data-skek-on~='hideYouTubeLive'] #skek-section:first-child + #skek-kick-sec
 .side-nav--collapsed .skek-section__add { display: none; }
 .side-nav--collapsed .skek-section__head { justify-content: center; padding: 0; }
 .side-nav--collapsed .skek-section:first-child .skek-section__head,
-html[data-skek-on~='hideYouTubeLive'] .side-nav--collapsed #skek-section:first-child + #skek-kick-section .skek-section__head { padding: 0; margin-top: 40px; }
+html[data-skek-on]:not([data-skek-on~='showYouTubeLive']) .side-nav--collapsed #skek-section:first-child + #skek-kick-section .skek-section__head { padding: 0; margin-top: 40px; }
 .side-nav--collapsed .skek-section__glyph { display: inline-flex; }
 .side-nav--collapsed .skek-card { justify-content: center; padding: 5px 0; }
 .side-nav--collapsed .skek-card__avatar { margin-right: 0; }

@@ -9,6 +9,12 @@
   // Twitch's channels first, then each site in the order sites.js has them.
   const SECTIONS = Object.entries(sites).map(([platform, { section }]) => ({ platform, ...section }));
   const lastRender = {};
+  // Long enough to read it, in case the mouse left before the card could notice.
+  const CONFIRM_MS = 8000;
+
+  // The channel whose card is asking whether to hide it, so an accidental click on the icon costs nothing.
+  let confirmingHide = null;
+  let confirmTimer = null;
 
   function sidebarHost() {
     return document.querySelector('[data-a-target="side-nav-bar"] .side-bar-contents nav') ||
@@ -27,7 +33,6 @@
   function hideButton(channel) {
     if (!canHide(channel)) return null;
     const label = `Hide ${channel.name}`;
-    const type = `${siteOf(channel).messagePrefix}:hide`;
     return el(
       'button',
       {
@@ -40,16 +45,41 @@
             // It's inside the card's link, which would open the stream.
             event.preventDefault();
             event.stopPropagation();
-            // The next card moves under the cursor, so a double-click would hide that too.
-            if (event.detail > 1) return;
             shared.hideTip();
-            send({ type, id: channel.id });
+            askToHide(channel.id);
           },
           // A middle click would open the link.
           auxclick: (event) => event.preventDefault(),
         },
       },
       icon('hide'),
+    );
+  }
+
+  function askToHide(id) {
+    confirmingHide = id;
+    clearTimeout(confirmTimer);
+    if (id) confirmTimer = setTimeout(() => askToHide(null), CONFIRM_MS);
+    renderSidebar();
+  }
+
+  function confirmButton(className, text, onClick) {
+    return el('button', { class: `skek-card__confirm-button ${className}`, type: 'button', on: { click: onClick } }, text);
+  }
+
+  // Cancel sits where the hide icon was, so a double-click on the icon can't hide anything.
+  function renderHideConfirm(channel) {
+    return el(
+      'div',
+      { class: 'skek-card skek-card--confirm', on: { mouseleave: () => askToHide(null) } },
+      el('span', { class: 'skek-card__confirm-text', title: channel.name }, `Hide ${channel.name}?`),
+      confirmButton('skek-card__confirm-button--hide', 'Hide', (event) => {
+        // The next card moves under the cursor, so a double-click would act on that too.
+        if (event.detail > 1) return;
+        askToHide(null);
+        send({ type: `${siteOf(channel).messagePrefix}:hide`, id: channel.id });
+      }),
+      confirmButton('skek-card__confirm-button--cancel', 'Cancel', () => askToHide(null)),
     );
   }
 
@@ -145,12 +175,12 @@
     placeSection(section, host, previous);
 
     const { platform } = config;
-    const signature = JSON.stringify([state.bySite[platform].own, channelsOn(platform), state.live, state.openId]);
+    const signature = JSON.stringify([state.bySite[platform].own, channelsOn(platform), state.live, state.openId, confirmingHide]);
     if (!rebuilt && signature === lastRender[platform]) return section;
     lastRender[platform] = signature;
 
     shared.hideTipUnlessHovered();
-    const cards = liveChannels(platform).map(renderCard);
+    const cards = liveChannels(platform).map((c) => (c.id === confirmingHide ? renderHideConfirm(c) : renderCard(c)));
     const list = section.querySelector('.skek-section__list');
     if (cards.length) list.replaceChildren(...cards);
     else {

@@ -69,7 +69,7 @@ Sites like YouTube and Kick share everything on Twitch's side, so a new one is m
 1. Add an entry to `src/features/streams/sites.js`. Its comments say what each part is for, and `node --test` checks it's complete.
 2. Create `src/features/<site>/background/`: a `runPoll` that saves live streams in the entry's storage keys, passed to `createSiteBackground` in `streams/background/site-background.js`, and an `index.js` wired up in `src/background/service-worker.js`. Add its keys to the table below, and its handlers and keys to `tests/project-wiring.test.js`.
 3. Create `src/features/<site>/frames/` for its player and chat, loading `streams/frames/` beside them in the manifest. Add the site's host to `host_permissions`.
-4. Add settings entries for its switch, in a category named after the site with an icon in `CATEGORY_ICONS`, and for hiding its section, with a rule in `streams/twitch/sidebar.css`. Add its icon to `ICONS` in `src/twitch/helpers.js` and a `skek-button--<platform>` colour in `streams/twitch/stream-view.css`.
+4. Add settings entries for its switch, in a category named after the site with an icon in `CATEGORY_ICONS`, and for showing its section, with a rule in `streams/twitch/sidebar.css`. Add its icon to `ICONS` in `src/twitch/helpers.js` and a `skek-button--<platform>` colour in `streams/twitch/stream-view.css`.
 
 ## Add a feature
 
@@ -115,7 +115,7 @@ Sites like YouTube and Kick share everything on Twitch's side, so a new one is m
 - Everything added to Twitch's page starts with `skek`: classes, ids, `data-skek-*` attributes, `--skek-*` custom properties and keyframes. Extension pages (settings window, manager) have their own document and don't need the prefix. `x.js` sits next to `x.css`.
 - To recognise Twitch elements, prefer `data-a-target`, `data-test-selector` or `href`, and fall back to Twitch's class names (`.side-nav-section`) only where no attribute exists. Don't use `aria-label` or visible text, which are translated, unless nothing else tells two things apart. Then match only a name that stays the same, and make a miss harmless, as the Kappa Train rule in `chat/sections.css` does. Check a selector on a live channel before relying on it. Never use generated class names like `Layout-sc-...`, and match hashed ones by prefix, like `[class*='chatCard--']`. `:has()` is fine, given the manifest's `minimum_chrome_version`.
 - Reach into a site's internals, like Twitch's player through React or YouTube's `movie_player`, only when nothing else can do the job, and make it do nothing if they change. `player/quality.js` and `kick/frames/watch-start.js` are the examples.
-- Never rename a storage key after release. Nothing migrates old keys, so users would lose that value.
+- Never rename a storage key after release. Nothing migrates old keys by itself, so users would lose that value. The one exception is `src/background/renamed-settings.js`, which carries the old hide settings for YouTube Live and Kick Live over to their show settings.
 - Use `innerHTML` only with constants from the code, never with text from a page or a stream.
 - A `message` listener checks `event.source` before trusting what it receives, as `view-layouts.js` does.
 - Don't add a script loader, a router or other shared machinery until a second feature really needs it. Code moves to `src/twitch/` when a second feature needs it. The stream view's half of a feature doesn't count: `view-layouts.js` uses `player/floating-window.js` because floating chat is one feature on two players.

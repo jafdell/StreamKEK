@@ -10,6 +10,7 @@ import { extractJson } from '../src/features/youtube/background/youtube-pages.js
 import { viewerCount } from '../src/features/youtube/background/live-entry.js';
 import { inputToUrl } from '../src/features/youtube/background/channels.js';
 import { liveChannelsFromGuide } from '../src/features/youtube/background/subscriptions.js';
+import { flippedSettings } from '../src/background/renamed-settings.js';
 import { channelPageToLive, followedStreamToLive, slugFromInput, startedAtIso } from '../src/features/kick/background/kick-api.js';
 
 // format.js is a classic content script, so it runs in a context holding the globals it expects.
@@ -52,6 +53,12 @@ test('liveChannelsFromGuide keeps only live channels, once each', () => {
   const lofi = 'UCSJ4gkVC6NrvII8umztf0Ow';
   const guide = { items: [entry(lofi, true), entry(lofi, true), entry('UCc5afI6aaaaaaaaaaaaaaaa', false), entry('FEwhat_to_watch', true)] };
   assert.deepEqual(liveChannelsFromGuide(guide), [{ id: lofi, name: 'Lofi Girl', handle: '@LofiGirl', avatar: 'large' }]);
+});
+
+test('flippedSettings keeps what people chose under the old hide settings', () => {
+  assert.deepEqual(flippedSettings({ hideYouTubeLive: true }), { set: { showYouTubeLive: false }, remove: ['hideYouTubeLive'] });
+  assert.deepEqual(flippedSettings({ hideKickLive: false }), { set: { showKickLive: true }, remove: ['hideKickLive'] });
+  assert.deepEqual(flippedSettings({}), { set: {}, remove: [] });
 });
 
 test('slugFromInput reads Kick links and refuses anything else', () => {
