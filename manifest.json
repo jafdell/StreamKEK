@@ -40,6 +40,7 @@
       ],
       "js": [
         "src/settings.js",
+        "src/features/streams/sites.js",
         "src/twitch/helpers.js",
         "src/twitch/page-sync.js",
         "src/twitch/settings-button.js",

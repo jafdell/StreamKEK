@@ -1,20 +1,18 @@
-// What the Twitch page knows. Kept in sync with chrome.storage by main.js. Kick Live shares all of
-// this page's code with YouTube Live: a Kick channel has `platform: 'kick'` and an id of kick:<slug>.
+// What the Twitch page knows. Kept in sync with chrome.storage by main.js. Every site shares this
+// page's code: what differs between them is in ../sites.js.
 (() => {
   'use strict';
 
-  // channels = yours plus subscriptions seen live, on both sites; offline ones are only listed if yours.
-  // live = both sites' live streams, from youtubeLive and kickLive.
+  const { sites, platformOf, siteOf } = skek;
+
+  // bySite = what's saved for each site: channels you added, followed channels seen live, live streams.
+  // channels = yours plus followed channels seen live, on every site; offline ones are only listed if yours.
+  // live = every site's live streams.
   // routeVideoId = the stream named in the address, if any.
   // pinnedVideoId = what's playing, so it doesn't change when viewer counts shift.
   const state = {
+    bySite: Object.fromEntries(Object.keys(sites).map((platform) => [platform, { own: [], followed: {}, live: {} }])),
     channels: [],
-    own: [],
-    subs: {},
-    kickOwn: [],
-    kickFollowed: {},
-    youtubeLive: {},
-    kickLive: {},
     live: {},
     openId: null,
     routeVideoId: null,
@@ -24,18 +22,10 @@
   };
 
   function mergeChannels() {
-    const ownIds = new Set([...state.own, ...state.kickOwn].map((c) => c.id));
-    state.channels = [
-      ...state.own,
-      ...Object.values(state.subs).filter((c) => !ownIds.has(c.id)),
-      ...state.kickOwn,
-      ...Object.values(state.kickFollowed).filter((c) => !ownIds.has(c.id)),
-    ];
-    state.live = { ...state.youtubeLive, ...state.kickLive };
-  }
-
-  function platformOf(channel) {
-    return channel?.platform ?? 'youtube';
+    const all = Object.values(state.bySite);
+    const ownIds = new Set(all.flatMap(({ own }) => own.map((c) => c.id)));
+    state.channels = all.flatMap(({ own, followed }) => [...own, ...Object.values(followed).filter((c) => !ownIds.has(c.id))]);
+    state.live = Object.assign({}, ...all.map(({ live }) => live));
   }
 
   function channelsOn(platform) {
@@ -59,5 +49,5 @@
     return streams.find((s) => s.videoId === wanted) ?? streams[0] ?? null;
   }
 
-  skek.streams = { state, mergeChannels, platformOf, channelsOn, liveChannels, streamsOf, openStream };
+  skek.streams = { state, sites, platformOf, siteOf, mergeChannels, channelsOn, liveChannels, streamsOf, openStream };
 })();

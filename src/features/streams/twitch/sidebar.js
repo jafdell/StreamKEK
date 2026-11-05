@@ -4,13 +4,10 @@
 
   const shared = skek.streams;
   const { el, icon, send } = skek.helpers;
-  const { state, channelsOn, liveChannels, platformOf, siteOf, streamsOf, avatarImg, compact } = shared;
+  const { state, sites, channelsOn, liveChannels, platformOf, siteOf, streamsOf, avatarImg, compact } = shared;
 
-  // Twitch's channels first, then YouTube, then Kick.
-  const SECTIONS = [
-    { platform: 'youtube', id: 'skek-section', title: 'YouTube Live', glyph: 'youtube' },
-    { platform: 'kick', id: 'skek-kick-section', title: 'Kick Live', glyph: 'kick' },
-  ];
+  // Twitch's channels first, then each site in the order sites.js has them.
+  const SECTIONS = Object.entries(sites).map(([platform, { section }]) => ({ platform, ...section }));
   const lastRender = {};
 
   function sidebarHost() {
@@ -20,9 +17,8 @@
 
   function canHide(channel) {
     if (state.openId === channel.id) return false;
-    return platformOf(channel) === 'kick'
-      ? !!state.kickFollowed[channel.id] && !state.kickOwn.some((c) => c.id === channel.id)
-      : !!state.subs[channel.id] && !state.own.some((c) => c.id === channel.id);
+    const { own, followed } = state.bySite[platformOf(channel)];
+    return !!followed[channel.id] && !own.some((c) => c.id === channel.id);
   }
 
   // Only for subscriptions and followed channels: channels you added are removed in the manager.
@@ -31,7 +27,7 @@
   function hideButton(channel) {
     if (!canHide(channel)) return null;
     const label = `Hide ${channel.name}`;
-    const type = platformOf(channel) === 'kick' ? 'kick-live:hide' : 'youtube-live:hide';
+    const type = `${siteOf(channel).messagePrefix}:hide`;
     return el(
       'button',
       {
@@ -92,8 +88,8 @@
     );
   }
 
-  // YouTube goes directly under Followed Channels, so Twitch channels stay first. Kick goes
-  // under YouTube, which stays in the page even when its setting hides it.
+  // The first site goes directly under Followed Channels, so Twitch channels stay first. Each
+  // other site goes under the one before, which stays in the page even when its setting hides it.
   function placeSection(section, host, previous) {
     if (previous) {
       if (previous.nextElementSibling !== section) previous.after(section);
@@ -104,11 +100,11 @@
     if (followed) {
       if (followed.nextElementSibling !== section) followed.after(section);
     } else if (native[0]) {
-      // Kick sits between this section and Twitch's. Moving past it would make it move back,
-      // which counts as a page change and renders again, forever.
-      const before = native[0].previousElementSibling;
-      const beforeKick = before?.id === 'skek-kick-section' ? before.previousElementSibling : before;
-      if (beforeKick !== section) native[0].before(section);
+      // Later sites' sections sit between this one and Twitch's. Moving past them would make them
+      // move back, which counts as a page change and renders again, forever.
+      let before = native[0].previousElementSibling;
+      while (before?.classList.contains('skek-section') && before !== section) before = before.previousElementSibling;
+      if (before !== section) native[0].before(section);
     } else if (!section.isConnected) {
       host.prepend(section);
     }
@@ -149,7 +145,7 @@
     placeSection(section, host, previous);
 
     const { platform } = config;
-    const signature = JSON.stringify([state.own, state.kickOwn, channelsOn(platform), state.live, state.openId]);
+    const signature = JSON.stringify([state.bySite[platform].own, channelsOn(platform), state.live, state.openId]);
     if (!rebuilt && signature === lastRender[platform]) return section;
     lastRender[platform] = signature;
 

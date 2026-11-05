@@ -194,25 +194,6 @@
     }
   }
 
-  // The player and chat addresses for a stream.
-  function frameUrls(channel, stream) {
-    const settings = `#skek-theme=${theme()}&skek-twitch-font=${twitchChatFontSize()}`;
-    if (platformOf(channel) === 'kick') {
-      const slug = encodeURIComponent(channel.slug);
-      return {
-        // The channel page offers every quality; the embed player, player.kick.com, stops at a low one.
-        player: `https://kick.com/${slug}`,
-        chat: `https://kick.com/popout/${slug}/chat${settings}`,
-      };
-    }
-    const id = encodeURIComponent(stream.videoId);
-    // The watch page offers every quality; the embedded player often stops at 1080p.
-    return {
-      player: `https://www.youtube.com/watch?v=${id}`,
-      chat: `https://www.youtube.com/live_chat?v=${id}&embed_domain=${location.hostname}${settings}`,
-    };
-  }
-
   function loadStream(channel, stream) {
     const { refs } = view;
     const key = stream ? `${channel?.id}/${stream.videoId}` : null;
@@ -227,7 +208,8 @@
       return;
     }
 
-    const urls = frameUrls(channel, stream);
+    const settings = `#skek-theme=${theme()}&skek-twitch-font=${twitchChatFontSize()}`;
+    const urls = siteOf(channel).frameUrls(channel, stream, settings);
     refs.player.replaceChildren(
       frame('skek-player__frame', urls.player, 'autoplay; encrypted-media; picture-in-picture; fullscreen'),
     );
@@ -259,21 +241,18 @@
     state.pinnedVideoId = stream?.videoId ?? null;
     loadStream(channel, stream);
 
-    // Kick's streams come with these details.
-    const isKick = platformOf(channel) === 'kick';
-    if (!isKick && stream && !stream.startedAt && !detailsRequested.has(stream.videoId)) {
+    const site = siteOf(channel);
+    if (site.loadsDetails && stream && !stream.startedAt && !detailsRequested.has(stream.videoId)) {
       detailsRequested.add(stream.videoId);
-      send({ type: 'youtube-live:loadStreamDetails', channelId: state.openId, videoId: stream.videoId });
+      send({ type: `${site.messagePrefix}:loadStreamDetails`, channelId: state.openId, videoId: stream.videoId });
     }
 
-    const site = siteOf(channel);
     const channelUrl = channel ? site.channelUrl(channel) : '';
     refs.avatar.src = channel?.avatar || '';
     refs.name.textContent = channel?.name ?? '';
     refs.name.href = channelUrl;
     refs.external.href = stream && channel ? site.streamUrl(channel, stream) : channelUrl;
-    refs.external.classList.toggle('skek-button--youtube', !isKick);
-    refs.external.classList.toggle('skek-button--kick', isKick);
+    refs.external.className = `skek-button skek-button--${platformOf(channel)}`;
     refs.externalLabel.textContent = `Watch on ${site.name}`;
     refs.title.textContent = stream?.title ?? 'Offline';
     refs.title.title = stream?.title ?? '';

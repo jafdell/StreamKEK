@@ -15,11 +15,28 @@ import { channelPageToLive, followedStreamToLive, slugFromInput, startedAtIso } 
 // format.js is a classic content script, so it runs in a context holding the globals it expects.
 const context = { skek: { helpers: { el() {} }, streams: {} } };
 vm.runInNewContext(readFileSync(new URL('../src/features/streams/twitch/format.js', import.meta.url), 'utf8'), context);
-const { compact, thumbnailUrl } = context.skek.streams;
+const { compact } = context.skek.streams;
 
-test('thumbnailUrl points at the stream and escapes its id', () => {
-  assert.equal(thumbnailUrl('abc_-1'), 'https://i.ytimg.com/vi/abc_-1/hqdefault_live.jpg');
-  assert.equal(thumbnailUrl('a/b'), 'https://i.ytimg.com/vi/a%2Fb/hqdefault_live.jpg');
+const sitesContext = { skek: {} };
+vm.runInNewContext(readFileSync(new URL('../src/features/streams/sites.js', import.meta.url), 'utf8'), sitesContext);
+const { sites, siteOf } = sitesContext.skek;
+
+test('YouTube previews point at the stream and escape its id', () => {
+  assert.equal(sites.youtube.previewUrl({ videoId: 'abc_-1' }), 'https://i.ytimg.com/vi/abc_-1/hqdefault_live.jpg');
+  assert.equal(sites.youtube.previewUrl({ videoId: 'a/b' }), 'https://i.ytimg.com/vi/a%2Fb/hqdefault_live.jpg');
+});
+
+test('siteOf treats a channel saved without a platform as YouTube', () => {
+  assert.equal(siteOf({ id: 'UC1' }).name, 'YouTube');
+  assert.equal(siteOf({ id: 'kick:a', platform: 'kick' }).name, 'Kick');
+});
+
+test('Kick links are told apart from anything else', () => {
+  const { linkPattern } = sites.kick;
+  assert.ok(linkPattern.test('https://kick.com/odablock'));
+  assert.ok(linkPattern.test('kick.com/odablock'));
+  assert.ok(!linkPattern.test('https://www.youtube.com/@kick.com'));
+  assert.ok(!linkPattern.test('@odablock'));
 });
 
 test('liveChannelsFromGuide keeps only live channels, once each', () => {

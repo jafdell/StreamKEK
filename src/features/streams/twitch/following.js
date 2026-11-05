@@ -4,30 +4,14 @@
 
   const shared = skek.streams;
   const { el, isPlainClick } = skek.helpers;
-  const { state, channelsOn, liveChannels, siteOf, avatarImg, compact, uptime } = shared;
+  const { state, sites, channelsOn, liveChannels, siteOf, avatarImg, compact, uptime } = shared;
 
-  const SITE_TABS = [
-    {
-      platform: 'youtube',
-      path: '/directory/following/youtube',
-      tabId: 'skek-following-tab',
-      panelId: 'skek-youtube-tab',
-      sectionId: 'skek-inline-section',
-      siteName: 'YouTube',
-      sectionTitle: 'YouTube live',
-      ownChannels: () => state.own,
-    },
-    {
-      platform: 'kick',
-      path: '/directory/following/kick',
-      tabId: 'skek-following-kick-tab',
-      panelId: 'skek-kick-tab',
-      sectionId: 'skek-kick-inline-section',
-      siteName: 'Kick',
-      sectionTitle: 'Kick live',
-      ownChannels: () => state.kickOwn,
-    },
-  ];
+  const SITE_TABS = Object.entries(sites).map(([platform, { name, following }]) => ({
+    platform,
+    siteName: name,
+    ...following,
+    ownChannels: () => state.bySite[platform].own,
+  }));
   const PAGES_WITH_SITE_SECTIONS = ['/directory/following', '/directory/following/live'];
 
   const lastPanelRender = {};
@@ -160,11 +144,11 @@
     } else if (isLiveBlock) {
       if (block.nextElementSibling !== sectionEl) block.after(sectionEl);
     } else if (header) {
-      // Kick's section can sit between this one and the header. Moving past it would make it
-      // move back, which counts as a page change and renders again, forever.
-      const before = header.previousElementSibling;
-      const skipKick = before?.id === 'skek-kick-inline-section' && before !== sectionEl;
-      if ((skipKick ? before.previousElementSibling : before) !== sectionEl) header.before(sectionEl);
+      // Later sites' sections sit between this one and the header. Moving past them would make
+      // them move back, which counts as a page change and renders again, forever.
+      let before = header.previousElementSibling;
+      while (before?.classList.contains('skek-inline') && before !== sectionEl) before = before.previousElementSibling;
+      if (before !== sectionEl) header.before(sectionEl);
     } else if (content.firstElementChild !== sectionEl) {
       content.prepend(sectionEl);
     }

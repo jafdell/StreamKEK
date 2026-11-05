@@ -4,7 +4,7 @@
 (() => {
   'use strict';
 
-  const { SETTINGS, settingDefaults } = skek;
+  const { SETTINGS, settingDefaults, sites } = skek;
 
   const REPO = 'https://github.com/jafdell/StreamKEK';
   const VERSION = chrome.runtime.getManifest().version;
@@ -12,18 +12,12 @@
   // Things in a category that aren't settings. `build` returns what goes under the label, and
   // `href` makes the whole row a link instead.
   const CUSTOM_ITEMS = [
-    {
-      category: 'YouTube',
-      label: 'Your YouTube channels',
-      hint: 'Add or remove channels by @handle, channel link or video link.',
-      build: () => channelManagerFrame('youtube', 'YouTube channels'),
-    },
-    {
-      category: 'Kick',
-      label: 'Your Kick channels',
-      hint: 'Add or remove channels by name or channel link.',
-      build: () => channelManagerFrame('kick', 'Kick channels'),
-    },
+    ...Object.entries(sites).map(([platform, { name, managerHint }]) => ({
+      category: name,
+      label: `Your ${name} channels`,
+      hint: managerHint,
+      build: () => channelManagerFrame(platform, `${name} channels`),
+    })),
     {
       category: 'Feedback',
       label: 'Report a bug',
@@ -57,7 +51,7 @@
     YouTube: '<path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.3 5 12 5 12 5s-6.3 0-7.8.4a2.5 2.5 0 0 0-1.8 1.8C2 8.7 2 12 2 12s0 3.3.4 4.8c.2.9.9 1.5 1.8 1.8 1.5.4 7.8.4 7.8.4s6.3 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.5.4-4.8.4-4.8s0-3.3-.4-4.8ZM10 15V9l5.2 3-5.2 3Z"/>',
   };
   const DEFAULT_CATEGORY_ICON = '<circle cx="12" cy="12" r="4"/>';
-  const SITE_CATEGORIES = ['Kick', 'YouTube'];
+  const SITE_CATEGORIES = Object.values(sites).map((site) => site.name);
 
   const search = document.getElementById('search');
   const categoryLinks = document.getElementById('categories');

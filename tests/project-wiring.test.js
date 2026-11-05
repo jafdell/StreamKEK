@@ -22,6 +22,7 @@ function filesIn(dir) {
 const context = {};
 vm.runInNewContext(read('src/settings.js'), context);
 const settingKeys = new Set(context.skek.SETTINGS.map((setting) => setting.key));
+vm.runInNewContext(read('src/features/streams/sites.js'), context);
 
 test('every file the manifest names exists', () => {
   const named = [
@@ -94,4 +95,26 @@ test('every message the pages send has a handler', () => {
       assert.ok(handlers[type], `${path} sends ${type}, which nothing handles`);
     }
   }
+});
+
+test('every site in sites.js is complete', () => {
+  const handlers = { ...youtubeHandlers, ...kickHandlers };
+  const seen = new Set();
+  for (const [platform, site] of Object.entries(context.skek.sites)) {
+    for (const action of ['add', 'remove', 'hide', 'unhide', 'refresh', ...(site.loadsDetails ? ['loadStreamDetails'] : [])]) {
+      assert.ok(handlers[`${site.messagePrefix}:${action}`], `${platform} has no handler for ${action}`);
+    }
+    assert.ok(settingKeys.has(site.followsSetting), `${platform} needs the setting ${site.followsSetting}`);
+    assert.ok(context.skek.SETTINGS.some((setting) => setting.category === site.name), `${platform} needs a settings category`);
+    for (const key of Object.values(site.keys)) {
+      assert.ok(!seen.has(key), `two sites share the storage key ${key}`);
+      seen.add(key);
+    }
+  }
+});
+
+test('saved storage keys keep the names they were released with', () => {
+  const { youtube, kick } = context.skek.sites;
+  assert.deepEqual({ ...youtube.keys }, { own: 'channels', followed: 'subChannels', live: 'live', status: 'status', hidden: 'hiddenChannels' });
+  assert.deepEqual({ ...kick.keys }, { own: 'kickChannels', followed: 'kickFollowed', live: 'kickLive', status: 'kickStatus', hidden: 'kickHidden' });
 });

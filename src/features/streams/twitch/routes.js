@@ -4,13 +4,15 @@
 
   const shared = skek.streams;
   const { isPlainClick } = skek.helpers;
-  const { state, platformOf, siteOf } = shared;
+  const { state, sites, platformOf, siteOf } = shared;
 
-  // A route is what follows the first / in these addresses:
-  // /yt/<channel>, or /yt/<channel>/<video id> for a stream you picked from the list.
-  // /kick/<channel> for a Kick stream.
-  const STREAM_PATH = /^\/((?:yt\/[^/]+(?:\/[\w-]{11})?)|(?:kick\/[^/]+))\/?$/;
-  const SHORTENED_PATHS = ['/yt', '/kick'];
+  // A route is what follows the first / in these addresses: /<route prefix>/<channel>, plus
+  // whatever else the site's routeTail allows, like /yt/<channel>/<video id> for a stream you
+  // picked from the list.
+  const siteEntries = Object.entries(sites);
+  const routePatterns = siteEntries.map(([, { routePrefix, routeTail = '' }]) => `${routePrefix}/[^/]+${routeTail}`);
+  const STREAM_PATH = new RegExp(`^/(${routePatterns.join('|')})/?$`);
+  const SHORTENED_PATHS = siteEntries.map(([, { routePrefix }]) => `/${routePrefix}`);
   const FALLBACK_PATH = '/directory/following';
 
   // Twitch's router doesn't see pushState, so it keeps the page you came from behind
@@ -36,7 +38,7 @@
 
   function routeParts(route) {
     const [prefix, slug = '', videoId = null] = route.split('/');
-    const platform = prefix === 'kick' ? 'kick' : 'youtube';
+    const platform = siteEntries.find(([, { routePrefix }]) => routePrefix === prefix)?.[0];
     const channel = state.channels.find((c) => platformOf(c) === platform && slugFor(c) === slug.toLowerCase());
     return { channel, videoId };
   }
@@ -108,7 +110,8 @@
   function handlePopState(event) {
     const saved = event.state?.skekRoute;
     // Routes saved by older versions have no site in them, and were all YouTube.
-    const route = (saved && !/^(yt|kick)\//.test(saved) ? `yt/${saved}` : saved) ?? location.pathname.match(STREAM_PATH)?.[1];
+    const hasSite = (route) => SHORTENED_PATHS.includes(`/${route.split('/')[0]}`);
+    const route = (saved && !hasSite(saved) ? `yt/${saved}` : saved) ?? location.pathname.match(STREAM_PATH)?.[1];
     if (route) {
       currentRoute = route;
       twitchPageLost = true;

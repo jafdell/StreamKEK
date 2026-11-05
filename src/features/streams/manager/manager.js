@@ -1,48 +1,31 @@
-// The channel manager, for YouTube and Kick: add and remove channels, the subscriptions and
-// follows switches, and showing hidden channels again.
+// The channel manager, for every site: add and remove channels, the switches for your followed
+// channels, and showing hidden channels again.
 (() => {
   'use strict';
 
-  // A channel's messages go to whichever feature's background owns it.
-  const messagePrefix = (channel) => (channel.platform === 'kick' ? 'kick-live' : 'youtube-live');
-  const isKickLink = (value) => /^(https?:\/\/)?([\w-]+\.)?kick\.com\//i.test(value);
+  const { SETTINGS, settingDefaults, sites, siteOf } = skek;
 
   // Inside the settings window, which has the heading and the switches already.
   const params = new URLSearchParams(location.search);
   document.documentElement.toggleAttribute('data-embedded', params.has('embedded'));
-  // Each of the settings window's tabs shows one site. The sidebar's + button shows both.
-  const site = params.get('site');
-  const PLACEHOLDERS = { youtube: '@handle or channel link', kick: 'Channel name or link' };
+  // Each of the settings window's tabs shows one site. The sidebar's + button shows them all.
+  const onlySite = sites[params.get('site')];
+  const shownSites = onlySite ? [onlySite] : Object.values(sites);
 
   const form = document.getElementById('add');
   const input = document.getElementById('input');
-  if (site) input.placeholder = PLACEHOLDERS[site];
+  if (onlySite) input.placeholder = onlySite.placeholder;
   const submit = document.getElementById('submit');
   const message = document.getElementById('message');
+  const switches = document.getElementById('switches');
   const list = document.getElementById('list');
   const empty = document.getElementById('empty');
-  const subsToggle = document.getElementById('subs-toggle');
-  const subsState = document.getElementById('subs-state');
-  const kickToggle = document.getElementById('kick-toggle');
-  const kickState = document.getElementById('kick-state');
   const hiddenSection = document.getElementById('hidden');
   const hiddenTitle = document.getElementById('hidden-title');
   const hiddenList = document.getElementById('hidden-list');
 
-  const WATCHED_KEYS = [
-    'channels',
-    'subChannels',
-    'live',
-    'status',
-    'showSubscriptions',
-    'hiddenChannels',
-    'kickChannels',
-    'kickFollowed',
-    'kickLive',
-    'kickStatus',
-    'kickHidden',
-    'showKickFollows',
-  ];
+  const allSites = Object.values(sites);
+  const WATCHED_KEYS = allSites.flatMap(({ keys, followsSetting }) => [...Object.values(keys), followsSetting]);
 
   function say(text, isError) {
     message.hidden = !text;
@@ -83,7 +66,7 @@
     remove.textContent = '×';
     remove.title = `Remove ${channel.name}`;
     remove.setAttribute('aria-label', remove.title);
-    remove.addEventListener('click', () => chrome.runtime.sendMessage({ type: `${messagePrefix(channel)}:remove`, id: channel.id }));
+    remove.addEventListener('click', () => chrome.runtime.sendMessage({ type: `${siteOf(channel).messagePrefix}:remove`, id: channel.id }));
 
     return channelRow(channel, state, remove);
   }
@@ -95,56 +78,66 @@
     show.textContent = 'Show';
     show.title = `Show ${channel.name} again`;
     show.setAttribute('aria-label', show.title);
-    show.addEventListener('click', () => chrome.runtime.sendMessage({ type: `${messagePrefix(channel)}:unhide`, id: channel.id }));
+    show.addEventListener('click', () => chrome.runtime.sendMessage({ type: `${siteOf(channel).messagePrefix}:unhide`, id: channel.id }));
     return channelRow(channel, null, show);
   }
 
-  async function render() {
-    const {
-      channels = [],
-      subChannels = {},
-      live = {},
-      status,
-      showSubscriptions = skek.settingDefaults.showSubscriptions,
-      hiddenChannels = {},
-      kickChannels = [],
-      kickFollowed = {},
-      kickLive = {},
-      kickStatus,
-      kickHidden = {},
-      showKickFollows = skek.settingDefaults.showKickFollows,
-    } = await chrome.storage.local.get(WATCHED_KEYS);
-    const allLive = { ...live, ...kickLive };
-    const own = [...(site === 'kick' ? [] : channels), ...(site === 'youtube' ? [] : kickChannels)];
-    list.replaceChildren(...own.map((c) => row(c, allLive[c.id])));
-    empty.hidden = own.length > 0;
+  // One switch per site, using the setting's own label and message.
+  const switchParts = new Map(
+    allSites.map((site) => {
+      const setting = SETTINGS.find((s) => s.key === site.followsSetting);
+      const label = document.createElement('label');
+      label.className = 'subs';
+      const text = document.createElement('span');
+      const title = document.createElement('span');
+      title.className = 'subs-title';
+      title.textContent = setting.label;
+      const stateText = document.createElement('span');
+      stateText.className = 'state';
+      text.append(title, stateText);
+      const toggle = document.createElement('input');
+      toggle.className = 'skek-switch';
+      toggle.type = 'checkbox';
+      toggle.setAttribute('role', 'switch');
+      toggle.addEventListener('change', () => chrome.runtime.sendMessage({ type: setting.message, enabled: toggle.checked }));
+      label.append(text, toggle);
+      switches.append(label);
+      return [site, { toggle, stateText }];
+    }),
+  );
 
-    const hidden = [
-      ...(site === 'kick' ? [] : Object.values(hiddenChannels)),
-      ...(site === 'youtube' ? [] : Object.values(kickHidden)),
-    ].sort((a, b) => a.name.localeCompare(b.name));
+  function followsState(site, saved) {
+    const status = saved[site.keys.status];
+    if (saved[site.followsSetting] === false) return 'Off';
+    if (status?.signedOut) return `Sign in to ${site.name} in this browser to use this`;
+    if (status?.failed) return `Couldn't reach ${site.name}. Trying again every minute`;
+    const followed = saved[site.keys.followed] ?? {};
+    const live = saved[site.keys.live] ?? {};
+    return `${Object.keys(followed).filter((id) => live[id]).length} live right now`;
+  }
+
+  async function render() {
+    const saved = await chrome.storage.local.get(WATCHED_KEYS);
+
+    const rows = shownSites.flatMap((site) => (saved[site.keys.own] ?? []).map((c) => row(c, saved[site.keys.live]?.[c.id])));
+    list.replaceChildren(...rows);
+    empty.hidden = rows.length > 0;
+
+    const hidden = shownSites
+      .flatMap((site) => Object.values(saved[site.keys.hidden] ?? {}))
+      .sort((a, b) => a.name.localeCompare(b.name));
     hiddenSection.hidden = !hidden.length;
     hiddenTitle.textContent = `Hidden channels (${hidden.length})`;
     hiddenList.replaceChildren(...hidden.map(hiddenRow));
 
-    kickToggle.checked = showKickFollows;
-    const liveFollows = Object.keys(kickFollowed).filter((id) => kickLive[id]).length;
-    kickState.textContent = !showKickFollows
-      ? 'Off'
-      : kickStatus?.signedOut
-        ? 'Sign in to Kick in this browser to use this'
-        : kickStatus?.failed
-          ? "Couldn't reach Kick. Trying again every minute"
-          : `${liveFollows} live right now`;
-
-    subsToggle.checked = showSubscriptions;
-    const liveSubs = Object.keys(subChannels).filter((id) => live[id]).length;
-    subsState.textContent = !showSubscriptions
-      ? 'Off'
-      : status?.signedOut
-        ? 'Sign in to YouTube in this browser to use this'
-        : `${liveSubs} live right now`;
-    if (status?.consentRequired) say('YouTube is showing its cookie prompt. Open youtube.com and answer it once.', true);
+    for (const site of allSites) {
+      const { toggle, stateText } = switchParts.get(site);
+      toggle.checked = saved[site.followsSetting] ?? settingDefaults[site.followsSetting];
+      stateText.textContent = followsState(site, saved);
+      if (saved[site.keys.status]?.consentRequired) {
+        say(`${site.name} is showing its cookie prompt. Open ${site.domain} and answer it once.`, true);
+      }
+    }
   }
 
   form.addEventListener('submit', async (event) => {
@@ -154,9 +147,8 @@
 
     submit.disabled = true;
     say('Looking up channel…');
-    const toKick = site ? site === 'kick' : isKickLink(value);
-    const type = toKick ? 'kick-live:add' : 'youtube-live:add';
-    const result = await chrome.runtime.sendMessage({ type, input: value });
+    const site = onlySite ?? allSites.find(({ linkPattern }) => linkPattern?.test(value)) ?? sites.youtube;
+    const result = await chrome.runtime.sendMessage({ type: `${site.messagePrefix}:add`, input: value });
     submit.disabled = false;
 
     if (result?.ok) {
@@ -167,18 +159,10 @@
     }
   });
 
-  subsToggle.addEventListener('change', () => {
-    chrome.runtime.sendMessage({ type: 'youtube-live:showSubscriptions', enabled: subsToggle.checked });
-  });
-  kickToggle.addEventListener('change', () => {
-    chrome.runtime.sendMessage({ type: 'kick-live:showFollows', enabled: kickToggle.checked });
-  });
-
   chrome.storage.onChanged.addListener((changes, area) => {
     // Other keys (settings, theme) would rebuild the list for nothing.
     if (area === 'local' && WATCHED_KEYS.some((key) => key in changes)) render();
   });
   render();
-  chrome.runtime.sendMessage({ type: 'youtube-live:refresh' });
-  chrome.runtime.sendMessage({ type: 'kick-live:refresh' });
+  for (const { messagePrefix } of allSites) chrome.runtime.sendMessage({ type: `${messagePrefix}:refresh` });
 })();

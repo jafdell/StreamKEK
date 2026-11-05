@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="../../../shared/page.css" />
     <link rel="stylesheet" href="manager.css" />
     <script src="../../../settings.js"></script>
+    <script src="../sites.js"></script>
     <script src="../../../shared/page-theme.js"></script>
   </head>
   <body>
@@ -15,20 +16,7 @@
       <button id="submit" type="submit">Add</button>
     </form>
     <p id="message" role="status" hidden></p>
-    <label class="subs">
-      <span>
-        <span class="subs-title">Show my live YouTube subscriptions</span>
-        <span id="subs-state" class="state"></span>
-      </span>
-      <input id="subs-toggle" class="skek-switch" type="checkbox" role="switch" checked />
-    </label>
-    <label class="subs">
-      <span>
-        <span class="subs-title">Show my live Kick follows</span>
-        <span id="kick-state" class="state"></span>
-      </span>
-      <input id="kick-toggle" class="skek-switch" type="checkbox" role="switch" checked />
-    </label>
+    <div id="switches"></div>
     <ul id="list"></ul>
     <p id="empty" hidden>Add a channel and it will appear in Twitch's sidebar whenever it goes live.</p>
     <details id="hidden" hidden>
