@@ -3,8 +3,8 @@
 
 import { allowCookiesOnTwitch, sendRequestsAsSite } from '../../streams/background/site-background.js';
 import { addChannel, removeChannel } from './channels.js';
-import { startChatSignIn } from './chat-sign-in.js';
 import { background } from './poller.js';
+import { startTwitchFrameCookies } from './twitch-frame-cookies.js';
 
 export const messageHandlers = {
   ...background.messageHandlers('kick-live'),
@@ -26,5 +26,5 @@ export function startBackground() {
     { header: 'referer', operation: 'set', value: 'https://kick.com/' },
   ]);
   background.startPolling('kick-live:poll');
-  startChatSignIn();
+  startTwitchFrameCookies();
 }

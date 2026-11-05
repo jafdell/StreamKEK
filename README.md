@@ -35,7 +35,7 @@ Open the settings from the extension's icon in Twitch's top bar or the browser t
 ## Good to know
 
 - **YouTube access:** the extension checks what's live every minute while a Twitch tab is open, using your YouTube sign-in. To play streams inside Twitch, it allows YouTube cookies on twitch.tv, which is why the browser warns about cookie settings, and removes YouTube's anti-framing and content security headers for `/watch` frames opened from twitch.tv.
-- **Kick access:** the extension checks what's live every minute while a Twitch tab is open, using your Kick sign-in, which only goes to Kick. To let you chat inside Twitch, it allows Kick cookies on twitch.tv and keeps a copy of your Kick sign-in that browsers only send to Kick under Twitch. Your real Kick sign-in isn't changed.
+- **Kick access:** the extension checks what's live every minute while a Twitch tab is open, using your Kick sign-in, which only goes to Kick. To let you chat inside Twitch, it allows Kick cookies on twitch.tv and keeps a copy of your Kick sign-in and your answer to its cookie prompt, which browsers only send to Kick under Twitch. Your real Kick cookies aren't changed. If a Kick stream keeps loading, open kick.com and answer its cookie prompt once.
 - **What Twitch can see:** your live YouTube subscriptions and Kick follows are drawn into Twitch's page, so Twitch and scripts running on its page could read them.
 - **Brave:** if chat says "Sign in to chat" while you're signed in to YouTube or Kick, open Brave Shields on twitch.tv and allow cross-site cookies.
 - **Site updates:** this relies on how Twitch, YouTube and Kick build their pages, so their updates can break parts of it.
