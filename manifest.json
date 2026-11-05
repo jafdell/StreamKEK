@@ -3,7 +3,7 @@
   "name": "StreamKEK",
   "version": "1.0.2",
   "minimum_chrome_version": "145",
-  "description": "Gives you more control over watching and chatting on Twitch, and brings YouTube live streams and their chat there too.",
+  "description": "Gives you more control over watching and chatting on Twitch, and brings YouTube and Kick live streams and their chat there too.",
   "icons": {
     "16": "icons/16.png",
     "48": "icons/48.png",
@@ -51,7 +51,7 @@
         "src/features/streams/twitch/sidebar.js",
         "src/features/streams/twitch/view-frames.js",
         "src/features/streams/twitch/view-layouts.js",
-        "src/features/streams/twitch/player-view.js",
+        "src/features/streams/twitch/stream-view.js",
         "src/features/streams/twitch/routes.js",
         "src/features/streams/twitch/following.js",
         "src/features/streams/twitch/main.js",
@@ -74,7 +74,7 @@
         "src/features/streams/twitch/sidebar.css",
         "src/features/streams/twitch/stream-tip.css",
         "src/features/streams/twitch/manager-frame.css",
-        "src/features/streams/twitch/player-view.css",
+        "src/features/streams/twitch/stream-view.css",
         "src/features/streams/twitch/following.css"
       ],
       "run_at": "document_start"

@@ -118,7 +118,7 @@ test('every site in sites.js is complete', () => {
       assert.ok(site.following?.[field], `${platform} needs following.${field}`);
     }
     for (const field of ['own', 'followed', 'live', 'status', 'hidden']) assert.ok(site.keys?.[field], `${platform} needs keys.${field}`);
-    assert.ok(read('src/features/streams/twitch/player-view.css').includes(`.skek-button--${platform}`), `${platform} needs a button colour`);
+    assert.ok(read('src/features/streams/twitch/stream-view.css').includes(`.skek-button--${platform}`), `${platform} needs a button colour`);
     assert.ok(read('src/twitch/helpers.js').includes(`${site.section.glyph}: '`), `${platform} needs the icon ${site.section.glyph}`);
     assert.ok(context.skek.SETTINGS.some((setting) => setting.category === site.name), `${platform} needs a settings category`);
     for (const key of Object.values(site.keys)) {

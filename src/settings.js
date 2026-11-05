@@ -51,7 +51,7 @@
       key: 'chatFontSize',
       category: 'Chat',
       label: 'Chat font size',
-      hint: "Text size in both Twitch and YouTube chat. Twitch's setting uses the size from Twitch's own chat settings.",
+      hint: "Text size in Twitch, YouTube and Kick chat. Twitch's setting uses the size from Twitch's own chat settings.",
       default: 'twitch',
       dropdown: true,
       choices: [
@@ -141,7 +141,7 @@
       key: 'theme',
       category: 'Appearance',
       label: 'Theme',
-      hint: 'Used by this window, popups, the stream view and its chat. The rest of Twitch keeps its own theme.',
+      hint: "Used by this window, popups, the stream view and YouTube's chat. Kick's chat stays dark, and the rest of Twitch keeps its own theme.",
       default: 'dark',
       choices: [
         { value: 'dark', label: 'Dark' },

@@ -2,7 +2,8 @@
 // streams/background/site-background.js.
 
 import { allowCookiesOnTwitch } from '../../streams/background/site-background.js';
-import { addChannel, background, removeChannel } from './poller.js';
+import { addChannel, removeChannel } from './channels.js';
+import { background } from './poller.js';
 
 export const messageHandlers = {
   ...background.messageHandlers('kick-live'),

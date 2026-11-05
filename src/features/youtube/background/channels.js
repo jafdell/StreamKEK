@@ -1,7 +1,7 @@
 // Channels you add yourself.
 
 import { ConsentRequired, YT, extractJson, fetchPage, watchPageSections } from './youtube-pages.js';
-import { buildLiveEntry } from './streams.js';
+import { buildLiveEntry } from './live-entry.js';
 
 // Returns the channel's live entry and avatar, or null when it's not live right now.
 export async function checkChannel(channelId, known) {

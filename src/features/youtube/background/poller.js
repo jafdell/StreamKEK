@@ -6,7 +6,7 @@
 import { forEachLimited } from '../../streams/background/for-each-limited.js';
 import { createSiteBackground } from '../../streams/background/site-background.js';
 import { ConsentRequired } from './youtube-pages.js';
-import { carryStreamDetails } from './streams.js';
+import { carryStreamDetails } from './live-entry.js';
 import { checkChannel } from './channels.js';
 import { fetchLiveSubscriptions } from './subscriptions.js';
 

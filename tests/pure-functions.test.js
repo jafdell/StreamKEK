@@ -7,7 +7,7 @@ import { test } from 'node:test';
 import vm from 'node:vm';
 
 import { extractJson } from '../src/features/youtube/background/youtube-pages.js';
-import { viewerCount } from '../src/features/youtube/background/streams.js';
+import { viewerCount } from '../src/features/youtube/background/live-entry.js';
 import { inputToUrl } from '../src/features/youtube/background/channels.js';
 import { liveChannelsFromGuide } from '../src/features/youtube/background/subscriptions.js';
 import { channelPageToLive, followedStreamToLive, slugFromInput, startedAtIso } from '../src/features/kick/background/kick-api.js';

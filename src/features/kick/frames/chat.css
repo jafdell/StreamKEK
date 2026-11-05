@@ -11,7 +11,7 @@ html[data-skek-kick-chat] #channel-chatroom { --chatroom-font-size: var(--skek-c
 /* The stream view has its own Stream Chat heading. */
 html[data-skek-kick-chat] #channel-chatroom > .contents > div:first-child:has(> span.absolute) { display: none !important; }
 
-/* Floating chat. The color-scheme has to be set here and in player-view.css, or the browser paints
+/* Floating chat. The color-scheme has to be set here and in stream-view.css, or the browser paints
    the frame white instead of showing the window's background through it. */
 html[data-skek-kick-chat][data-skek-transparent] { color-scheme: light !important; }
 html[data-skek-kick-chat][data-skek-transparent],

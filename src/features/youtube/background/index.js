@@ -4,7 +4,7 @@
 import { allowCookiesOnTwitch } from '../../streams/background/site-background.js';
 import { addChannel, removeChannel } from './channels.js';
 import { background } from './poller.js';
-import { loadStreamDetails } from './streams.js';
+import { loadStreamDetails } from './live-entry.js';
 
 export const messageHandlers = {
   ...background.messageHandlers('youtube-live'),

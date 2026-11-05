@@ -302,7 +302,7 @@ html.skek yt-live-chat-app { min-height: 0 !important; }
 
 /* Floating chat: streams/frames/chat-settings.js sets this while the window behind the frame draws the background. It
    comes after the rules it overrides. The colour scheme has to be set here and on the frame in
-   player-view.css, or the browser paints the frame white. The message box keeps its own
+   stream-view.css, or the browser paints the frame white. The message box keeps its own
    background, so typing stays readable. */
 html.skek[data-skek-transparent] {
   color-scheme: light !important;
