@@ -22,7 +22,7 @@
         on: {
           click: (event) => shared.openOnPlainClick(event, channel.id, stream.videoId),
           mouseenter: () => {
-            preview.src = siteOf(channel).previewUrl(stream);
+            if (preview) preview.src = siteOf(channel).previewUrl(stream);
           },
         },
       },
@@ -41,8 +41,9 @@
     const collapsed = !!anchor.closest('.side-nav--collapsed');
     const streams = streamsOf(live);
     const several = streams.length > 1;
-    const previewUrl = siteOf(channel).previewUrl(live);
-    // Kick only gives an image for channels you follow.
+    // Off in the settings, or Kick only gives an image for channels you follow. The title and list stay.
+    const previewsOn = document.documentElement.matches("[data-skek-on~='sidebarPreviews']");
+    const previewUrl = previewsOn ? siteOf(channel).previewUrl(live) : '';
     const preview = previewUrl
       ? el('img', { class: 'skek-preview-img', src: previewUrl, alt: '', referrerPolicy: 'no-referrer' })
       : null;

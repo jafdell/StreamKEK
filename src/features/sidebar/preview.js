@@ -59,7 +59,7 @@
 
   function show(card) {
     hide();
-    const url = previewUrl(card);
+    const url = document.documentElement.matches("[data-skek-on~='sidebarPreviews']") ? previewUrl(card) : null;
     if (!url) return;
     anchor = card;
     const started = Date.now();

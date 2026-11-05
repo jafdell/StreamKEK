@@ -21,7 +21,7 @@ In a pull request, say what you tried and what you couldn't.
 | Floating chat | Also dragging, resizing, the slider, typing a message, and double-clicking the video to leave fullscreen |
 | Stream quality | Each choice on a Twitch, a YouTube and a Kick stream, and a size the stream doesn't offer |
 | Chat settings | Twitch chat, chat on a Twitch video, YouTube chat and Kick chat, with and without [7TV](https://7tv.app) |
-| Sidebar previews | Hovering a live and an offline channel, near the top and bottom of the window, in the expanded and collapsed sidebar, on Twitch, YouTube and Kick channels, and each stream of a YouTube channel with several |
+| Sidebar previews | Hovering a live and an offline channel, near the top and bottom of the window, in the expanded and collapsed sidebar, on Twitch, YouTube and Kick channels, and each stream of a YouTube channel with several. With the setting off, no images show, and the titles and stream list still do |
 | Sidebar highlight | Hovering a Twitch channel's card looks like hovering a YouTube or Kick one, and the channel you're watching is highlighted in the expanded and collapsed sidebar, and it moves when you change channel. Nothing extra is highlighted on a YouTube or Kick stream, the Following page or a category page |
 | Hide settings | Turning each on and off in the expanded and collapsed sidebar, in chat, or on a channel with extensions over the video, hovering the player |
 | Feedback links | Each link in the settings window and the toolbar popup opens the right GitHub page in a new tab, and the bug form has the version filled in |

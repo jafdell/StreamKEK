@@ -48,6 +48,13 @@
       default: false,
     },
     {
+      key: 'sidebarPreviews',
+      category: 'Sidebar',
+      label: 'Show stream previews',
+      hint: 'Shows an image of the stream when you hover a live channel in the sidebar, on Twitch, YouTube and Kick.',
+      default: true,
+    },
+    {
       key: 'chatFontSize',
       category: 'Chat',
       label: 'Chat font size',
