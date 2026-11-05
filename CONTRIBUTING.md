@@ -6,7 +6,7 @@ Bugs and feature requests go in issues. To send a change: fork the repo, make a 
 
 - **Service worker** (`src/background/service-worker.js`, feature code in `background/` folders): works out what's live on YouTube and Kick, for all tabs at once. It also allows both sites' cookies on Twitch, `rules/youtube-watch-frame.json` lets YouTube's watch page load in a frame, and `rules/youtube-guide-origin.json` and `rules/kick-api-origin.json` let it read what's live.
 - **Twitch page scripts** (the first `content_scripts` entry in `manifest.json`): run in every Twitch tab and share one global, `skek`.
-- **Stream view:** the `/yt/<channel>` page those scripts draw over Twitch's. It holds two YouTube frames, the player and the chat. Twitch's own page stays alive behind it, with its video paused and the address showing `/yt/...`, so a Twitch feature's scripts and shortcuts keep running there. Check for `#skek-view` where that matters, as `player-modes.js` does.
+- **Stream view:** the `/yt/<channel>` page those scripts draw over Twitch's. It holds two YouTube frames, the player and the chat. Twitch's own page stays alive behind it, with its video paused and the address showing `/yt/...`, so a Twitch feature's scripts and shortcuts keep running there. Check for `#skek-view` where that matters, as `player/modes.js` does.
 - **Frame scripts** (`frames/` folders): load on YouTube itself too, wherever their manifest entry matches, and switch themselves on only inside those two frames.
 - **Page-world scripts** (`"world": "MAIN"` in the manifest): run in the site's own page, to reach things like its player.
 - **Extension pages:** the settings window and the channel manager. The manager also opens beside the sidebar's **+** button, called the **+** frame.
@@ -19,17 +19,17 @@ Each feature is a folder in `src/features/`. This table lists only what its name
 
 | To change... | Look in |
 | --- | --- |
-| Settings | `src/settings.js` (the registry). A CSS-only setting's rule lives with its feature, like `src/features/sidebar-sections/sidebar-sections.css` |
+| Settings | `src/settings.js` (the registry). A CSS-only setting's rule lives with its feature, like `src/features/sidebar/sections.css` |
 | Code shared by every feature on Twitch pages | `src/twitch/`: `helpers.js`, `page-sync.js`, `base.css` |
 | The extension's button in Twitch's top bar and the window around the settings page | `src/twitch/settings-button.js` and `.css` |
 | The settings page: categories, search, rows. Also the toolbar popup | `src/settings-window/`. `src/shared/` holds what it shares with the channel manager: `page.css` and `page-theme.js` |
 | The Theme setting's colors | Twitch's values for each theme, wherever `src/` matches `data-theme` or `data-skek-theme`, plus `READABLE` in `youtube/frames/chat.js` (chatters' name colors) |
 | YouTube Live | `src/features/youtube/`: `background/` (polling, reading YouTube pages), `twitch/` (sidebar, stream view, address, Following page), `frames/` (chat, player), `manager/` (channel manager) |
 | Kick Live | `src/features/kick/`: `background/` (polling, Kick's API) and `frames/` (chat, player). Its sidebar section, stream view, address and Following page share YouTube Live's code in `streams/twitch/`, where `SITES` in `format.js` holds what differs, and its channels are in `streams/manager/` |
-| Chat: font size, timestamps, what sits over chat | `src/features/chat-font-size/`, `chat-timestamps/`, `chat-sections/`. YouTube's chat is styled in `youtube/frames/chat.css` |
-| Stream quality | `src/features/stream-quality/` (Twitch) and `youtube/frames/watch-start.js` (YouTube) |
-| Theatre, stacked and floating chat modes | `src/features/player-modes/` (Twitch, plus `floating-window.js` and `.css`, which both use) and `streams/twitch/player-view.js` and `.css` (YouTube). `frames/layout-keys.js` forwards the shortcuts from inside YouTube's frames, and `frames/chat.js` and `.css` make floating chat see-through. Theatre on Twitch is Twitch's own. Stacked and floating exist twice, so change both |
-| Sidebar previews | `src/features/sidebar-preview/` (Twitch channels) and `streams/twitch/stream-tip.js` (YouTube channels) |
+| Chat: font size, timestamps, what sits over chat | `src/features/chat/`, `chat-timestamps/`, `chat-sections/`. YouTube's chat is styled in `youtube/frames/chat.css` |
+| Stream quality | `src/features/player/` (Twitch) and `youtube/frames/watch-start.js` (YouTube) |
+| Theatre, stacked and floating chat modes | `src/features/player/` (Twitch, plus `floating-window.js` and `.css`, which both use) and `streams/twitch/player-view.js` and `.css` (YouTube). `frames/layout-keys.js` forwards the shortcuts from inside YouTube's frames, and `frames/chat.js` and `.css` make floating chat see-through. Theatre on Twitch is Twitch's own. Stacked and floating exist twice, so change both |
+| Sidebar previews | `src/features/sidebar/` (Twitch channels) and `streams/twitch/stream-tip.js` (YouTube channels) |
 | Tests | `tests/`, and `TESTING.md` for what to check by hand |
 
 ## Development setup
@@ -43,7 +43,7 @@ Each feature is a folder in `src/features/`. This table lists only what its name
 ## Add a setting
 
 1. Add one entry to `SETTINGS` in `src/settings.js`: its `key`, `category`, `label`, `hint` and `default`. Its row in the settings window, its searchability and its storage default now exist. Reuse an existing category where one fits; a new name adds a new category to the left column (give it an icon in `CATEGORY_ICONS` in `src/settings-window/settings-window.js`, or it gets a plain dot).
-2. Add a rule starting `html[data-skek-on~='yourKey']` to a CSS file in the first `content_scripts` entry of the manifest, usually your feature's. Prefer this to JS: it can't flash when Twitch re-renders. A rule that hides something should fail safe: add a `:not()` so a Twitch markup change can't hide more than you meant, as `sidebar-sections.css` does. `data-skek-on` exists only on Twitch's top page. In a frame, have its script read the setting and put its own attribute on the frame's `<html>`, then gate the CSS on that, as `chat.js` does with `data-skek-theme`.
+2. Add a rule starting `html[data-skek-on~='yourKey']` to a CSS file in the first `content_scripts` entry of the manifest, usually your feature's. Prefer this to JS: it can't flash when Twitch re-renders. A rule that hides something should fail safe: add a `:not()` so a Twitch markup change can't hide more than you meant, as `sidebar/sections.css` does. `data-skek-on` exists only on Twitch's top page. In a frame, have its script read the setting and put its own attribute on the frame's `<html>`, then gate the CSS on that, as `chat.js` does with `data-skek-theme`.
 3. Add it to the feature list in `README.md`, and to `TESTING.md` if it needs its own check.
 
 If it needs JS instead of CSS:
@@ -63,14 +63,14 @@ To pick one value from a few rather than switch something on or off, give the en
 
 ## Add a feature
 
-1. Create `src/features/<name>/`. Folders only as needed: `twitch/` for page scripts and CSS, `frames/` for scripts inside other sites' frames, `background/` or a page of its own. A small feature keeps its files flat, named after it, like `player-modes/player-modes.js` and `.css`. A CSS-only feature is a single file, like `sidebar-sections`.
+1. Create `src/features/<name>/`. Folders only as needed: `twitch/` for page scripts and CSS, `frames/` for scripts inside other sites' frames, `background/` or a page of its own. A small feature keeps its files flat, named after it, like `player/modes.js` and `.css`. A CSS-only feature is a single file, like `sidebar-sections`.
 
-   A feature that also changes the YouTube stream view can't live in one folder: the Twitch part goes in the feature's folder and the stream view part in `youtube-live/`, each with a comment pointing to the other, as `stream-quality.js` and `watch-start.js` have.
+   A feature that also changes the YouTube stream view can't live in one folder: the Twitch part goes in the feature's folder and the stream view part in `youtube-live/`, each with a comment pointing to the other, as `player/quality.js` and `watch-start.js` have.
 2. List its files in the first `content_scripts` entry of `manifest.json`: JS after `streams/twitch/main.js`, CSS with the other features' CSS, before the `youtube-live` files. Keep the `streams/twitch/` entries in order: each file destructures from the ones before it. A new YouTube Live file goes among them, after what it destructures and before `main.js`.
 
    Some files are set up differently:
    - A frame script gets a manifest entry of its own with `all_frames`, as `chat.js` and `watch.js` have. The entry also matches normal YouTube pages, so the script's first line returns unless it's framed on Twitch (`if (!location.ancestorOrigins[0]?.endsWith('.twitch.tv')) return;`), page-world scripts included, and its CSS is scoped to a class the script puts on `<html>`, like `html.skek-watch`.
-   - A page-world script gets one with `"world": "MAIN"`, as `stream-quality.js` and `watch-start.js` have. It has no `chrome.*` or `skek`, so give it what it needs as an attribute on `<html>`, set by a normal script, like `data-skek-quality`.
+   - A page-world script gets one with `"world": "MAIN"`, as `player/quality.js` and `watch-start.js` have. It has no `chrome.*` or `skek`, so give it what it needs as an attribute on `<html>`, set by a normal script, like `data-skek-quality`.
    - Any extension file a Twitch or YouTube page loads needs a `web_accessible_resources` entry: a framed page like `manager.html`, an image like `icons/48.png`, a font like `fonts/inter-latin.woff2`.
    - A page of its own links `src/shared/page.css` and loads `src/settings.js`, then `src/shared/page-theme.js`, as `manager.html` does. `page.css` keeps the body hidden until `page-theme.js` has run.
 3. Write each script on Twitch pages in the wrapper:
@@ -103,12 +103,12 @@ To pick one value from a few rather than switch something on or off, give the en
 ## Rules
 
 - Everything added to Twitch's page starts with `skek`: classes, ids, `data-skek-*` attributes, `--skek-*` custom properties and keyframes. Extension pages (settings window, manager) have their own document and don't need the prefix. `x.js` sits next to `x.css`.
-- To recognise Twitch elements, prefer `data-a-target`, `data-test-selector` or `href`, and fall back to Twitch's class names (`.side-nav-section`) only where no attribute exists. Don't use `aria-label` or visible text, which are translated, unless nothing else tells two things apart. Then match only a name that stays the same, and make a miss harmless, as the Kappa Train rule in `chat-sections.css` does. Check a selector on a live channel before relying on it. Never use generated class names like `Layout-sc-...`, and match hashed ones by prefix, like `[class*='chatCard--']`. `:has()` is fine, given the manifest's `minimum_chrome_version`.
-- Reach into a site's internals, like Twitch's player through React or YouTube's `movie_player`, only when nothing else can do the job, and make it do nothing if they change. `stream-quality.js` is the example.
+- To recognise Twitch elements, prefer `data-a-target`, `data-test-selector` or `href`, and fall back to Twitch's class names (`.side-nav-section`) only where no attribute exists. Don't use `aria-label` or visible text, which are translated, unless nothing else tells two things apart. Then match only a name that stays the same, and make a miss harmless, as the Kappa Train rule in `chat/sections.css` does. Check a selector on a live channel before relying on it. Never use generated class names like `Layout-sc-...`, and match hashed ones by prefix, like `[class*='chatCard--']`. `:has()` is fine, given the manifest's `minimum_chrome_version`.
+- Reach into a site's internals, like Twitch's player through React or YouTube's `movie_player`, only when nothing else can do the job, and make it do nothing if they change. `player/quality.js` is the example.
 - Never rename a storage key after release. Nothing migrates old keys, so users would lose that value.
 - Use `innerHTML` only with constants from the code, never with text from a page or a stream.
 - A `message` listener checks `event.source` before trusting what it receives, as `player-view.js` does.
-- Don't add a script loader, a router or other shared machinery until a second feature really needs it. Code moves to `src/twitch/` when a second feature needs it. The stream view's half of a feature doesn't count: `player-view.js` uses `player-modes/floating-window.js` because floating chat is one feature on two players.
+- Don't add a script loader, a router or other shared machinery until a second feature really needs it. Code moves to `src/twitch/` when a second feature needs it. The stream view's half of a feature doesn't count: `player-view.js` uses `player/floating-window.js` because floating chat is one feature on two players.
 - New permissions need a stated reason in the PR.
 - Leave `version` in `manifest.json` alone; the maintainer sets it.
 - Don't lower `minimum_chrome_version` below 145. The `topDomains` limit in `rules/youtube-watch-frame.json` only exists from Chrome 145.

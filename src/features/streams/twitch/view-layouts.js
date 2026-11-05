@@ -1,5 +1,5 @@
 // The stream view's theatre, stacked and floating chat modes. The same modes on Twitch's own player
-// are in features/player-modes/, and both use its floating window.
+// are in features/player/, and both use its floating window.
 (() => {
   'use strict';
 

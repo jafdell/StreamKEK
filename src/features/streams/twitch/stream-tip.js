@@ -1,5 +1,5 @@
 // Hover tooltip, same idea as Twitch's stream-title balloon, with a still image of the stream.
-// Twitch channels get theirs from features/sidebar-preview/sidebar-preview.js. A channel with
+// Twitch channels get theirs from features/sidebar/preview.js. A channel with
 // several streams gets a list you can move onto and click to switch.
 (() => {
   'use strict';

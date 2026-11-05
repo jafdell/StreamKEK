@@ -332,7 +332,7 @@ html.skek[data-skek-transparent] #items {
 }
 /* The message box and what's under it show only while using the window, so chat can fill it. */
 html.skek[data-skek-transparent]:not(:hover, :focus-within) #panel-pages { display: none !important; }
-/* The scrollbar shows only when scrolled up from the newest messages. See player-modes.css. */
+/* The scrollbar shows only when scrolled up from the newest messages. See player/modes.css. */
 @keyframes skek-float-scrollbar {
   from, to { scrollbar-color: rgba(128, 128, 128, 0.6) transparent; }
 }

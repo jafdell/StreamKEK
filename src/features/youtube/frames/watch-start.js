@@ -1,7 +1,7 @@
 // Sets a stream up once it starts inside Twitch: the Stream quality setting, and live instead
 // of the stream's beginning. Only done once, or when the setting changes, so the player's own
 // quality menu and rewinding still work afterwards. Runs in the page itself to reach YouTube's
-// player. watch.js sets the attribute. Twitch's player is in features/stream-quality/.
+// player. watch.js sets the attribute. Twitch's player is in features/player/.
 (() => {
   'use strict';
 

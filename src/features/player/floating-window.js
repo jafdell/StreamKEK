@@ -1,4 +1,4 @@
-// The window around floating chat, for both Twitch's player (player-modes.js) and the stream view
+// The window around floating chat, for both Twitch's player (player/modes.js) and the stream view
 // (player-view.js): real fullscreen, plus a bar and edges to move and resize it and a slider for
 // its background. The chat itself can't live in this window, because Twitch owns its chat and
 // moving the stream view's would reload its frame. So floating-window.css places each chat under

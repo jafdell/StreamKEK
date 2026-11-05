@@ -3,7 +3,7 @@
 // Stacked: the stream full width on top with chat under it, for a narrow window.
 // Floating chat: the stream fullscreen with chat in a window over it; see floating-window.js.
 // Both are built on Twitch's theatre mode, which already covers the top bar and sidebar, and
-// player-modes.css moves the player and chat. So theatre mode can't show alongside them: asking
+// player/modes.css moves the player and chat. So theatre mode can't show alongside them: asking
 // for it just removes what they added.
 (() => {
   'use strict';

@@ -212,7 +212,7 @@ html[data-skek-theme='light'] .skek-view {
 .skek-view--stacked .skek-reopen { display: none; }
 .skek-view--stacked.skek-view--chat-hidden .skek-info { padding-right: 16px; }
 
-/* floating chat: chat always shows here too. Its window is in features/player-modes/floating-window.css,
+/* floating chat: chat always shows here too. Its window is in features/player/floating-window.css,
    whose bar replaces the head. The color-scheme has to be set here and in frames/chat.css, or the
    browser paints the frame white instead of showing the window's background through it. */
 

@@ -1,5 +1,5 @@
 // The Stream quality setting, for Kick's player in the stream view. Twitch's is in
-// features/stream-quality/. Picks the best size at or under the setting when a stream starts or the
+// features/player/. Picks the best size at or under the setting when a stream starts or the
 // setting changes, so the player's own quality menu still works afterwards. Kick's saved quality is
 // left alone: it only knows some sizes by name, and goes back to Automatic for the others. Runs in
 // the page itself, because reaching the player means going through React's internals, and does

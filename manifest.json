@@ -55,22 +55,22 @@
         "src/features/streams/twitch/routes.js",
         "src/features/streams/twitch/following.js",
         "src/features/streams/twitch/main.js",
-        "src/features/sidebar-preview/sidebar-preview.js",
-        "src/features/claim-points/claim-points.js",
-        "src/features/player-modes/floating-window.js",
-        "src/features/player-modes/player-modes.js"
+        "src/features/sidebar/preview.js",
+        "src/features/chat/claim-points.js",
+        "src/features/player/floating-window.js",
+        "src/features/player/modes.js"
       ],
       "css": [
         "src/twitch/base.css",
         "src/twitch/settings-button.css",
-        "src/features/sidebar-sections/sidebar-sections.css",
-        "src/features/sidebar-preview/sidebar-preview.css",
-        "src/features/chat-font-size/chat-font-size.css",
-        "src/features/chat-timestamps/chat-timestamps.css",
-        "src/features/chat-sections/chat-sections.css",
-        "src/features/player-extensions/player-extensions.css",
-        "src/features/player-modes/player-modes.css",
-        "src/features/player-modes/floating-window.css",
+        "src/features/sidebar/sections.css",
+        "src/features/sidebar/preview.css",
+        "src/features/chat/font-size.css",
+        "src/features/chat/timestamps.css",
+        "src/features/chat/sections.css",
+        "src/features/player/extensions.css",
+        "src/features/player/modes.css",
+        "src/features/player/floating-window.css",
         "src/features/streams/twitch/sidebar.css",
         "src/features/streams/twitch/stream-tip.css",
         "src/features/streams/twitch/manager-frame.css",
@@ -84,7 +84,7 @@
         "https://www.twitch.tv/*"
       ],
       "js": [
-        "src/features/stream-quality/stream-quality.js"
+        "src/features/player/quality.js"
       ],
       "run_at": "document_idle",
       "world": "MAIN"
