@@ -1,0 +1,29 @@
+name: Feature request
+description: Suggest an idea for StreamKEK.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like?
+      description: Describe the feature and how you'd use it.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: What problem would it solve?
+    validations:
+      required: false
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where would it apply?
+      multiple: true
+      options:
+        - Twitch streams
+        - Twitch videos
+        - YouTube streams
+        - Settings
+    validations:
+      required: false
