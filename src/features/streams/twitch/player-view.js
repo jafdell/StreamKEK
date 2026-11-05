@@ -1,18 +1,14 @@
-// The Twitch-style stream view for YouTube and Kick: player, info bar and chat. Its theatre, stacked
-// and floating chat modes are here too; the same modes on Twitch's own player are in
-// features/player-modes/.
+// The Twitch-style stream view for other sites: its info bar, and opening and closing it. Its two
+// frames are in view-frames.js, and its theatre, stacked and floating modes in view-layouts.js.
 (() => {
   'use strict';
 
   const shared = skek.streams;
-  const { el, icon, theme, send } = skek.helpers;
-  const { state, openStream, platformOf, siteOf, uptime } = shared;
+  const { el, icon, send } = skek.helpers;
+  const { state, openStream, platformOf, siteOf, uptime, loadStream, showOverlay, toggleLayout } = shared;
 
   const VIEW_ID = 'skek-view';
-  const OVERLAY_MS = 3000;
-  const LAYOUT_SHORTCUTS = { KeyT: 'theatre', KeyS: 'stacked', KeyC: 'floating' };
 
-  let view = null;
   const paused = new Set();
 
   function pauseTwitchVideos() {
@@ -171,62 +167,10 @@
     return { root, refs, streamKey: undefined, layout: null };
   }
 
-  function frame(className, src, allow) {
-    return el('iframe', {
-      class: className,
-      src,
-      allow,
-      allowFullscreen: true,
-      referrerPolicy: 'strict-origin-when-cross-origin',
-    });
-  }
-
-  // The sizes behind Twitch's own chat font size setting.
-  const TWITCH_CHAT_FONT_SIZES = { small: 12, default: 14, bigger: 16, biggest: 18 };
-
-  // The chat frame can't read Twitch's storage, so it gets this in its address.
-  function twitchChatFontSize() {
-    try {
-      const preference = JSON.parse(localStorage.getItem('chatSettings'))?.fontSizePreference;
-      return TWITCH_CHAT_FONT_SIZES[preference] ?? TWITCH_CHAT_FONT_SIZES.default;
-    } catch {
-      return TWITCH_CHAT_FONT_SIZES.default;
-    }
-  }
-
-  function loadStream(channel, stream) {
-    const { refs } = view;
-    const key = stream ? `${channel?.id}/${stream.videoId}` : null;
-    if (view.streamKey === key) return;
-    view.streamKey = key;
-
-    if (!stream) {
-      refs.player.replaceChildren(
-        el('div', { class: 'skek-offline' }, el('p', {}, `${channel?.name ?? 'This channel'} is offline.`)),
-      );
-      refs.chat.replaceChildren(el('p', { class: 'skek-chat__empty' }, 'Chat is available while the channel is live.'));
-      return;
-    }
-
-    const settings = `#skek-theme=${theme()}&skek-twitch-font=${twitchChatFontSize()}`;
-    const urls = siteOf(channel).frameUrls(channel, stream, settings);
-    refs.player.replaceChildren(
-      frame('skek-player__frame', urls.player, 'autoplay; encrypted-media; picture-in-picture; fullscreen'),
-    );
-    const chatFrame = frame('skek-chat__frame', urls.chat, 'clipboard-write');
-    chatFrame.addEventListener('load', syncChatFrame);
-    refs.chat.replaceChildren(chatFrame);
-  }
-
-  // In floating chat the window draws the background, so the frame has to stop drawing its own.
-  function syncChatFrame() {
-    const chatFrame = view?.refs.chat.querySelector('iframe');
-    chatFrame?.contentWindow.postMessage({ skekChatTransparent: view.layout === 'floating' }, new URL(chatFrame.src).origin);
-  }
-
   const detailsRequested = new Set();
 
   function updateInfo() {
+    const { view } = state;
     if (!view || !state.openId) return;
     const { refs } = view;
     const channel = state.channels.find((c) => c.id === state.openId);
@@ -266,69 +210,12 @@
 
   function setChatHidden(hidden) {
     state.chatHidden = hidden;
-    view?.root.classList.toggle('skek-view--chat-hidden', hidden);
+    state.view?.root.classList.toggle('skek-view--chat-hidden', hidden);
     chrome.storage.local.set({ chatHidden: hidden });
   }
 
-  let overlayTimer = null;
-
-  // Like Twitch's overlay: the info bar shows over the video while the mouse is moving.
-  function showOverlay() {
-    if (!view?.layout) return;
-    view.root.classList.add('skek-view--controls');
-    clearTimeout(overlayTimer);
-    overlayTimer = setTimeout(() => view?.root.classList.remove('skek-view--controls'), OVERLAY_MS);
-  }
-
-  // These all fill the window, and only one can be on: null, 'theatre', 'stacked' or 'floating'.
-  function setLayout(layout) {
-    view.layout = layout;
-    view.root.classList.toggle('skek-view--full-window', !!layout);
-    view.root.classList.toggle('skek-view--stacked', layout === 'stacked');
-    view.root.classList.toggle('skek-view--floating', layout === 'floating');
-    view.refs.theatreButton.ariaLabel = layout === 'theatre' ? 'Exit theatre mode' : 'Theatre mode';
-    view.refs.stackedButton.ariaLabel = layout === 'stacked' ? 'Exit stacked mode' : 'Stacked mode';
-    view.refs.floatingButton.ariaLabel = layout === 'floating' ? 'Exit floating chat' : 'Floating chat';
-    if (layout === 'floating') skek.floatingWindow.open(() => setLayout(null));
-    else skek.floatingWindow.close();
-    syncChatFrame();
-    if (layout) showOverlay();
-    else view.root.classList.remove('skek-view--controls');
-    placeView();
-  }
-
-  function toggleLayout(layout) {
-    setLayout(view.layout === layout ? null : layout);
-  }
-
-  // Captured first, so Alt+T doesn't also switch Twitch's own player behind the view.
-  addEventListener(
-    'keydown',
-    (event) => {
-      if (!view) return;
-      // Ctrl is left out because AltGr reports as Ctrl+Alt on Windows.
-      const layout = event.altKey && !event.ctrlKey ? LAYOUT_SHORTCUTS[event.code] : null;
-      if (!layout && !(event.key === 'Escape' && view.layout)) return;
-      event.preventDefault();
-      event.stopPropagation();
-      if (layout) toggleLayout(layout);
-      else setLayout(null);
-    },
-    true,
-  );
-
-  // The frames report the mouse and keys, which never reach this page while over them.
-  addEventListener('message', (event) => {
-    if (!view || ![...view.root.querySelectorAll('iframe')].some((frame) => frame.contentWindow === event.source)) return;
-    const message = event.data?.skekFrame;
-    if (message === 'activity') showOverlay();
-    else if (message === 'toggle-theatre') toggleLayout('theatre');
-    else if (message === 'toggle-stacked') toggleLayout('stacked');
-    else if (message === 'toggle-floating') toggleLayout('floating');
-    else if (message === 'exit-theatre' && view.layout) setLayout(null);
-  });
-
   function placeView() {
+    const { view } = state;
     const main = document.querySelector('main.twilight-main, main');
     if (!view || !main) return;
     const mainRect = main.getBoundingClientRect();
@@ -351,15 +238,16 @@
   function openView(id) {
     const channelKnown = state.channels.some((c) => c.id === id);
     if (!channelKnown) return;
-    if (!view) {
-      view = buildView();
+    if (!state.view) {
+      state.view = buildView();
       savedTitle = document.title;
-      view.root.classList.toggle('skek-view--chat-hidden', state.chatHidden);
+      state.view.root.classList.toggle('skek-view--chat-hidden', state.chatHidden);
       placeView();
       tickTimer = setInterval(() => {
         placeView();
         pauseTwitchVideos();
         const stream = openStream();
+        const { view } = state;
         if (view && stream) view.refs.uptime.textContent = uptime(stream.startedAt);
         if (view?.title && document.title !== view.title) document.title = view.title;
       }, 500);
@@ -374,8 +262,8 @@
   function closeView() {
     clearInterval(tickTimer);
     skek.floatingWindow.close();
-    view?.root.remove();
-    view = null;
+    state.view?.root.remove();
+    state.view = null;
     state.openId = null;
     state.routeVideoId = null;
     state.pinnedVideoId = null;

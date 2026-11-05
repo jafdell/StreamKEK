@@ -49,6 +49,8 @@
         "src/features/streams/twitch/stream-tip.js",
         "src/features/streams/twitch/manager-frame.js",
         "src/features/streams/twitch/sidebar.js",
+        "src/features/streams/twitch/view-frames.js",
+        "src/features/streams/twitch/view-layouts.js",
         "src/features/streams/twitch/player-view.js",
         "src/features/streams/twitch/routes.js",
         "src/features/streams/twitch/following.js",

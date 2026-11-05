@@ -10,6 +10,7 @@
   // live = every site's live streams.
   // routeVideoId = the stream named in the address, if any.
   // pinnedVideoId = what's playing, so it doesn't change when viewer counts shift.
+  // view = the open stream view: its elements, its stream and its layout. See player-view.js.
   const state = {
     bySite: Object.fromEntries(Object.keys(sites).map((platform) => [platform, { own: [], followed: {}, live: {} }])),
     channels: [],
@@ -17,6 +18,7 @@
     openId: null,
     routeVideoId: null,
     pinnedVideoId: null,
+    view: null,
     chatHidden: false,
     channelsLoaded: false,
   };
