@@ -4,9 +4,9 @@
 (() => {
   'use strict';
 
-  const yt = skek.youtube;
+  const shared = skek.streams;
   const { el, icon, theme, send } = skek.helpers;
-  const { state, openStream, platformOf, siteOf, uptime } = yt;
+  const { state, openStream, platformOf, siteOf, uptime } = shared;
 
   const VIEW_ID = 'skek-view';
   const OVERLAY_MS = 3000;
@@ -254,7 +254,7 @@
     // The stream in the address has ended, but the channel has another.
     if (stream && state.routeVideoId && stream.videoId !== state.routeVideoId) {
       state.routeVideoId = null;
-      yt.forgetRouteVideo(channel);
+      shared.forgetRouteVideo(channel);
     }
     state.pinnedVideoId = stream?.videoId ?? null;
     loadStream(channel, stream);
@@ -389,7 +389,7 @@
     state.openId = id;
     pauseTwitchVideos();
     updateInfo();
-    yt.renderSidebar();
+    shared.renderSidebar();
   }
 
   function closeView() {
@@ -402,7 +402,7 @@
     state.pinnedVideoId = null;
     if (savedTitle) document.title = savedTitle;
     resumeTwitchVideos();
-    yt.renderSidebar();
+    shared.renderSidebar();
   }
 
   Object.assign(yt, { updateInfo, placeView, openView, closeView });

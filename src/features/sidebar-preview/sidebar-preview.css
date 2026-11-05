@@ -10,7 +10,7 @@
   pointer-events: none;
 }
 
-/* Also used by the YouTube tip in youtube-live/twitch/stream-tip.js. Keeps its shape while loading. */
+/* Also used by the YouTube tip in streams/twitch/stream-tip.js. Keeps its shape while loading. */
 .skek-preview-img {
   display: block;
   width: 100%;

@@ -1,5 +1,5 @@
 // Stacked and floating chat modes on Twitch's own player. The stream view has its own in
-// youtube-live/twitch/player-view.js.
+// streams/twitch/player-view.js.
 // Stacked: the stream full width on top with chat under it, for a narrow window.
 // Floating chat: the stream fullscreen with chat in a window over it; see floating-window.js.
 // Both are built on Twitch's theatre mode, which already covers the top bar and sidebar, and

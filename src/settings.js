@@ -115,7 +115,7 @@
       hint: "What streams start at on Twitch, YouTube and Kick. If a stream doesn't offer it, the next size down plays. The player's own quality menu still works.",
       default: '1440',
       dropdown: true,
-      // A new choice also needs an entry in HIGHEST_FOR_SETTING in youtube-live/frames/watch-start.js.
+      // A new choice also needs an entry in HIGHEST_FOR_SETTING in youtube/frames/watch-start.js.
       choices: [
         ...[1440, 1080, 720, 480, 360].map((height) => ({ value: String(height), label: `${height}p` })),
         { value: 'auto', label: 'Automatic' },

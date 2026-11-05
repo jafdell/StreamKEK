@@ -3,7 +3,8 @@
 //   where a stream is { videoId, title, category, viewers, startedAt }
 // The other keys are in CONTRIBUTING.md.
 
-import { ConsentRequired, forEachLimited } from './youtube-pages.js';
+import { forEachLimited } from '../../streams/background/for-each-limited.js';
+import { ConsentRequired } from './youtube-pages.js';
 import { carryStreamDetails } from './streams.js';
 import { checkChannel } from './channels.js';
 import { fetchLiveSubscriptions } from './subscriptions.js';

@@ -1,5 +1,5 @@
-// The Stream quality setting, for Twitch's player. YouTube's is in youtube-live/frames/watch-start.js
-// and Kick's in kick-live/frames/watch-start.js.
+// The Stream quality setting, for Twitch's player. YouTube's is in youtube/frames/watch-start.js
+// and Kick's in kick/frames/watch-start.js.
 // Applied when a stream starts or the setting changes, so the player's own quality menu still
 // works afterwards. Twitch's saved quality is left alone: it ignores a size the stream doesn't
 // offer, so it can't fall back to the next one down. Runs in the page itself, because reaching

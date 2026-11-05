@@ -1,7 +1,7 @@
 // Works out what's live on Kick and saves it. `kickLive` has the same shape as YouTube's `live`.
 // The other keys are in CONTRIBUTING.md.
 
-import { forEachLimited } from '../../youtube-live/background/youtube-pages.js';
+import { forEachLimited } from '../../streams/background/for-each-limited.js';
 import { fetchChannel, fetchFollowedLive, slugFromInput } from './kick-api.js';
 
 let polling = null;

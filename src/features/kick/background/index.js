@@ -1,5 +1,5 @@
 // Wires the Kick Live background code to browser events. The sidebar section, stream view and
-// Following page are shared with YouTube Live, in youtube-live/twitch/.
+// Following page are shared with YouTube Live, in streams/twitch/.
 
 import { addChannel, hideChannel, poll, pollIfTwitchOpen, removeChannel, setShowFollows, unhideChannel } from './poller.js';
 

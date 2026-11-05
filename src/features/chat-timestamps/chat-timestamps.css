@@ -1,5 +1,5 @@
 /* The Hide timestamps setting: Twitch's live chat, 7TV's live chat and Twitch's chat on videos.
-   YouTube's chat never shows them; see youtube-live/frames/chat.css. */
+   YouTube's chat never shows them; see youtube/frames/chat.css. */
 
 html[data-skek-on~='hideChatTimestamps'] .chat-line__timestamp,
 html[data-skek-on~='hideChatTimestamps'] .seventv-chat-message-timestamp,

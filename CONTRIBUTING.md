@@ -23,20 +23,20 @@ Each feature is a folder in `src/features/`. This table lists only what its name
 | Code shared by every feature on Twitch pages | `src/twitch/`: `helpers.js`, `page-sync.js`, `base.css` |
 | The extension's button in Twitch's top bar and the window around the settings page | `src/twitch/settings-button.js` and `.css` |
 | The settings page: categories, search, rows. Also the toolbar popup | `src/settings-window/`. `src/shared/` holds what it shares with the channel manager: `page.css` and `page-theme.js` |
-| The Theme setting's colors | Twitch's values for each theme, wherever `src/` matches `data-theme` or `data-skek-theme`, plus `READABLE` in `youtube-live/frames/chat.js` (chatters' name colors) |
-| YouTube Live | `src/features/youtube-live/`: `background/` (polling, reading YouTube pages), `twitch/` (sidebar, stream view, address, Following page), `frames/` (chat, player), `manager/` (channel manager) |
-| Kick Live | `src/features/kick-live/`: `background/` (polling, Kick's API) and `frames/` (chat, player). Its sidebar section, stream view, address and Following page share YouTube Live's code in `youtube-live/twitch/`, where `SITES` in `format.js` holds what differs, and its channels are in `youtube-live/manager/` |
-| Chat: font size, timestamps, what sits over chat | `src/features/chat-font-size/`, `chat-timestamps/`, `chat-sections/`. YouTube's chat is styled in `youtube-live/frames/chat.css` |
-| Stream quality | `src/features/stream-quality/` (Twitch) and `youtube-live/frames/watch-start.js` (YouTube) |
-| Theatre, stacked and floating chat modes | `src/features/player-modes/` (Twitch, plus `floating-window.js` and `.css`, which both use) and `youtube-live/twitch/player-view.js` and `.css` (YouTube). `frames/layout-keys.js` forwards the shortcuts from inside YouTube's frames, and `frames/chat.js` and `.css` make floating chat see-through. Theatre on Twitch is Twitch's own. Stacked and floating exist twice, so change both |
-| Sidebar previews | `src/features/sidebar-preview/` (Twitch channels) and `youtube-live/twitch/stream-tip.js` (YouTube channels) |
+| The Theme setting's colors | Twitch's values for each theme, wherever `src/` matches `data-theme` or `data-skek-theme`, plus `READABLE` in `youtube/frames/chat.js` (chatters' name colors) |
+| YouTube Live | `src/features/youtube/`: `background/` (polling, reading YouTube pages), `twitch/` (sidebar, stream view, address, Following page), `frames/` (chat, player), `manager/` (channel manager) |
+| Kick Live | `src/features/kick/`: `background/` (polling, Kick's API) and `frames/` (chat, player). Its sidebar section, stream view, address and Following page share YouTube Live's code in `streams/twitch/`, where `SITES` in `format.js` holds what differs, and its channels are in `streams/manager/` |
+| Chat: font size, timestamps, what sits over chat | `src/features/chat-font-size/`, `chat-timestamps/`, `chat-sections/`. YouTube's chat is styled in `youtube/frames/chat.css` |
+| Stream quality | `src/features/stream-quality/` (Twitch) and `youtube/frames/watch-start.js` (YouTube) |
+| Theatre, stacked and floating chat modes | `src/features/player-modes/` (Twitch, plus `floating-window.js` and `.css`, which both use) and `streams/twitch/player-view.js` and `.css` (YouTube). `frames/layout-keys.js` forwards the shortcuts from inside YouTube's frames, and `frames/chat.js` and `.css` make floating chat see-through. Theatre on Twitch is Twitch's own. Stacked and floating exist twice, so change both |
+| Sidebar previews | `src/features/sidebar-preview/` (Twitch channels) and `streams/twitch/stream-tip.js` (YouTube channels) |
 | Tests | `tests/`, and `TESTING.md` for what to check by hand |
 
 ## Development setup
 
 - Load unpacked from the repo root. There's no build step and there are no runtime dependencies; please open an issue before adding either.
 - **Use the Reload button on the extensions page.** Remove and Load unpacked is an uninstall and wipes `chrome.storage.local`. Moving the folder changes the extension ID, which has the same effect. Reload open Twitch tabs after reloading the extension.
-- After a reload, check the extensions page for service worker errors. A bad import stops the whole worker. After background changes, also run `node -e "import('./src/features/youtube-live/background/index.js');import('./src/features/kick-live/background/index.js')"`, because the tests don't load those files or their `poller.js`.
+- After a reload, check the extensions page for service worker errors. A bad import stops the whole worker. After background changes, also run `node -e "import('./src/features/youtube/background/index.js');import('./src/features/kick/background/index.js')"`, because the tests don't load those files or their `poller.js`.
 - Run tests with plain `node --test`, not `node --test tests/`.
 - **Debugging:** Twitch page and page-world scripts log to the Twitch tab's console. Frame scripts log there too, once you pick the frame in the console's context dropdown. The service worker has its own console, linked from the extensions page.
 
@@ -66,7 +66,7 @@ To pick one value from a few rather than switch something on or off, give the en
 1. Create `src/features/<name>/`. Folders only as needed: `twitch/` for page scripts and CSS, `frames/` for scripts inside other sites' frames, `background/` or a page of its own. A small feature keeps its files flat, named after it, like `player-modes/player-modes.js` and `.css`. A CSS-only feature is a single file, like `sidebar-sections`.
 
    A feature that also changes the YouTube stream view can't live in one folder: the Twitch part goes in the feature's folder and the stream view part in `youtube-live/`, each with a comment pointing to the other, as `stream-quality.js` and `watch-start.js` have.
-2. List its files in the first `content_scripts` entry of `manifest.json`: JS after `youtube-live/twitch/main.js`, CSS with the other features' CSS, before the `youtube-live` files. Keep the `youtube-live/twitch/` entries in order: each file destructures from the ones before it. A new YouTube Live file goes among them, after what it destructures and before `main.js`.
+2. List its files in the first `content_scripts` entry of `manifest.json`: JS after `streams/twitch/main.js`, CSS with the other features' CSS, before the `youtube-live` files. Keep the `streams/twitch/` entries in order: each file destructures from the ones before it. A new YouTube Live file goes among them, after what it destructures and before `main.js`.
 
    Some files are set up differently:
    - A frame script gets a manifest entry of its own with `all_frames`, as `chat.js` and `watch.js` have. The entry also matches normal YouTube pages, so the script's first line returns unless it's framed on Twitch (`if (!location.ancestorOrigins[0]?.endsWith('.twitch.tv')) return;`), page-world scripts included, and its CSS is scoped to a class the script puts on `<html>`, like `html.skek-watch`.
@@ -88,13 +88,13 @@ To pick one value from a few rather than switch something on or off, give the en
    ```
    - A top-level `const` outside the wrapper shares one scope with every other content script, and a duplicate name is a SyntaxError that kills that whole file.
    - Scripts run at `document_start`, so touch the page only inside `onBodyReady`. Use `onPageChange` rather than your own observer on `<body>`: `render` can run five times a second while chat moves, so it must be cheap and change nothing when nothing has changed (see `signature` in `sidebar.js`).
-   - A multi-file feature adds a `skek.<name>` object, as `skek.youtube` does. Destructure what loads earlier at the top, and call everything else as `skek.<name>.fn()` at call time (the YouTube Live files alias it: `const yt = skek.youtube;`).
+   - A multi-file feature adds a `skek.<name>` object, as `skek.streams` does. Destructure what loads earlier at the top, and call everything else as `skek.<name>.fn()` at call time (the files in `streams/twitch/` alias it: `const shared = skek.streams;`).
    - Frame and page-world scripts are wrapped too, as `chat.js` and `watch-start.js` are: a frame script shares its world with the other scripts in that frame, and anything declared outside a page-world script becomes a global on the site's own page. `skek.helpers` exists only on Twitch pages.
    - Anything that reads a setting's default takes it from `skek.settingDefaults` rather than repeating the value; a frame script lists `src/settings.js` before it in the manifest to get it. The service worker has no `skek`, so background code repeats the default, as `poller.js` does: keep them equal.
 4. For a setting, add it as described above.
 5. For background work, add `src/features/<name>/background/index.js` exporting `messageHandlers` and `startBackground`. Add one import, one spread and one call in `src/background/service-worker.js`. Prefix message types and alarm names with the feature's name, `<name>:doThing`, as `youtube-live:refresh` does, so features can't clash. Don't add a second `onMessage` listener. No top-level await, dynamic import, or top-level `chrome.*` outside `service-worker.js`.
 
-   `startBackground` runs every time the worker wakes, not once, and the worker can stop between events. Register its listeners synchronously, keep state in storage rather than in variables, and don't recreate what already exists (see the alarm in `youtube-live/background/index.js`). A handler takes `(msg)` and returns `{ ok: true, ... }`; anything it throws reaches the sender as `{ ok: false, error }`. Twitch pages send with `skek.helpers.send`.
+   `startBackground` runs every time the worker wakes, not once, and the worker can stop between events. Register its listeners synchronously, keep state in storage rather than in variables, and don't recreate what already exists (see the alarm in `youtube/background/index.js`). A handler takes `(msg)` and returns `{ ok: true, ... }`; anything it throws reaches the sender as `{ ok: false, error }`. Twitch pages send with `skek.helpers.send`.
 6. For something in the settings window that isn't a switch or a choice, add an entry to `CUSTOM_ITEMS` in `src/settings-window/settings-window.js`: its `category`, `label`, `hint` and a `build` function returning what goes under the label, or an `href` to make the row a link. It's searchable like a setting. `skek.helpers` isn't available on that page. Anything bigger should be its own page in a frame, as `channelManagerFrame` does with `manager.html`.
 7. Add any storage key that isn't in `SETTINGS`, and any setting with a `message`, to the table below. Name a key so it can't clash with another feature's, like `floatingChat`. Each key is written from one context, the background or one kind of page, never both: writers rewrite whole values, as `runPoll` does, so a second one loses updates.
 8. Add it to the feature list in `README.md`, what to check to `TESTING.md`, and a row to "Where do I...?" if it spans folders.
@@ -123,7 +123,7 @@ All in `chrome.storage.local`. A key in `SETTINGS` is written by the settings wi
 | `channels` | `[{id,name,handle,avatar}]` | background |
 | `subChannels` | `{[id]:{id,name,handle,avatar}}` | background |
 | `hiddenChannels` | `{[id]:{id,name,handle,avatar}}` | background |
-| `live` | see the comment at the top of `src/features/youtube-live/background/poller.js` | background |
+| `live` | see the comment at the top of `src/features/youtube/background/poller.js` | background |
 | `status` | `{checkedAt,consentRequired,signedOut}` | background |
 | `showSubscriptions` | boolean, default true | background |
 | `kickChannels` | `[{id,platform,slug,name,handle,avatar}]` | background |

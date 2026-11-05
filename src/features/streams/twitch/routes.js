@@ -2,9 +2,9 @@
 (() => {
   'use strict';
 
-  const yt = skek.youtube;
+  const shared = skek.streams;
   const { isPlainClick } = skek.helpers;
-  const { state, platformOf, siteOf } = yt;
+  const { state, platformOf, siteOf } = shared;
 
   // A route is what follows the first / in these addresses:
   // /yt/<channel>, or /yt/<channel>/<video id> for a stream you picked from the list.
@@ -81,25 +81,25 @@
     currentRoute = location.pathname.match(STREAM_PATH)?.[1] ?? null;
     if (!currentRoute) twitchPageLost = false;
 
-    yt.renderFollowing();
+    shared.renderFollowing();
     if (!state.channelsLoaded) return;
 
     const { channel, videoId } = currentRoute ? routeParts(currentRoute) : {};
     const id = channel?.id ?? null;
     if (!id) {
-      if (state.openId) yt.closeView();
+      if (state.openId) shared.closeView();
       return;
     }
     if (id === state.openId && videoId === state.routeVideoId) return;
     state.routeVideoId = videoId;
-    yt.openView(id);
+    shared.openView(id);
   }
 
   function openOnPlainClick(event, channelId, videoId = null) {
     // Let ctrl/middle click open the stream on YouTube or Kick as a normal link.
     if (!isPlainClick(event)) return;
     event.preventDefault();
-    yt.hideTip();
+    shared.hideTip();
     navigateTo(channelId, videoId);
   }
 

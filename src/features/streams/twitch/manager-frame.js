@@ -25,7 +25,7 @@
     manager = el('iframe', {
       class: 'skek-manager',
       title: 'Manage channels',
-      src: chrome.runtime.getURL('src/features/youtube-live/manager/manager.html'),
+      src: chrome.runtime.getURL('src/features/streams/manager/manager.html'),
     });
     manager.style.left = `${Math.min(rect.right + 8, innerWidth - FRAME_WIDTH_WITH_MARGIN)}px`;
     manager.style.top = `${Math.max(8, Math.min(rect.top, innerHeight - FRAME_HEIGHT_WITH_MARGIN))}px`;
@@ -33,5 +33,5 @@
     document.addEventListener('mousedown', closeManager);
   }
 
-  Object.assign(skek.youtube, { toggleManager });
+  Object.assign(skek.streams, { toggleManager });
 })();

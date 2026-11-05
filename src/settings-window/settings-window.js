@@ -195,7 +195,7 @@
     const frame = document.createElement('iframe');
     frame.className = 'manager-frame';
     frame.title = title;
-    frame.src = chrome.runtime.getURL(`src/features/youtube-live/manager/manager.html?embedded&site=${site}`);
+    frame.src = chrome.runtime.getURL(`src/features/streams/manager/manager.html?embedded&site=${site}`);
     // Keys pressed inside a frame never reach this page's listener.
     frame.addEventListener('load', () => frame.contentWindow.addEventListener('keydown', closeOnEscape));
     return frame;

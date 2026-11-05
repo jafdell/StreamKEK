@@ -3,7 +3,7 @@
   'use strict';
 
   const { el } = skek.helpers;
-  const { platformOf } = skek.youtube;
+  const { platformOf } = skek.streams;
 
   function avatarImg(channel, className) {
     return el('img', { class: className, src: channel.avatar || '', alt: '', referrerPolicy: 'no-referrer' });
@@ -49,5 +49,5 @@
     return `${Math.floor(seconds / 3600)}:${pad(Math.floor(seconds / 60) % 60)}:${pad(seconds % 60)}`;
   }
 
-  Object.assign(skek.youtube, { avatarImg, thumbnailUrl, siteOf, compact, uptime });
+  Object.assign(skek.streams, { avatarImg, thumbnailUrl, siteOf, compact, uptime });
 })();

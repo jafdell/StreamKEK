@@ -1,6 +1,6 @@
 /* The Chat font size setting, for Twitch's own chat. Twitch sets its size on these elements and
    everything inside inherits it, including 7TV's messages. src/twitch/page-sync.js sets the
-   attribute and the variable. YouTube's chat is sized in youtube-live/frames/. */
+   attribute and the variable. YouTube's chat is sized in youtube/frames/. */
 
 html[data-skek-chat-font] [class*='chat-list--'],
 html[data-skek-chat-font] .video-chat__message-list-wrapper {

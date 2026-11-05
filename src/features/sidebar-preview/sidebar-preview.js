@@ -1,5 +1,5 @@
 // A still image of the stream when hovering a live Twitch channel in the sidebar, under Twitch's
-// own title balloon. YouTube channels show theirs inside their tip, in youtube-live/twitch/stream-tip.js.
+// own title balloon. YouTube channels show theirs inside their tip, in streams/twitch/stream-tip.js.
 (() => {
   'use strict';
 

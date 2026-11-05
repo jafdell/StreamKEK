@@ -2,9 +2,9 @@
 (() => {
   'use strict';
 
-  const yt = skek.youtube;
+  const shared = skek.streams;
   const { send, onBodyReady, onPageChange } = skek.helpers;
-  const { state, mergeChannels } = yt;
+  const { state, mergeChannels } = shared;
 
   function init() {
     chrome.storage.onChanged.addListener((changes, area) => {
@@ -16,13 +16,13 @@
       if (changes.kickFollowed) state.kickFollowed = changes.kickFollowed.newValue ?? {};
       if (changes.kickLive) state.kickLive = changes.kickLive.newValue ?? {};
       mergeChannels();
-      yt.renderSidebar();
+      shared.renderSidebar();
       if (state.openId && !state.channels.some((c) => c.id === state.openId)) {
-        yt.navigateTo(null); // the open channel was just removed or hidden
+        shared.navigateTo(null); // the open channel was just removed or hidden
         return;
       }
-      yt.updateInfo();
-      yt.syncWithUrl();
+      shared.updateInfo();
+      shared.syncWithUrl();
     });
 
     const keys = ['channels', 'subChannels', 'live', 'kickChannels', 'kickFollowed', 'kickLive', 'chatHidden'];
@@ -36,20 +36,20 @@
       mergeChannels();
       state.chatHidden = !!saved.chatHidden;
       state.channelsLoaded = true;
-      yt.renderSidebar(true);
-      yt.syncWithUrl();
+      shared.renderSidebar(true);
+      shared.syncWithUrl();
     });
 
     onPageChange(() => {
-      yt.renderSidebar();
-      yt.renderFollowing();
+      shared.renderSidebar();
+      shared.renderFollowing();
     });
 
     // This is how the stream view notices Twitch's own navigation, like clicking a Twitch channel,
     // so it isn't wasted work.
-    setInterval(yt.syncWithUrl, 300);
-    addEventListener('popstate', yt.handlePopState);
-    addEventListener('resize', yt.placeView);
+    setInterval(shared.syncWithUrl, 300);
+    addEventListener('popstate', shared.handlePopState);
+    addEventListener('resize', shared.placeView);
 
     send({ type: 'youtube-live:refresh' });
     send({ type: 'kick-live:refresh' });

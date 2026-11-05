@@ -6,16 +6,16 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import vm from 'node:vm';
 
-import { extractJson } from '../src/features/youtube-live/background/youtube-pages.js';
-import { viewerCount } from '../src/features/youtube-live/background/streams.js';
-import { inputToUrl } from '../src/features/youtube-live/background/channels.js';
-import { liveChannelsFromGuide } from '../src/features/youtube-live/background/subscriptions.js';
-import { channelPageToLive, followedStreamToLive, slugFromInput, startedAtIso } from '../src/features/kick-live/background/kick-api.js';
+import { extractJson } from '../src/features/youtube/background/youtube-pages.js';
+import { viewerCount } from '../src/features/youtube/background/streams.js';
+import { inputToUrl } from '../src/features/youtube/background/channels.js';
+import { liveChannelsFromGuide } from '../src/features/youtube/background/subscriptions.js';
+import { channelPageToLive, followedStreamToLive, slugFromInput, startedAtIso } from '../src/features/kick/background/kick-api.js';
 
 // format.js is a classic content script, so it runs in a context holding the globals it expects.
-const context = { skek: { helpers: { el() {} }, youtube: {} } };
-vm.runInNewContext(readFileSync(new URL('../src/features/youtube-live/twitch/format.js', import.meta.url), 'utf8'), context);
-const { compact, thumbnailUrl } = context.skek.youtube;
+const context = { skek: { helpers: { el() {} }, streams: {} } };
+vm.runInNewContext(readFileSync(new URL('../src/features/streams/twitch/format.js', import.meta.url), 'utf8'), context);
+const { compact, thumbnailUrl } = context.skek.streams;
 
 test('thumbnailUrl points at the stream and escapes its id', () => {
   assert.equal(thumbnailUrl('abc_-1'), 'https://i.ytimg.com/vi/abc_-1/hqdefault_live.jpg');

@@ -2,9 +2,9 @@
 (() => {
   'use strict';
 
-  const yt = skek.youtube;
+  const shared = skek.streams;
   const { el, isPlainClick } = skek.helpers;
-  const { state, channelsOn, liveChannels, siteOf, avatarImg, compact, uptime } = yt;
+  const { state, channelsOn, liveChannels, siteOf, avatarImg, compact, uptime } = shared;
 
   const SITE_TABS = [
     {
@@ -48,8 +48,8 @@
       if (!isPlainClick(event)) return;
       event.preventDefault();
       if (location.pathname === path) return;
-      history.pushState(yt.stateWithRoute(null), '', path);
-      yt.syncWithUrl();
+      history.pushState(shared.stateWithRoute(null), '', path);
+      shared.syncWithUrl();
     });
     return li;
   }
@@ -62,7 +62,7 @@
       {
         class: 'skek-stream',
         href: site.streamUrl(channel, live),
-        on: { click: (event) => yt.openOnPlainClick(event, channel.id) },
+        on: { click: (event) => shared.openOnPlainClick(event, channel.id) },
       },
       el(
         'span',
@@ -123,7 +123,7 @@
         el('h3', { class: 'skek-following__title' }, 'Live channels'),
         el(
           'button',
-          { class: 'skek-button skek-manager-toggle', type: 'button', on: { click: yt.toggleManager } },
+          { class: 'skek-button skek-manager-toggle', type: 'button', on: { click: shared.toggleManager } },
           el('span', {}, 'Manage channels'),
         ),
       ),

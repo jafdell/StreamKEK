@@ -4,9 +4,9 @@
 (() => {
   'use strict';
 
-  const yt = skek.youtube;
+  const shared = skek.streams;
   const { el } = skek.helpers;
-  const { state, streamsOf, openStream, siteOf, compact } = yt;
+  const { state, streamsOf, openStream, siteOf, compact } = shared;
 
   let tip = null;
   let tipTimer = null;
@@ -20,7 +20,7 @@
         href: siteOf(channel).streamUrl(channel, stream),
         title: stream.title,
         on: {
-          click: (event) => yt.openOnPlainClick(event, channel.id, stream.videoId),
+          click: (event) => shared.openOnPlainClick(event, channel.id, stream.videoId),
           mouseenter: () => {
             preview.src = siteOf(channel).previewUrl(stream);
           },

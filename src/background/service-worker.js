@@ -4,8 +4,8 @@
 import {
   messageHandlers as youtubeLiveHandlers,
   startBackground as startYoutubeLive,
-} from '../features/youtube-live/background/index.js';
-import { messageHandlers as kickLiveHandlers, startBackground as startKickLive } from '../features/kick-live/background/index.js';
+} from '../features/youtube/background/index.js';
+import { messageHandlers as kickLiveHandlers, startBackground as startKickLive } from '../features/kick/background/index.js';
 
 const handlers = { __proto__: null, ...youtubeLiveHandlers, ...kickLiveHandlers }; // so 'constructor' etc. stay unknown types
 

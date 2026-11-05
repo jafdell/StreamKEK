@@ -2,9 +2,9 @@
 (() => {
   'use strict';
 
-  const yt = skek.youtube;
+  const shared = skek.streams;
   const { el, icon, send } = skek.helpers;
-  const { state, channelsOn, liveChannels, platformOf, siteOf, streamsOf, avatarImg, compact } = yt;
+  const { state, channelsOn, liveChannels, platformOf, siteOf, streamsOf, avatarImg, compact } = shared;
 
   // Twitch's channels first, then YouTube, then Kick.
   const SECTIONS = [
@@ -46,7 +46,7 @@
             event.stopPropagation();
             // The next card moves under the cursor, so a double-click would hide that too.
             if (event.detail > 1) return;
-            yt.hideTip();
+            shared.hideTip();
             send({ type, id: channel.id });
           },
           // A middle click would open the link.
@@ -65,9 +65,9 @@
         class: `skek-card${state.openId === channel.id ? ' skek-card--active' : ''}`,
         href: siteOf(channel).streamUrl(channel, live),
         on: {
-          click: (event) => yt.openOnPlainClick(event, channel.id),
-          mouseenter: (event) => yt.showTip(event.currentTarget, channel, live),
-          mouseleave: yt.hideTipSoon,
+          click: (event) => shared.openOnPlainClick(event, channel.id),
+          mouseenter: (event) => shared.showTip(event.currentTarget, channel, live),
+          mouseleave: shared.hideTipSoon,
         },
       },
       el('span', { class: 'skek-card__avatar' }, avatarImg(channel, 'skek-card__img')),
@@ -130,7 +130,7 @@
             type: 'button',
             title: 'Manage channels',
             ariaLabel: 'Manage channels',
-            on: { click: yt.toggleManager },
+            on: { click: shared.toggleManager },
           },
           icon('plus'),
         ),
@@ -153,7 +153,7 @@
     if (!rebuilt && signature === lastRender[platform]) return section;
     lastRender[platform] = signature;
 
-    yt.hideTipUnlessHovered();
+    shared.hideTipUnlessHovered();
     const cards = liveChannels(platform).map(renderCard);
     const list = section.querySelector('.skek-section__list');
     if (cards.length) list.replaceChildren(...cards);

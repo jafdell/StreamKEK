@@ -1,16 +1,6 @@
 // Reads YouTube's public pages using the browser's own session. No API key needed.
 
 export const YT = 'https://www.youtube.com';
-const CONCURRENCY = 3;
-
-export async function forEachLimited(items, fn) {
-  const queue = [...items];
-  await Promise.all(
-    Array.from({ length: CONCURRENCY }, async () => {
-      for (let item = queue.shift(); item; item = queue.shift()) await fn(item);
-    }),
-  );
-}
 
 export function extractJson(html, marker) {
   const at = html.indexOf(marker);

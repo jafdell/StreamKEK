@@ -6,8 +6,8 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { test } from 'node:test';
 import vm from 'node:vm';
 
-import { messageHandlers as kickHandlers } from '../src/features/kick-live/background/index.js';
-import { messageHandlers as youtubeHandlers } from '../src/features/youtube-live/background/index.js';
+import { messageHandlers as kickHandlers } from '../src/features/kick/background/index.js';
+import { messageHandlers as youtubeHandlers } from '../src/features/youtube/background/index.js';
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const exists = (path) => existsSync(new URL(`../${path}`, import.meta.url));

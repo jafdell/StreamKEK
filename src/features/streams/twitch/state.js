@@ -59,5 +59,5 @@
     return streams.find((s) => s.videoId === wanted) ?? streams[0] ?? null;
   }
 
-  skek.youtube = { state, mergeChannels, platformOf, channelsOn, liveChannels, streamsOf, openStream };
+  skek.streams = { state, mergeChannels, platformOf, channelsOn, liveChannels, streamsOf, openStream };
 })();

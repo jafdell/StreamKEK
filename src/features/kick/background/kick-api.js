@@ -14,7 +14,7 @@ function toChannel(slug, username, avatar) {
   return { id: `kick:${slug}`, platform: 'kick', slug, name: username ?? slug, handle: null, avatar: avatar ?? null };
 }
 
-// The same shape as a YouTube channel's entry in `live`, see youtube-live/background/poller.js.
+// The same shape as a YouTube channel's entry in `live`, see youtube/background/poller.js.
 // A Kick channel has one stream at a time. `thumbnail` is only known for followed channels.
 function toEntry(stream) {
   const top = {
