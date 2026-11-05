@@ -107,8 +107,8 @@
         el('h3', { class: 'skek-following__title' }, 'Live channels'),
         el(
           'button',
-          { class: 'skek-button skek-manager-toggle', type: 'button', on: { click: shared.toggleManager } },
-          el('span', {}, 'Manage channels'),
+          { class: 'skek-button skek-manager-toggle', type: 'button', on: { click: (event) => shared.toggleManager(event, platform) } },
+          el('span', {}, `Manage ${siteName} channels`),
         ),
       ),
       live.length

@@ -17,8 +17,10 @@
       // The storage keys. Never rename these: nothing migrates old keys.
       keys: { own: 'channels', followed: 'subChannels', live: 'live', status: 'status', hidden: 'hiddenChannels' },
       followsSetting: 'showSubscriptions',
-      placeholder: '@handle or channel link',
-      managerHint: 'Add or remove channels by @handle, channel link or video link.',
+      placeholder: 'YouTube @handle or link',
+      managerHint: 'Add a channel by @handle, channel link or video link.',
+      // Says a link belongs to this site, so one pasted under another site can be sent here.
+      linkPattern: /^(https?:\/\/)?([\w-]+\.)?(youtube\.com|youtu\.be)\//i,
       // The /watch page only says when a stream started and what it's playing if asked separately.
       loadsDetails: true,
       section: { id: 'skek-section', title: 'YouTube Live', glyph: 'youtube' },
@@ -49,9 +51,8 @@
       messagePrefix: 'kick-live',
       keys: { own: 'kickChannels', followed: 'kickFollowed', live: 'kickLive', status: 'kickStatus', hidden: 'kickHidden' },
       followsSetting: 'showKickFollows',
-      placeholder: 'Channel name or link',
-      managerHint: 'Add or remove channels by name or channel link.',
-      // In the sidebar's + button, which covers every site, this says a link belongs to this site.
+      placeholder: 'Kick channel name or link',
+      managerHint: 'Add a channel by name or channel link.',
       linkPattern: /^(https?:\/\/)?([\w-]+\.)?kick\.com\//i,
       section: { id: 'skek-kick-section', title: 'Kick Live', glyph: 'kick' },
       following: {

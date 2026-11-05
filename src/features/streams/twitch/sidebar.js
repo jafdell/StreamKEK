@@ -141,7 +141,8 @@
     }
   }
 
-  function buildSection({ id, title, glyph }) {
+  function buildSection({ platform, id, title, glyph }) {
+    const manageLabel = `Manage ${sites[platform].name} channels`;
     return el(
       'div',
       { id, class: 'skek-section' },
@@ -155,9 +156,9 @@
           {
             class: 'skek-iconbtn skek-section__add skek-manager-toggle',
             type: 'button',
-            title: 'Manage channels',
-            ariaLabel: 'Manage channels',
-            on: { click: shared.toggleManager },
+            title: manageLabel,
+            ariaLabel: manageLabel,
+            on: { click: (event) => shared.toggleManager(event, platform) },
           },
           icon('plus'),
         ),

@@ -1,20 +1,17 @@
-// The channel manager, for every site: add and remove channels, the switches for your followed
-// channels, and showing hidden channels again.
+// The channel manager for one site, named in its address: add and remove channels, the switch for
+// your followed channels, and showing hidden channels again.
 (() => {
   'use strict';
 
-  const { SETTINGS, settingDefaults, sites, siteOf } = skek;
+  const { SETTINGS, settingDefaults, sites } = skek;
 
-  // Inside the settings window, which has the heading and the switches already.
   const params = new URLSearchParams(location.search);
+  const site = sites[params.get('site')];
+  // Inside the settings window, which has the heading, the hint and the switch already.
   document.documentElement.toggleAttribute('data-embedded', params.has('embedded'));
-  // Each of the settings window's tabs shows one site. The sidebar's + button shows them all.
-  const onlySite = sites[params.get('site')];
-  const shownSites = onlySite ? [onlySite] : Object.values(sites);
 
   const form = document.getElementById('add');
   const input = document.getElementById('input');
-  if (onlySite) input.placeholder = onlySite.placeholder;
   const submit = document.getElementById('submit');
   const message = document.getElementById('message');
   const switches = document.getElementById('switches');
@@ -24,8 +21,11 @@
   const hiddenTitle = document.getElementById('hidden-title');
   const hiddenList = document.getElementById('hidden-list');
 
-  const allSites = Object.values(sites);
-  const WATCHED_KEYS = allSites.flatMap(({ keys, followsSetting }) => [...Object.values(keys), followsSetting]);
+  document.getElementById('title').textContent = `Your ${site.name} channels`;
+  document.getElementById('hint').textContent = site.managerHint;
+  input.placeholder = site.placeholder;
+
+  const WATCHED_KEYS = [...Object.values(site.keys), site.followsSetting];
 
   function say(text, isError) {
     message.hidden = !text;
@@ -66,7 +66,7 @@
     remove.textContent = '×';
     remove.title = `Remove ${channel.name}`;
     remove.setAttribute('aria-label', remove.title);
-    remove.addEventListener('click', () => chrome.runtime.sendMessage({ type: `${siteOf(channel).messagePrefix}:remove`, id: channel.id }));
+    remove.addEventListener('click', () => chrome.runtime.sendMessage({ type: `${site.messagePrefix}:remove`, id: channel.id }));
 
     return channelRow(channel, state, remove);
   }
@@ -78,37 +78,32 @@
     show.textContent = 'Show';
     show.title = `Show ${channel.name} again`;
     show.setAttribute('aria-label', show.title);
-    show.addEventListener('click', () => chrome.runtime.sendMessage({ type: `${siteOf(channel).messagePrefix}:unhide`, id: channel.id }));
+    show.addEventListener('click', () => chrome.runtime.sendMessage({ type: `${site.messagePrefix}:unhide`, id: channel.id }));
     return channelRow(channel, null, show);
   }
 
-  // One switch per site, using the setting's own label and message.
-  const switchParts = new Map(
-    allSites.map((site) => {
-      const setting = SETTINGS.find((s) => s.key === site.followsSetting);
-      const label = document.createElement('label');
-      label.className = 'subs';
-      const text = document.createElement('span');
-      const title = document.createElement('span');
-      title.className = 'subs-title';
-      title.textContent = setting.label;
-      const stateText = document.createElement('span');
-      stateText.className = 'state';
-      text.append(title, stateText);
-      const toggle = document.createElement('input');
-      toggle.className = 'skek-switch';
-      toggle.type = 'checkbox';
-      toggle.setAttribute('role', 'switch');
-      // Before storage answers, so a switch that's on doesn't slide on every open.
-      toggle.checked = settingDefaults[site.followsSetting];
-      toggle.addEventListener('change', () => chrome.runtime.sendMessage({ type: setting.message, enabled: toggle.checked }));
-      label.append(text, toggle);
-      switches.append(label);
-      return [site, { toggle, stateText }];
-    }),
-  );
+  // The switch for your followed channels, using the setting's own label and message.
+  const setting = SETTINGS.find((s) => s.key === site.followsSetting);
+  const toggle = document.createElement('input');
+  const toggleState = document.createElement('span');
+  const switchLabel = document.createElement('label');
+  switchLabel.className = 'subs';
+  const switchText = document.createElement('span');
+  const switchTitle = document.createElement('span');
+  switchTitle.className = 'subs-title';
+  switchTitle.textContent = setting.label;
+  toggleState.className = 'state';
+  switchText.append(switchTitle, toggleState);
+  toggle.className = 'skek-switch';
+  toggle.type = 'checkbox';
+  toggle.setAttribute('role', 'switch');
+  // Before storage answers, so a switch that's on doesn't slide on every open.
+  toggle.checked = settingDefaults[site.followsSetting];
+  toggle.addEventListener('change', () => chrome.runtime.sendMessage({ type: setting.message, enabled: toggle.checked }));
+  switchLabel.append(switchText, toggle);
+  switches.append(switchLabel);
 
-  function followsState(site, saved) {
+  function followsState(saved) {
     const status = saved[site.keys.status];
     if (saved[site.followsSetting] === false) return 'Off';
     if (status?.signedOut) return `Sign in to ${site.name} in this browser to use this`;
@@ -121,24 +116,19 @@
   async function render() {
     const saved = await chrome.storage.local.get(WATCHED_KEYS);
 
-    const rows = shownSites.flatMap((site) => (saved[site.keys.own] ?? []).map((c) => row(c, saved[site.keys.live]?.[c.id])));
+    const rows = (saved[site.keys.own] ?? []).map((c) => row(c, saved[site.keys.live]?.[c.id]));
     list.replaceChildren(...rows);
     empty.hidden = rows.length > 0;
 
-    const hidden = shownSites
-      .flatMap((site) => Object.values(saved[site.keys.hidden] ?? {}))
-      .sort((a, b) => a.name.localeCompare(b.name));
+    const hidden = Object.values(saved[site.keys.hidden] ?? {}).sort((a, b) => a.name.localeCompare(b.name));
     hiddenSection.hidden = !hidden.length;
     hiddenTitle.textContent = `Hidden channels (${hidden.length})`;
     hiddenList.replaceChildren(...hidden.map(hiddenRow));
 
-    for (const site of allSites) {
-      const { toggle, stateText } = switchParts.get(site);
-      toggle.checked = saved[site.followsSetting] ?? settingDefaults[site.followsSetting];
-      stateText.textContent = followsState(site, saved);
-      if (saved[site.keys.status]?.consentRequired) {
-        say(`${site.name} is showing its cookie prompt. Open ${site.domain} and answer it once.`, true);
-      }
+    toggle.checked = saved[site.followsSetting] ?? settingDefaults[site.followsSetting];
+    toggleState.textContent = followsState(saved);
+    if (saved[site.keys.status]?.consentRequired) {
+      say(`${site.name} is showing its cookie prompt. Open ${site.domain} and answer it once.`, true);
     }
   }
 
@@ -147,9 +137,11 @@
     const value = input.value.trim();
     if (!value) return;
 
+    const otherSite = Object.values(sites).find((other) => other !== site && other.linkPattern.test(value));
+    if (otherSite) return say(`That's a ${otherSite.name} link. Add it under ${otherSite.name} instead.`, true);
+
     submit.disabled = true;
     say('Looking up channel…');
-    const site = onlySite ?? allSites.find(({ linkPattern }) => linkPattern?.test(value)) ?? sites.youtube;
     const result = await chrome.runtime.sendMessage({ type: `${site.messagePrefix}:add`, input: value });
     submit.disabled = false;
 
@@ -166,5 +158,5 @@
     if (area === 'local' && WATCHED_KEYS.some((key) => key in changes)) render();
   });
   render();
-  for (const { messagePrefix } of allSites) chrome.runtime.sendMessage({ type: `${messagePrefix}:refresh` });
+  chrome.runtime.sendMessage({ type: `${site.messagePrefix}:refresh` });
 })();

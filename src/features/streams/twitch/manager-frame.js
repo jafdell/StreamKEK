@@ -9,6 +9,7 @@
   const FRAME_HEIGHT_WITH_MARGIN = 468;
 
   let manager = null;
+  let managerPlatform = null;
 
   function closeManager(event) {
     // The button's own click handles closing, or it would just reopen.
@@ -18,14 +19,18 @@
     document.removeEventListener('mousedown', closeManager);
   }
 
-  function toggleManager(event) {
+  // Another site's button switches to that site's channels rather than just closing.
+  function toggleManager(event, platform) {
     event.stopPropagation();
-    if (manager) return closeManager();
+    const wasOpen = manager && managerPlatform === platform;
+    closeManager();
+    if (wasOpen) return;
+    managerPlatform = platform;
     const rect = event.currentTarget.getBoundingClientRect();
     manager = el('iframe', {
       class: 'skek-manager',
-      title: 'Manage channels',
-      src: chrome.runtime.getURL('src/features/streams/manager/manager.html'),
+      title: `Manage ${skek.sites[platform].name} channels`,
+      src: chrome.runtime.getURL(`src/features/streams/manager/manager.html?site=${platform}`),
     });
     manager.style.left = `${Math.min(rect.right + 8, innerWidth - FRAME_WIDTH_WITH_MARGIN)}px`;
     manager.style.top = `${Math.max(8, Math.min(rect.top, innerHeight - FRAME_HEIGHT_WITH_MARGIN))}px`;

@@ -41,6 +41,16 @@ test('Kick links are told apart from anything else', () => {
   assert.ok(!linkPattern.test('@odablock'));
 });
 
+test('YouTube links are told apart from anything else', () => {
+  const { linkPattern } = sites.youtube;
+  assert.ok(linkPattern.test('https://www.youtube.com/@LofiGirl'));
+  assert.ok(linkPattern.test('youtube.com/watch?v=abc'));
+  assert.ok(linkPattern.test('https://youtu.be/abc'));
+  assert.ok(linkPattern.test('https://m.youtube.com/@LofiGirl'));
+  assert.ok(!linkPattern.test('https://kick.com/youtube.com/'));
+  assert.ok(!linkPattern.test('@LofiGirl'));
+});
+
 test('liveChannelsFromGuide keeps only live channels, once each', () => {
   const entry = (id, live) => ({
     guideEntryRenderer: {
