@@ -2,8 +2,7 @@
 (() => {
   'use strict';
 
-  // Inside the settings window, which has the heading and subscriptions switch already,
-  // and whose search box should keep focus.
+  // Inside the settings window, which has the heading and subscriptions switch already.
   const embedded = new URLSearchParams(location.search).has('embedded');
   document.documentElement.toggleAttribute('data-embedded', embedded);
 
@@ -105,5 +104,4 @@
   });
   render();
   chrome.runtime.sendMessage({ type: 'youtube-live:refresh' });
-  if (!embedded) input.focus();
 })();

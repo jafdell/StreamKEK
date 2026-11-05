@@ -287,6 +287,5 @@
     // Rows are built with their saved state, so switches don't slide on every open.
     groups.append(...categories.map((category) => categoryGroup(category, saved)));
     render();
-    search.focus();
   });
 })();
