@@ -8,6 +8,10 @@
     return el('img', { class: className, src: channel.avatar || '', alt: '', referrerPolicy: 'no-referrer' });
   }
 
+  function thumbnailUrl(videoId) {
+    return `https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault_live.jpg`;
+  }
+
   function compact(n) {
     if (n == null) return '';
     if (n < 1000) return String(n);
@@ -22,5 +26,5 @@
     return `${Math.floor(seconds / 3600)}:${pad(Math.floor(seconds / 60) % 60)}:${pad(seconds % 60)}`;
   }
 
-  Object.assign(skek.youtube, { avatarImg, compact, uptime });
+  Object.assign(skek.youtube, { avatarImg, thumbnailUrl, compact, uptime });
 })();

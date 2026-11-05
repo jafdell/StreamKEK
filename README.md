@@ -25,6 +25,7 @@ Open the settings from the extension's icon in Twitch's top bar or the browser t
 - **Stream quality:** choose what streams start at on Twitch and YouTube, up to 1440p.
 - **Chat font size** for both Twitch and YouTube chat.
 - **Cleaner Twitch chat:** hide timestamps, the top strip, drops, pinned messages and the Hype Train.
+- **Stream previews:** hover a live channel in the sidebar to see an image of the stream, on Twitch and YouTube.
 - **Cleaner sidebar:** hide Live Channels, Recommended Categories, Viewers Also Watch and YouTube Live.
 - **Auto-claim channel points**, only in a tab where the stream is playing. Off by default.
 - **Dark or light theme** for the settings window and the YouTube stream view.
@@ -38,7 +39,7 @@ Open the settings from the extension's icon in Twitch's top bar or the browser t
 
 ## Feedback and contributing
 
-Found a bug or have an idea? Open an issue, for both bug reports and feature requests. Before reporting a bug, please turn off your other Twitch extensions and check that it still happens, since they can change the same parts of the page. It also helps to say which browser you use and what you were watching: a Twitch stream, a Twitch video or a YouTube stream.
+Found a bug or have an idea? Open an issue, for both bug reports and feature requests, or use the **Feedback** links in the settings window. Before reporting a bug, please turn off your other Twitch extensions and check that it still happens, since they can change the same parts of the page. It also helps to say which browser you use and what you were watching: a Twitch stream, a Twitch video or a YouTube stream.
 
 Pull requests are welcome too. For a bigger change, open an issue first so we can talk it through. [CONTRIBUTING.md](CONTRIBUTING.md) covers how the code is laid out and how to add a setting or a feature, and [TESTING.md](TESTING.md) lists what to check by hand.
 

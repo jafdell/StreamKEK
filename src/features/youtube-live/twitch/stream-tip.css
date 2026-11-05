@@ -1,8 +1,8 @@
 .skek-tip {
   position: fixed;
   z-index: 10000;
-  max-width: 260px;
-  padding: 3px 6px;
+  width: 320px;
+  padding: 4px;
   border-radius: 4px;
   background: var(--skek-popup-bg);
   color: var(--skek-popup-text);
@@ -12,14 +12,13 @@
   line-height: 1.1;
   pointer-events: none;
 }
+.skek-tip__name,
+.skek-tip__title,
+.skek-tip__meta { padding: 2px; }
 .skek-tip__meta { font-weight: 400; line-height: 1.4; }
+.skek-tip .skek-preview-img { margin-top: 4px; }
 
-.skek-tip--streams {
-  width: 320px;
-  max-width: none;
-  padding: 4px;
-  pointer-events: auto;
-}
+.skek-tip--streams { pointer-events: auto; }
 .skek-tip--streams .skek-tip__name { padding: 4px 6px; }
 .skek-tip__list { display: flex; flex-direction: column; max-height: min(60vh, 420px); overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--skek-popup-scrollbar) transparent; }
 .skek-tip__stream {

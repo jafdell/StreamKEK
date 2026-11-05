@@ -10,6 +10,14 @@ body:
     validations:
       required: true
   - type: input
+    id: version
+    attributes:
+      label: StreamKEK version
+      description: Shown at the bottom left of the settings window.
+      placeholder: 1.0.1
+    validations:
+      required: true
+  - type: input
     id: browser
     attributes:
       label: Browser and version

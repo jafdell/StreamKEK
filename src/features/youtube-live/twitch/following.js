@@ -4,7 +4,7 @@
 
   const yt = skek.youtube;
   const { el, isPlainClick } = skek.helpers;
-  const { state, liveChannels, avatarImg, compact, uptime } = yt;
+  const { state, liveChannels, avatarImg, thumbnailUrl, compact, uptime } = yt;
 
   const FOLLOWING_YOUTUBE_PATH = '/directory/following/youtube';
   const PAGES_WITH_YOUTUBE_SECTION = ['/directory/following', '/directory/following/live'];
@@ -46,7 +46,7 @@
         { class: 'skek-stream__thumb' },
         el('img', {
           class: 'skek-stream__img',
-          src: `https://i.ytimg.com/vi/${encodeURIComponent(live.videoId)}/hqdefault_live.jpg`,
+          src: thumbnailUrl(live.videoId),
           alt: '',
           referrerPolicy: 'no-referrer',
         }),

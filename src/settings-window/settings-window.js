@@ -6,7 +6,11 @@
 
   const { SETTINGS, settingDefaults } = skek;
 
-  // Things in a category that aren't settings. `build` returns what goes under the label.
+  const REPO = 'https://github.com/jafdell/StreamKEK';
+  const VERSION = chrome.runtime.getManifest().version;
+
+  // Things in a category that aren't settings. `build` returns what goes under the label, and
+  // `href` makes the whole row a link instead.
   const CUSTOM_ITEMS = [
     {
       category: 'YouTube',
@@ -14,12 +18,33 @@
       hint: 'Add or remove channels by @handle, channel link or video link.',
       build: channelManagerFrame,
     },
+    {
+      category: 'Feedback',
+      label: 'Report a bug',
+      hint: 'Something not working? Opens a short form on GitHub, which needs a GitHub account.',
+      // The form fills in its version field from the address.
+      href: `${REPO}/issues/new?template=bug_report.yml&version=${encodeURIComponent(VERSION)}`,
+    },
+    {
+      category: 'Feedback',
+      label: 'Request a feature',
+      hint: 'Have an idea? Opens a short form on GitHub, which needs a GitHub account.',
+      href: `${REPO}/issues/new?template=feature_request.yml`,
+    },
+    {
+      category: 'Feedback',
+      label: 'GitHub page',
+      hint: "See StreamKEK's code, releases and what others have reported.",
+      href: REPO,
+    },
   ];
 
   // Only ever fed into innerHTML from these constants.
+  const LINK_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14 4h6v6h-2V7.4l-7.3 7.3-1.4-1.4L16.6 6H14V4ZM5 6h5v2H6v10h10v-4h2v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z"/></svg>';
   const CATEGORY_ICONS = {
     Appearance: '<path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 2v14a7 7 0 0 1 0-14Z"/>',
     Chat: '<path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9.5L5 21v-4H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/>',
+    Feedback: '<path d="M3 20.5 22 12 3 3.5V10l12 2-12 2v6.5Z"/>',
     Player: '<path d="M8 5v14l11-7L8 5Z"/>',
     Sidebar: '<path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm1 2v10h4V7H5Zm6 0v10h8V7h-8Z"/>',
     YouTube: '<path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.3 5 12 5 12 5s-6.3 0-7.8.4a2.5 2.5 0 0 0-1.8 1.8C2 8.7 2 12 2 12s0 3.3.4 4.8c.2.9.9 1.5 1.8 1.8 1.5.4 7.8.4 7.8.4s6.3 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.5.4-4.8.4-4.8s0-3.3-.4-4.8ZM10 15V9l5.2 3-5.2 3Z"/>',
@@ -28,6 +53,7 @@
 
   const search = document.getElementById('search');
   const categoryLinks = document.getElementById('categories');
+  const feedbackLink = document.getElementById('feedback-category');
   const title = document.getElementById('title');
   const groups = document.getElementById('groups');
   const noResults = document.getElementById('no-results');
@@ -138,6 +164,25 @@
     return card;
   }
 
+  function linkRow(item) {
+    const row = document.createElement('a');
+    row.className = 'card setting';
+    row.dataset.search = searchText(item);
+    row.href = item.href;
+    row.target = '_blank';
+    row.rel = 'noopener';
+    const icon = document.createElement('span');
+    icon.className = 'link-icon';
+    icon.innerHTML = LINK_ICON;
+    row.append(cardText(item), icon);
+    return row;
+  }
+
+  function itemRow(item, saved) {
+    if (item.href) return linkRow(item);
+    return item.build ? customCard(item) : settingRow(item, saved[item.key]);
+  }
+
   function channelManagerFrame() {
     const frame = document.createElement('iframe');
     frame.className = 'manager-frame';
@@ -157,7 +202,7 @@
     const items = [...SETTINGS, ...CUSTOM_ITEMS]
       .filter((item) => item.category === category)
       .sort((a, b) => a.label.localeCompare(b.label));
-    group.append(heading, ...items.map((item) => (item.build ? customCard(item) : settingRow(item, saved[item.key]))));
+    group.append(heading, ...items.map((item) => itemRow(item, saved)));
     return group;
   }
 
@@ -196,7 +241,7 @@
     groups.hidden = !anyMatch;
     noResults.hidden = anyMatch;
     title.textContent = searching ? 'Search results' : selectedCategory;
-    for (const link of categoryLinks.children) {
+    for (const link of [...categoryLinks.children, ...feedbackLink.children]) {
       link.setAttribute('aria-current', String(!searching && link.dataset.category === selectedCategory));
     }
   }
@@ -212,7 +257,7 @@
   }
 
   document.documentElement.classList.toggle('framed', framed);
-  document.getElementById('version').textContent = `Version ${chrome.runtime.getManifest().version}`;
+  document.getElementById('version').textContent = `Version ${VERSION}`;
   search.addEventListener('input', render);
   closeButton.hidden = !framed;
   closeButton.addEventListener('click', closeWindow);
@@ -236,7 +281,9 @@
   });
 
   chrome.storage.local.get(settingDefaults).then((saved) => {
-    categoryLinks.append(...categories.map(categoryLink));
+    // Feedback sits apart at the bottom, so it isn't mistaken for a group of settings.
+    categoryLinks.append(...categories.filter((category) => category !== 'Feedback').map(categoryLink));
+    feedbackLink.append(categoryLink('Feedback'));
     // Rows are built with their saved state, so switches don't slide on every open.
     groups.append(...categories.map((category) => categoryGroup(category, saved)));
     render();
