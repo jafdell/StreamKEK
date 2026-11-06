@@ -32,6 +32,8 @@ Features are in `src/features/`. `chat/`, `player/` and `sidebar/` match the set
 | Theatre, stacked and floating chat modes | `src/features/player/` (Twitch, plus `floating-window.js` and `.css`, which both use) and `streams/twitch/view-layouts.js` and `stream-view.css` (other sites). `streams/frames/layout-keys.js` forwards the shortcuts from inside their frames, and `chat-settings.js` there and each site's `chat.css` make floating chat see-through. Theatre on Twitch is Twitch's own. Stacked and floating exist twice, so change both |
 | Sidebar previews | `sidebar/preview.js` (Twitch channels) and `streams/twitch/stream-tip.js` (other sites) |
 | Favorites | `streams/twitch/favorites.js` and `.css`. Twitch's channels there are read from Twitch's own API in the page, not from `sites.js` |
+| Dragging a channel from the sidebar | `streams/twitch/sidebar-drag.js`, which Favorites and multi-stream each register a drop target with |
+| Multi-stream | `streams/twitch/multi-view.js` and `.css`, with its sizes and address in `multi-layout.js`, and `routes.js` for going in and out of it. `streams/frames/audio.js` mutes the frames. It's a view of its own, not a mode of the stream view, and its frames never move in the page, since that would reload them. Twitch's streams there use Twitch's embedded player and chat, through its entry in `sites.js` |
 | Tests | `tests/`, and `TESTING.md` for what to check by hand |
 
 ## Development setup

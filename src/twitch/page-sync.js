@@ -2,6 +2,9 @@
 (() => {
   'use strict';
 
+  // Also runs in Twitch's chat in the multi-stream view, but not in that chat on other websites.
+  if (window !== window.top && !location.ancestorOrigins[0]?.endsWith('.twitch.tv')) return;
+
   const { SETTINGS, settingDefaults } = skek;
 
   // CSS gated on html[data-skek-on~='<key>'] can't flash when Twitch re-renders, and

@@ -214,22 +214,27 @@
     chrome.storage.local.set({ chatHidden: hidden });
   }
 
-  function placeView() {
-    const { view } = state;
+  // Over everything right of the sidebar, or the whole window. For the multi-stream view too.
+  function placeRoot(root, fullWindow) {
     const main = document.querySelector('main.twilight-main, main');
-    if (!view || !main) return;
+    if (!main) return;
     const mainRect = main.getBoundingClientRect();
     const nav = document.querySelector('[data-a-target="side-nav-bar"]');
     const left = nav ? nav.getBoundingClientRect().right : mainRect.left;
-    const { style } = view.root;
-    style.left = view.layout ? '0' : `${left}px`;
-    style.top = view.layout ? '0' : `${mainRect.top}px`;
-    style.height = view.layout ? '100%' : `${mainRect.height}px`;
-    style.width = view.layout ? '100%' : `${document.documentElement.clientWidth - left}px`;
+    const { style } = root;
+    style.left = fullWindow ? '0' : `${left}px`;
+    style.top = fullWindow ? '0' : `${mainRect.top}px`;
+    style.height = fullWindow ? '100%' : `${mainRect.height}px`;
+    style.width = fullWindow ? '100%' : `${document.documentElement.clientWidth - left}px`;
 
     // Sits beside Twitch's own layout so its menus keep opening above us.
     const parent = main.parentElement;
-    if (view.root.parentElement !== parent) parent.append(view.root);
+    if (root.parentElement !== parent) parent.append(root);
+  }
+
+  function placeView() {
+    const { view } = state;
+    if (view) placeRoot(view.root, !!view.layout);
   }
 
   let tickTimer = null;
@@ -272,5 +277,5 @@
     shared.renderSidebar();
   }
 
-  Object.assign(shared, { updateInfo, placeView, openView, closeView });
+  Object.assign(shared, { updateInfo, placeRoot, placeView, openView, closeView, pauseTwitchVideos, resumeTwitchVideos });
 })();

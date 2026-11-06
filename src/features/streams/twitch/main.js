@@ -28,6 +28,7 @@
         return;
       }
       shared.updateInfo();
+      shared.updateMulti();
       shared.syncWithUrl();
     });
 
@@ -55,6 +56,7 @@
     setInterval(shared.syncWithUrl, 300);
     addEventListener('popstate', shared.handlePopState);
     addEventListener('resize', shared.placeView);
+    addEventListener('resize', shared.placeMulti);
 
     for (const [, { messagePrefix }] of siteEntries) send({ type: `${messagePrefix}:refresh` });
   }

@@ -54,6 +54,114 @@ test('twitchStatusFrom tells live, offline and missing channels apart', () => {
   assert.equal(Object.keys(status).length, 2);
 });
 
+const multiContext = { skek: { streams: {} } };
+vm.runInNewContext(readFileSync(new URL('../src/features/streams/twitch/multi-layout.js', import.meta.url), 'utf8'), multiContext);
+const { multiLayout, parseMultiHash, multiHash, swapStreams } = multiContext.skek.streams;
+
+function assertInside(rect, width, height) {
+  assert.ok(rect.x >= 0 && rect.y >= 0 && rect.x + rect.w <= width + 1 && rect.y + rect.h <= height + 1, `${JSON.stringify(rect)} is outside ${width}x${height}`);
+}
+
+test('multiLayout gives two streams a chat each, under them', () => {
+  const { players, chats, chat, picker } = plain(multiLayout({ count: 2, width: 1600, height: 900, chat: true }));
+  assert.deepEqual(players.map((p) => [p.x, p.y, p.w]), [[0, 0, 800], [800, 0, 800]]);
+  assert.equal(players[0].h, 478); // 450 of 16:9 video, plus its bar
+  assert.deepEqual(chats, [{ x: 0, y: 478, w: 800, h: 422 }, { x: 800, y: 478, w: 800, h: 422 }]);
+  assert.equal(chat, null);
+  assert.equal(picker, null);
+});
+
+test('multiLayout leaves two chats room to read in a short window', () => {
+  const { players, chats } = plain(multiLayout({ count: 2, width: 1600, height: 500, chat: true }));
+  assert.equal(chats[0].h, 220);
+  assert.equal(players[0].h, 280);
+});
+
+test('multiLayout shares one chat between three or four streams', () => {
+  for (const count of [3, 4]) {
+    const { players, chats, chat, picker } = plain(multiLayout({ count, width: 1600, height: 900, chat: true }));
+    assert.equal(players.length, count);
+    assert.equal(chats, null);
+    assert.deepEqual(picker, { x: 1260, y: 0, w: 340, h: 40 });
+    assert.deepEqual(chat, { x: 1260, y: 40, w: 340, h: 860 });
+    for (const player of players) assertInside(player, 1260, 900);
+  }
+});
+
+test('multiLayout moves a shared chat under the streams in a narrow window', () => {
+  const { players, chat, picker } = plain(multiLayout({ count: 3, width: 800, height: 900, chat: true }));
+  assert.equal(picker.y + picker.h, chat.y);
+  assert.equal(chat.y + chat.h, 900);
+  for (const player of players) assert.ok(player.y + player.h <= picker.y + 1);
+});
+
+test('multiLayout falls back to one chat when two wouldn\'t be readable', () => {
+  const { chats, chat } = plain(multiLayout({ count: 2, width: 500, height: 900, chat: true }));
+  assert.equal(chats, null);
+  assert.ok(chat);
+});
+
+test('multiLayout keeps streams from overlapping or leaving the view, at any size', () => {
+  for (const [width, height] of [[1600, 900], [2560, 1300], [900, 400], [320, 200]]) {
+    for (const count of [2, 3, 4]) {
+      for (const chat of [true, false]) {
+        const { players } = plain(multiLayout({ count, width, height, chat }));
+        assert.equal(players.length, count);
+        players.forEach((a, i) => {
+          assertInside(a, width, height);
+          players.slice(i + 1).forEach((b) => {
+            const apart = a.x + a.w <= b.x + 1 || b.x + b.w <= a.x + 1 || a.y + a.h <= b.y + 1 || b.y + b.h <= a.y + 1;
+            assert.ok(apart, `${JSON.stringify(a)} overlaps ${JSON.stringify(b)} at ${width}x${height}, ${count} streams`);
+          });
+        });
+      }
+    }
+  }
+});
+
+test('multiLayout survives having no room at all, as before the page has laid out', () => {
+  assert.equal(multiLayout({ count: 3, width: 0, height: 0, chat: true }).players.length, 3);
+});
+
+test('multiLayout makes the first of three streams the biggest', () => {
+  const { players } = plain(multiLayout({ count: 3, width: 1260, height: 900, chat: false }));
+  assert.ok(players[0].w > players[1].w);
+  assert.equal(players[1].w, players[2].w);
+});
+
+test('parseMultiHash reads streams from every site, and writes them back the same', () => {
+  const hash = '#skek-multi=twitch/kaicenat,kick/some-name,youtube/UCabc_-/abcdefghijk';
+  const entries = plain(parseMultiHash(hash));
+  assert.deepEqual(entries, [
+    { id: 'twitch:kaicenat', platform: 'twitch', key: 'kaicenat', videoId: null },
+    { id: 'kick:some-name', platform: 'kick', key: 'some-name', videoId: null },
+    { id: 'UCabc_-', platform: 'youtube', key: 'UCabc_-', videoId: 'abcdefghijk' },
+  ]);
+  assert.equal(multiHash(entries), hash);
+});
+
+test('parseMultiHash ignores what could reach anything but a channel', () => {
+  assert.equal(parseMultiHash('').length, 0);
+  assert.equal(parseMultiHash('#other=twitch/a').length, 0);
+  for (const bad of ['twitch/../logout', 'kick/a/b', 'kick/a%2Fb', 'example/a', 'twitch/a&parent=evil', 'twitch/a-b', 'youtube/UC1/short', '']) {
+    assert.equal(parseMultiHash(`#skek-multi=${bad}`).length, 0, bad);
+  }
+});
+
+test('swapStreams swaps two streams and leaves the others in place', () => {
+  const ids = (list) => [...list].map((e) => e.id).join();
+  const list = [{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }];
+  assert.equal(ids(swapStreams(list, 'a', 'c')), 'c,b,a,d');
+  assert.equal(ids(swapStreams(list, 'd', 'b')), 'a,d,c,b');
+  assert.equal(ids(swapStreams(list, 'a', 'gone')), 'a,b,c,d');
+});
+
+test('parseMultiHash keeps four streams at most, once each', () => {
+  const ids = (hash) => parseMultiHash(hash).map((e) => e.id).join();
+  assert.equal(ids('#skek-multi=twitch/a,twitch/A,kick/a'), 'twitch:a,kick:a');
+  assert.equal(ids('#skek-multi=twitch/a,twitch/b,twitch/c,twitch/d,twitch/e'), 'twitch:a,twitch:b,twitch:c,twitch:d');
+});
+
 const sitesContext = { skek: {} };
 vm.runInNewContext(readFileSync(new URL('../src/features/streams/sites.js', import.meta.url), 'utf8'), sitesContext);
 const { sites, siteOf } = sitesContext.skek;
@@ -66,6 +174,15 @@ test('YouTube previews point at the stream and escape its id', () => {
 test('siteOf treats a channel saved without a platform as YouTube', () => {
   assert.equal(siteOf({ id: 'UC1' }).name, 'YouTube');
   assert.equal(siteOf({ id: 'kick:a', platform: 'kick' }).name, 'Kick');
+});
+
+test('Twitch frames name this page as their parent, in the theme chosen', () => {
+  sitesContext.location = { hostname: 'www.twitch.tv' };
+  const urls = siteOf({ platform: 'twitch' }).frameUrls({ login: 'a' }, null, '#skek-theme=dark');
+  assert.equal(urls.player, 'https://player.twitch.tv/?channel=a&parent=www.twitch.tv');
+  assert.equal(urls.chat, 'https://www.twitch.tv/embed/a/chat?parent=www.twitch.tv&darkpopout#skek-theme=dark');
+  const light = siteOf({ platform: 'twitch' }).frameUrls({ login: 'a' }, null, '#skek-theme=light');
+  assert.equal(light.chat, 'https://www.twitch.tv/embed/a/chat?parent=www.twitch.tv#skek-theme=light');
 });
 
 test('Kick links are told apart from anything else', () => {

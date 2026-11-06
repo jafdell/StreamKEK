@@ -77,12 +77,21 @@
     },
   };
 
-  // Not one of SITES, since it needs no stream view: this is only what a favorite's card needs when
-  // the channel is on Twitch. See streams/twitch/favorites.js.
+  // Not one of SITES, since it needs no stream view or service worker: this is only what a favorite's
+  // card and the multi-stream view need when a channel is on Twitch. Those are in streams/twitch/.
   const TWITCH = {
     name: 'Twitch',
     streamUrl: (channel) => `https://www.twitch.tv/${channel.login}`,
+    channelUrl: (channel) => `https://www.twitch.tv/${channel.login}`,
     previewUrl: (stream) => stream.thumbnail ?? '',
+    frameUrls(channel, stream, settings) {
+      const parent = `parent=${location.hostname}`;
+      const theme = settings.includes('skek-theme=dark') ? '&darkpopout' : '';
+      return {
+        player: `https://player.twitch.tv/?channel=${channel.login}&${parent}`,
+        chat: `https://www.twitch.tv/embed/${channel.login}/chat?${parent}${theme}${settings}`,
+      };
+    },
   };
 
   // YouTube's channels were saved before there were other sites, so they don't say.

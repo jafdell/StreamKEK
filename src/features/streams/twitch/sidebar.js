@@ -4,7 +4,7 @@
 
   const shared = skek.streams;
   const { el, icon, send } = skek.helpers;
-  const { state, sites, channelsOn, liveChannels, platformOf, siteOf, streamsOf, avatarImg, compact, isFavorite, starButton } = shared;
+  const { state, sites, channelsOn, liveChannels, platformOf, siteOf, streamsOf, avatarImg, compact, isFavorite, starButton, openIds } = shared;
 
   // Twitch's channels first, then each site in the order sites.js has them.
   const SECTIONS = Object.entries(sites).map(([platform, { section }]) => ({ platform, ...section }));
@@ -23,7 +23,7 @@
   }
 
   function canHide(channel) {
-    if (state.openId === channel.id) return false;
+    if (openIds().includes(channel.id)) return false;
     const { own, followed } = state.bySite[platformOf(channel)];
     return !!followed[channel.id] && !own.some((c) => c.id === channel.id);
   }
@@ -90,7 +90,7 @@
     return el(
       'a',
       {
-        class: `skek-card${state.openId === channel.id ? ' skek-card--active' : ''}`,
+        class: `skek-card${openIds().includes(channel.id) ? ' skek-card--active' : ''}`,
         'data-skek-channel': channel.id,
         href: siteOf(channel).streamUrl(channel, live),
         on: {
@@ -183,7 +183,7 @@
     placeSection(section, host, previous);
 
     const { platform } = config;
-    const signature = JSON.stringify([state.bySite[platform].own, channelsOn(platform), state.live, state.openId, confirmingHide, state.favorites]);
+    const signature = JSON.stringify([state.bySite[platform].own, channelsOn(platform), state.live, openIds(), confirmingHide, state.favorites]);
     if (!rebuilt && signature === lastRender[platform]) return section;
     lastRender[platform] = signature;
 

@@ -14,9 +14,10 @@
   function render() {
     // The stream view's address, like /kick/<channel>, isn't a Twitch channel.
     const watching = document.getElementById('skek-view') ? null : location.pathname.split('/')[1]?.toLowerCase();
+    const open = skek.streams.openIds();
     for (const card of document.querySelectorAll(CARD)) {
       const channel = card.pathname.match(CHANNEL_PATH)?.[1].toLowerCase();
-      const current = !!channel && channel === watching;
+      const current = !!channel && (channel === watching || open.includes(`twitch:${channel}`));
       if (card.hasAttribute(ATTRIBUTE) !== current) card.toggleAttribute(ATTRIBUTE, current);
     }
   }
