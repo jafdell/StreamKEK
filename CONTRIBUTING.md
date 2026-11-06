@@ -141,5 +141,6 @@ All in `chrome.storage.local`. A key in `SETTINGS` is written by the settings wi
 | `kickLive` | like `live`, and each stream also has `thumbnail` | background |
 | `kickStatus` | `{checkedAt,signedOut,failed}` | background |
 | `showKickFollows` | boolean, default true | background |
+| `kickVolume` | number above 0, up to 1, default 1 | Kick's player frame |
 | `chatHidden` | boolean | Twitch page |
 | `floatingChat` | `{x,y,width,height,opacity}`, each optional | Twitch page |

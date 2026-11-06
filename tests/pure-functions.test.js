@@ -114,6 +114,9 @@ function reducesPage(path, ancestorOrigins) {
     document: { documentElement: root },
     skek: { settingDefaults: {} },
     chrome: { storage: { local: { get: async () => ({}) }, onChanged: { addListener() {} } } },
+    MutationObserver: class {
+      observe() {}
+    },
   });
   return root.reduced;
 }
