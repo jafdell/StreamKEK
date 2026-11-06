@@ -17,8 +17,10 @@
       // The storage keys. Never rename these: nothing migrates old keys.
       keys: { own: 'channels', followed: 'subChannels', live: 'live', status: 'status', hidden: 'hiddenChannels' },
       followsSetting: 'showSubscriptions',
-      placeholder: '@handle or channel link',
-      managerHint: 'Add or remove channels by @handle, channel link or video link.',
+      placeholder: 'YouTube @handle or link',
+      managerHint: 'Add a channel by @handle, channel link or video link.',
+      // Says a link belongs to this site, so one pasted under another site can be sent here.
+      linkPattern: /^(https?:\/\/)?([\w-]+\.)?(youtube\.com|youtu\.be)\//i,
       // The /watch page only says when a stream started and what it's playing if asked separately.
       loadsDetails: true,
       section: { id: 'skek-section', title: 'YouTube Live', glyph: 'youtube' },
@@ -49,9 +51,8 @@
       messagePrefix: 'kick-live',
       keys: { own: 'kickChannels', followed: 'kickFollowed', live: 'kickLive', status: 'kickStatus', hidden: 'kickHidden' },
       followsSetting: 'showKickFollows',
-      placeholder: 'Channel name or link',
-      managerHint: 'Add or remove channels by name or channel link.',
-      // In the sidebar's + button, which covers every site, this says a link belongs to this site.
+      placeholder: 'Kick channel name or link',
+      managerHint: 'Add a channel by name or channel link.',
       linkPattern: /^(https?:\/\/)?([\w-]+\.)?kick\.com\//i,
       section: { id: 'skek-kick-section', title: 'Kick Live', glyph: 'kick' },
       following: {
@@ -76,8 +77,27 @@
     },
   };
 
+  // Not one of SITES, since it needs no stream view or service worker: this is only what a favorite's
+  // card and the multi-stream view need when a channel is on Twitch. Those are in streams/twitch/.
+  const TWITCH = {
+    name: 'Twitch',
+    streamUrl: (channel) => `https://www.twitch.tv/${channel.login}`,
+    channelUrl: (channel) => `https://www.twitch.tv/${channel.login}`,
+    previewUrl: (stream) => stream.thumbnail ?? '',
+    frameUrls(channel, stream, settings) {
+      const parent = `parent=${location.hostname}`;
+      const theme = settings.includes('skek-theme=dark') ? '&darkpopout' : '';
+      return {
+        player: `https://player.twitch.tv/?channel=${channel.login}&${parent}`,
+        chat: `https://www.twitch.tv/embed/${channel.login}/chat?${parent}${theme}${settings}`,
+      };
+    },
+  };
+
   // YouTube's channels were saved before there were other sites, so they don't say.
   const platformOf = (channel) => channel?.platform ?? 'youtube';
 
-  Object.assign(skek, { sites: SITES, platformOf, siteOf: (channel) => SITES[platformOf(channel)] });
+  const siteOf = (channel) => (platformOf(channel) === 'twitch' ? TWITCH : SITES[platformOf(channel)]);
+
+  Object.assign(skek, { sites: SITES, platformOf, siteOf });
 })();

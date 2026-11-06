@@ -1,0 +1,149 @@
+/* The multi-stream view. Its streams and chats are placed one by one in multi-view.js, so they never
+   have to move in the page. Its theme comes from .skek-view in stream-view.css. */
+
+.skek-multi { flex-direction: column; }
+
+.skek-multi__bar,
+.skek-multi__head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  background: var(--color-background-base);
+}
+.skek-multi__bar {
+  height: 36px;
+  padding: 0 8px 0 12px;
+  border-bottom: 1px solid var(--color-border-base);
+}
+.skek-multi__title { margin: 0; font-size: 14px; font-weight: 600; line-height: 1.4; white-space: nowrap; }
+.skek-multi__hint { overflow: hidden; font-size: 13px; white-space: nowrap; text-overflow: ellipsis; color: var(--color-text-alt-2); }
+.skek-multi__spacer { flex: 1 1 auto; min-width: 0; }
+
+.skek-multi__button { flex: 0 0 auto; width: 24px; height: 24px; }
+.skek-multi__button[hidden] { display: none; }
+.skek-multi__button--on { color: var(--color-text-link); }
+.skek-multi__button svg { width: 18px; height: 18px; }
+
+.skek-multi__stage { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; background: #000; }
+
+.skek-multi__cell { position: absolute; display: flex; flex-direction: column; box-sizing: border-box; outline: 1px solid var(--color-background-base); }
+.skek-multi__head { height: 28px; padding: 0 2px 0 6px; cursor: grab; user-select: none; }
+.skek-multi__site { flex: 0 0 auto; display: flex; }
+.skek-multi__site svg { display: block; width: 14px; height: 14px; }
+.skek-multi__site--twitch { color: #9147ff; }
+.skek-multi__site--youtube { color: #f00; }
+.skek-multi__site--kick { color: #53fc18; }
+.skek-multi__name {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--color-text-base) !important;
+  text-decoration: none !important;
+}
+.skek-multi__name:hover { color: var(--color-text-link-hover) !important; }
+.skek-multi__viewers { flex: 0 0 auto; font-size: 13px; font-variant-numeric: tabular-nums; color: var(--color-text-live); }
+
+.skek-multi__player { flex: 1 1 auto; min-height: 0; background: #000; }
+.skek-multi__frame { display: block; width: 100%; height: 100%; border: 0; }
+
+.skek-multi__chat { position: absolute; box-sizing: border-box; background: var(--color-background-base); outline: 1px solid var(--color-border-base); }
+
+.skek-multi__picker {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  padding: 4px;
+  box-sizing: border-box;
+  background: var(--color-background-base);
+}
+.skek-multi__tab {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-text-base);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.skek-multi__tab:hover { background: var(--color-background-interactable-hover); }
+.skek-multi__tab--active { background: var(--color-background-interactable-hover); font-weight: 600; }
+.skek-multi__tab-name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+/* While a stream's bar is dragged. */
+.skek-multi--moving,
+.skek-multi--moving * { cursor: grabbing !important; }
+.skek-multi__swap { position: absolute; inset: 0; z-index: 2; background: rgba(0, 0, 0, 0.45); }
+.skek-multi__swap-tile {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 2px dashed rgba(255, 255, 255, 0.45);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+.skek-multi__swap-tile--self { border-style: solid; border-color: rgba(255, 255, 255, 0.2); background: rgba(0, 0, 0, 0.5); }
+.skek-multi__swap-tile--over { border-color: #bf94ff; background: rgba(145, 71, 255, 0.35); }
+.skek-multi__ghost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--color-background-base);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* While a channel is dragged: over the frames, which take in a drag and never tell the page. Above the
+   stream view (500), below Twitch's top nav menus (1000). */
+.skek-drop {
+  position: fixed;
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 2px dashed rgba(255, 255, 255, 0.45);
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+}
+.skek-drop--over { border-color: #bf94ff; background: rgba(145, 71, 255, 0.35); }
+.skek-drop--refused { border-color: rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.7); }
+.skek-drop__message { position: relative; z-index: 1; margin: 0; padding: 16px; pointer-events: none; }
+.skek-drop__tile {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 2px dashed rgba(255, 255, 255, 0.45);
+}
+.skek-drop__tile.skek-drop--over { border-color: #bf94ff; background: rgba(145, 71, 255, 0.35); }

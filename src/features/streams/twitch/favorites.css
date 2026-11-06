@@ -1,0 +1,52 @@
+/* The Favorites section only shows with none live while a channel is being dragged to it. */
+html:not([data-skek-dragging]) .skek-section--no-live-favorites { display: none; }
+html[data-skek-dragging] #skek-favorites { outline: 1px dashed var(--color-border-base, rgba(83, 83, 95, 0.48)); outline-offset: -1px; }
+
+/* A favorite's own card in Twitch's list, while it's in Favorites instead. */
+.side-nav-card[data-skek-favorite] { display: none; }
+
+/* Which site a favorite is from. */
+.skek-card__avatar { position: relative; }
+.skek-card__platform {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--color-background-base, #1f1f23);
+  color: #fff;
+}
+.skek-card__platform svg { display: block; width: 10px; height: 10px; }
+.skek-card__platform--twitch { background: #9147ff; }
+.skek-card__platform--youtube { background: #f00; }
+.skek-card__platform--kick { background: #53fc18; color: #000; }
+
+/* Takes the viewer count's place while you hover the card, beside the hide icon if it has one. */
+.skek-star {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+.skek-card:has(.skek-card__hide) .skek-star { right: 34px; }
+.skek-star--on { color: #ffb31a; }
+.skek-card:hover .skek-star,
+.side-nav-card:hover .skek-star,
+.skek-star:focus-visible { opacity: 1; pointer-events: auto; }
+.skek-card:hover:has(.skek-star) .skek-card__live,
+.skek-card:has(.skek-star:focus-visible) .skek-card__live,
+.side-nav-card:hover:has(.skek-star) [data-a-target='side-nav-live-status'] { visibility: hidden; }
+
+/* Where a dragged channel would land. */
+.skek-card--drop-before { box-shadow: inset 0 2px 0 var(--color-background-button-primary-default, #9147ff); }
+.skek-card--drop-after { box-shadow: inset 0 -2px 0 var(--color-background-button-primary-default, #9147ff); }
+
+.side-nav--collapsed .skek-star { display: none; }

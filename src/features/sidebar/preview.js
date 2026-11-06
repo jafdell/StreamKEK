@@ -93,6 +93,7 @@
     });
     document.documentElement.addEventListener('mouseleave', hide);
     document.addEventListener('click', hide, true);
+    document.addEventListener('dragstart', hide, true);
     // Chat scrolls all the time, so only the sidebar's own scrolling counts.
     addEventListener('scroll', (event) => {
       if (anchor && event.target.contains?.(anchor)) hide();

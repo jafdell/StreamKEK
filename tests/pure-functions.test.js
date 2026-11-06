@@ -19,6 +19,174 @@ const context = { skek: { helpers: { el() {} }, streams: {} } };
 vm.runInNewContext(readFileSync(new URL('../src/features/streams/twitch/format.js', import.meta.url), 'utf8'), context);
 const { compact } = context.skek.streams;
 
+const favoritesContext = { skek: { helpers: { onBodyReady() {} }, streams: {} } };
+vm.runInNewContext(readFileSync(new URL('../src/features/streams/twitch/favorites.js', import.meta.url), 'utf8'), favoritesContext);
+const { moveFavorite, twitchStatusFrom } = favoritesContext.skek.streams;
+
+// Objects from another vm context have a different Object, which deepEqual tells apart.
+const plain = (value) => JSON.parse(JSON.stringify(value));
+
+const chatWordsContext = { skek: {}, window: {}, location: { hostname: 'www.twitch.tv', ancestorOrigins: [] } };
+vm.runInNewContext(readFileSync(new URL('../src/features/chat/chat-words.js', import.meta.url), 'utf8'), chatWordsContext);
+const { addWords, wordPattern } = chatWordsContext.skek.chatWords;
+const matchesWords = (words, text) => new RegExp(wordPattern(words), 'iu').test(text);
+
+test('addWords splits on commas, tidies spaces and skips repeats in any case', () => {
+  assert.deepEqual(plain(addWords(['Spoiler'], ' spoiler, new  phrase ,,KEKW\nother')), ['Spoiler', 'new phrase', 'KEKW', 'other']);
+  assert.deepEqual(plain(addWords([], 'x'.repeat(81))), []);
+});
+
+test('wordPattern matches whole words in any case, and nothing when there are none', () => {
+  assert.equal(wordPattern([]), null);
+  assert.ok(matchesWords(['ass'], 'what an ASS!'));
+  assert.ok(!matchesWords(['ass'], 'first class'));
+  assert.ok(!matchesWords(['las'], 'lås'));
+});
+
+test('wordPattern takes phrases, other alphabets and characters a pattern treats specially', () => {
+  assert.ok(matchesWords(['big spoiler'], 'a big   spoiler here'));
+  assert.ok(matchesWords(['c++'], 'I love C++ a lot'));
+  assert.ok(matchesWords(['a-b', '(x)'], 'see (x) now'));
+  assert.ok(matchesWords(['لا'], 'قال لا الآن'));
+  assert.ok(!matchesWords(['لا'], 'لاعب'));
+});
+
+test('moveFavorite adds a new favorite where it was dropped, or last', () => {
+  const list = [{ id: 'a' }, { id: 'b' }];
+  assert.deepEqual(plain(moveFavorite(list, { id: 'c' }, 'b')), [{ id: 'a' }, { id: 'c' }, { id: 'b' }]);
+  assert.deepEqual(plain(moveFavorite(list, { id: 'c' }, undefined)), [{ id: 'a' }, { id: 'b' }, { id: 'c' }]);
+});
+
+test('moveFavorite moves a favorite without repeating it', () => {
+  const list = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
+  assert.deepEqual(plain(moveFavorite(list, { id: 'c' }, 'a')), [{ id: 'c' }, { id: 'a' }, { id: 'b' }]);
+  assert.deepEqual(plain(moveFavorite(list, { id: 'a' }, undefined)), [{ id: 'b' }, { id: 'c' }, { id: 'a' }]);
+});
+
+test('twitchStatusFrom tells live, offline and missing channels apart', () => {
+  const status = plain(twitchStatusFrom([
+    { login: 'on', displayName: 'On', profileImageURL: 'pic', stream: { viewersCount: 5, title: 'T', game: { displayName: 'G' } } },
+    { login: 'off', displayName: 'Off', profileImageURL: 'pic', stream: null },
+    null,
+  ]));
+  assert.deepEqual(status['twitch:on'].live, {
+    title: 'T',
+    category: 'G',
+    viewers: 5,
+    thumbnail: 'https://static-cdn.jtvnw.net/previews-ttv/live_user_on-440x248.jpg',
+  });
+  assert.equal(status['twitch:off'].live, null);
+  assert.equal(Object.keys(status).length, 2);
+});
+
+const multiContext = { skek: { streams: {} } };
+vm.runInNewContext(readFileSync(new URL('../src/features/streams/twitch/multi-layout.js', import.meta.url), 'utf8'), multiContext);
+const { multiLayout, parseMultiHash, multiHash, swapStreams } = multiContext.skek.streams;
+
+function assertInside(rect, width, height) {
+  assert.ok(rect.x >= 0 && rect.y >= 0 && rect.x + rect.w <= width + 1 && rect.y + rect.h <= height + 1, `${JSON.stringify(rect)} is outside ${width}x${height}`);
+}
+
+test('multiLayout gives two streams a chat each, under them', () => {
+  const { players, chats, chat, picker } = plain(multiLayout({ count: 2, width: 1600, height: 900, chat: true }));
+  assert.deepEqual(players.map((p) => [p.x, p.y, p.w]), [[0, 0, 800], [800, 0, 800]]);
+  assert.equal(players[0].h, 478); // 450 of 16:9 video, plus its bar
+  assert.deepEqual(chats, [{ x: 0, y: 478, w: 800, h: 422 }, { x: 800, y: 478, w: 800, h: 422 }]);
+  assert.equal(chat, null);
+  assert.equal(picker, null);
+});
+
+test('multiLayout leaves two chats room to read in a short window', () => {
+  const { players, chats } = plain(multiLayout({ count: 2, width: 1600, height: 500, chat: true }));
+  assert.equal(chats[0].h, 220);
+  assert.equal(players[0].h, 280);
+});
+
+test('multiLayout shares one chat between three or four streams', () => {
+  for (const count of [3, 4]) {
+    const { players, chats, chat, picker } = plain(multiLayout({ count, width: 1600, height: 900, chat: true }));
+    assert.equal(players.length, count);
+    assert.equal(chats, null);
+    assert.deepEqual(picker, { x: 1260, y: 0, w: 340, h: 40 });
+    assert.deepEqual(chat, { x: 1260, y: 40, w: 340, h: 860 });
+    for (const player of players) assertInside(player, 1260, 900);
+  }
+});
+
+test('multiLayout moves a shared chat under the streams in a narrow window', () => {
+  const { players, chat, picker } = plain(multiLayout({ count: 3, width: 800, height: 900, chat: true }));
+  assert.equal(picker.y + picker.h, chat.y);
+  assert.equal(chat.y + chat.h, 900);
+  for (const player of players) assert.ok(player.y + player.h <= picker.y + 1);
+});
+
+test('multiLayout falls back to one chat when two wouldn\'t be readable', () => {
+  const { chats, chat } = plain(multiLayout({ count: 2, width: 500, height: 900, chat: true }));
+  assert.equal(chats, null);
+  assert.ok(chat);
+});
+
+test('multiLayout keeps streams from overlapping or leaving the view, at any size', () => {
+  for (const [width, height] of [[1600, 900], [2560, 1300], [900, 400], [320, 200]]) {
+    for (const count of [2, 3, 4]) {
+      for (const chat of [true, false]) {
+        const { players } = plain(multiLayout({ count, width, height, chat }));
+        assert.equal(players.length, count);
+        players.forEach((a, i) => {
+          assertInside(a, width, height);
+          players.slice(i + 1).forEach((b) => {
+            const apart = a.x + a.w <= b.x + 1 || b.x + b.w <= a.x + 1 || a.y + a.h <= b.y + 1 || b.y + b.h <= a.y + 1;
+            assert.ok(apart, `${JSON.stringify(a)} overlaps ${JSON.stringify(b)} at ${width}x${height}, ${count} streams`);
+          });
+        });
+      }
+    }
+  }
+});
+
+test('multiLayout survives having no room at all, as before the page has laid out', () => {
+  assert.equal(multiLayout({ count: 3, width: 0, height: 0, chat: true }).players.length, 3);
+});
+
+test('multiLayout makes the first of three streams the biggest', () => {
+  const { players } = plain(multiLayout({ count: 3, width: 1260, height: 900, chat: false }));
+  assert.ok(players[0].w > players[1].w);
+  assert.equal(players[1].w, players[2].w);
+});
+
+test('parseMultiHash reads streams from every site, and writes them back the same', () => {
+  const hash = '#skek-multi=twitch/kaicenat,kick/some-name,youtube/UCabc_-/abcdefghijk';
+  const entries = plain(parseMultiHash(hash));
+  assert.deepEqual(entries, [
+    { id: 'twitch:kaicenat', platform: 'twitch', key: 'kaicenat', videoId: null },
+    { id: 'kick:some-name', platform: 'kick', key: 'some-name', videoId: null },
+    { id: 'UCabc_-', platform: 'youtube', key: 'UCabc_-', videoId: 'abcdefghijk' },
+  ]);
+  assert.equal(multiHash(entries), hash);
+});
+
+test('parseMultiHash ignores what could reach anything but a channel', () => {
+  assert.equal(parseMultiHash('').length, 0);
+  assert.equal(parseMultiHash('#other=twitch/a').length, 0);
+  for (const bad of ['twitch/../logout', 'kick/a/b', 'kick/a%2Fb', 'example/a', 'twitch/a&parent=evil', 'twitch/a-b', 'youtube/UC1/short', '']) {
+    assert.equal(parseMultiHash(`#skek-multi=${bad}`).length, 0, bad);
+  }
+});
+
+test('swapStreams swaps two streams and leaves the others in place', () => {
+  const ids = (list) => [...list].map((e) => e.id).join();
+  const list = [{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }];
+  assert.equal(ids(swapStreams(list, 'a', 'c')), 'c,b,a,d');
+  assert.equal(ids(swapStreams(list, 'd', 'b')), 'a,d,c,b');
+  assert.equal(ids(swapStreams(list, 'a', 'gone')), 'a,b,c,d');
+});
+
+test('parseMultiHash keeps four streams at most, once each', () => {
+  const ids = (hash) => parseMultiHash(hash).map((e) => e.id).join();
+  assert.equal(ids('#skek-multi=twitch/a,twitch/A,kick/a'), 'twitch:a,kick:a');
+  assert.equal(ids('#skek-multi=twitch/a,twitch/b,twitch/c,twitch/d,twitch/e'), 'twitch:a,twitch:b,twitch:c,twitch:d');
+});
+
 const sitesContext = { skek: {} };
 vm.runInNewContext(readFileSync(new URL('../src/features/streams/sites.js', import.meta.url), 'utf8'), sitesContext);
 const { sites, siteOf } = sitesContext.skek;
@@ -33,12 +201,31 @@ test('siteOf treats a channel saved without a platform as YouTube', () => {
   assert.equal(siteOf({ id: 'kick:a', platform: 'kick' }).name, 'Kick');
 });
 
+test('Twitch frames name this page as their parent, in the theme chosen', () => {
+  sitesContext.location = { hostname: 'www.twitch.tv' };
+  const urls = siteOf({ platform: 'twitch' }).frameUrls({ login: 'a' }, null, '#skek-theme=dark');
+  assert.equal(urls.player, 'https://player.twitch.tv/?channel=a&parent=www.twitch.tv');
+  assert.equal(urls.chat, 'https://www.twitch.tv/embed/a/chat?parent=www.twitch.tv&darkpopout#skek-theme=dark');
+  const light = siteOf({ platform: 'twitch' }).frameUrls({ login: 'a' }, null, '#skek-theme=light');
+  assert.equal(light.chat, 'https://www.twitch.tv/embed/a/chat?parent=www.twitch.tv#skek-theme=light');
+});
+
 test('Kick links are told apart from anything else', () => {
   const { linkPattern } = sites.kick;
   assert.ok(linkPattern.test('https://kick.com/odablock'));
   assert.ok(linkPattern.test('kick.com/odablock'));
   assert.ok(!linkPattern.test('https://www.youtube.com/@kick.com'));
   assert.ok(!linkPattern.test('@odablock'));
+});
+
+test('YouTube links are told apart from anything else', () => {
+  const { linkPattern } = sites.youtube;
+  assert.ok(linkPattern.test('https://www.youtube.com/@LofiGirl'));
+  assert.ok(linkPattern.test('youtube.com/watch?v=abc'));
+  assert.ok(linkPattern.test('https://youtu.be/abc'));
+  assert.ok(linkPattern.test('https://m.youtube.com/@LofiGirl'));
+  assert.ok(!linkPattern.test('https://kick.com/youtube.com/'));
+  assert.ok(!linkPattern.test('@LofiGirl'));
 });
 
 test('liveChannelsFromGuide keeps only live channels, once each', () => {
@@ -104,6 +291,9 @@ function reducesPage(path, ancestorOrigins) {
     document: { documentElement: root },
     skek: { settingDefaults: {} },
     chrome: { storage: { local: { get: async () => ({}) }, onChanged: { addListener() {} } } },
+    MutationObserver: class {
+      observe() {}
+    },
   });
   return root.reduced;
 }

@@ -1,16 +1,48 @@
 /* Hides Twitch's own sidebar sections, gated by settings from src/settings.js.
    aria-label is translated, so sections are recognised by what's inside them.
    The sections stay in the DOM, so features can still position things against them.
-   The :not() parts mean a Twitch markup change can't hide a section nobody asked to hide. */
+   The :not() parts mean a Twitch markup change can't hide a section nobody asked to hide.
+   Collapsed, the cards have no attributes and Live Channels and Viewers Also Watch share an icon,
+   so only their English names tell them apart. In another language they just stay visible there. */
 
+/* Twitch's collapse arrow floats at the top of the sidebar, over the heading's row. The row only goes
+   when what comes up under the arrow has room for it: Favorites, or Followed Channels with its sort
+   icon moved aside. Anything else, like a Twitch markup change, keeps the row, so the arrow can't
+   cover a button. The stories and streak have no attribute that's there in both the expanded and
+   collapsed sidebar, only their place: before Twitch's first list. */
+html[data-skek-on~='hideForYou'] [data-a-target^='side-nav-bar'] .side-nav__title {
+  visibility: hidden;
+}
+
+html[data-skek-on~='hideForYou'] [data-a-target^='side-nav-bar'] .side-nav__title:has(~ #skek-favorites:not(.skek-section--no-live-favorites), ~ .side-nav-section .followed-side-nav-header__dropdown-trigger) {
+  display: none;
+}
+
+/* The whole heading is Twitch's sort button, so only its icon moves. With live favorites above it,
+   the arrow isn't on this row and the icon stays where Twitch put it. */
+html[data-skek-on~='hideForYou'] [data-a-target='side-nav-bar'] .side-nav-section:not(#skek-favorites:not(.skek-section--no-live-favorites) + *) .followed-side-nav-header__dropdown-trigger {
+  padding-right: 36px;
+}
+
+html[data-skek-on~='hideForYou'] [data-a-target='side-nav-bar'] .side-nav-section:not(#skek-favorites:not(.skek-section--no-live-favorites) + *) .followed-side-nav-header__dropdown-trigger > :last-child {
+  align-self: flex-start;
+  margin-top: 6px;
+}
+
+html[data-skek-on~='hideForYou'] [data-a-target^='side-nav-bar'] :not(.side-nav__title, .side-nav-section, .skek-section, .side-nav-section ~ *):has(~ .side-nav-section) {
+  display: none !important;
+}
+
+html[data-skek-on~='hideLiveChannels'] [data-a-target='side-nav-bar-collapsed'] .side-nav-section[aria-label='Live Channels'],
 html[data-skek-on~='hideLiveChannels'] [data-a-target='side-nav-bar'] .side-nav-section:has([data-test-selector='recommended-channel']):not(:has([data-test-selector='followed-channel'], [data-test-selector='similarity-channel'])) {
   display: none !important;
 }
 
-html[data-skek-on~='hideRecommendedCategories'] [data-a-target='side-nav-bar'] .side-nav-section:has(a[href^='/directory/category/']):not(:has([data-test-selector='followed-channel'], [data-test-selector='similarity-channel'], [data-test-selector='recommended-channel'])) {
+html[data-skek-on~='hideRecommendedCategories'] [data-a-target^='side-nav-bar'] .side-nav-section:has(a[href^='/directory/category/']):not(:has([data-test-selector='followed-channel'], [data-test-selector='similarity-channel'], [data-test-selector='recommended-channel'])) {
   display: none !important;
 }
 
+html[data-skek-on~='hideViewersAlsoWatch'] [data-a-target='side-nav-bar-collapsed'] .side-nav-section[aria-label$=' Viewers Also Watch'],
 html[data-skek-on~='hideViewersAlsoWatch'] [data-a-target='side-nav-bar'] .side-nav-section:has([data-test-selector='similarity-channel']):not(:has([data-test-selector='followed-channel'], [data-test-selector='recommended-channel'])) {
   display: none !important;
 }

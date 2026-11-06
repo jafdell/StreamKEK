@@ -2,9 +2,10 @@
 // features/player/. Picks the best size at or under the setting when a stream starts or the
 // setting changes, so the player's own quality menu still works afterwards. Kick's saved quality is
 // left alone: it only knows some sizes by name, and goes back to Automatic for the others. Also
-// starts each player at full volume, leaving a muted one muted, since browsers can pause a video
-// that's unmuted without a click. Runs in the page itself, because reaching the player means going through
-// React's internals, and does nothing if Kick changes them. watch.js sets the attribute.
+// starts each player at the volume you last chose, since Kick always starts at 50%, leaving a muted
+// one muted, since browsers can pause a video that's unmuted without a click. Runs in the page itself,
+// because reaching the player means going through React's internals, and does nothing if Kick changes
+// them. watch.js sets the attributes, and saves data-skek-volume when this changes it.
 (() => {
   'use strict';
 
@@ -13,6 +14,7 @@
   const CHECK_MS = 1000;
   const SLIDER_UPDATE_MS = 50;
 
+  const root = document.documentElement;
   let player = null;
   let applied = '';
 
@@ -44,11 +46,18 @@
   // Once per player, so a volume you choose afterwards stays. Kick's slider only reads the volume
   // again when mute changes, and not if it changes straight back. A muted stream needs nothing more,
   // since unmuting it does that.
-  function startAtFullVolume(found) {
-    found.setVolume(1);
+  function startAtSavedVolume(found) {
+    found.setVolume(Number(root.dataset.skekVolume));
     if (found.isMuted()) return;
     found.setMuted(true);
     setTimeout(() => found.setMuted(false), SLIDER_UPDATE_MS);
+  }
+
+  // From the player, not the video element, which reads 0 and fires no event while muted. A volume of
+  // 0 isn't kept, so the next stream doesn't start silent with its slider at the bottom.
+  function rememberVolume() {
+    const volume = Math.round(player.getVolume() * 100) / 100;
+    if (volume > 0 && volume !== Number(root.dataset.skekVolume)) root.dataset.skekVolume = volume;
   }
 
   function applyQuality(qualities, setting) {
@@ -64,17 +73,18 @@
   }
 
   setInterval(() => {
-    const setting = document.documentElement.dataset.skekQuality;
+    const setting = root.dataset.skekQuality;
     if (!setting) return;
     if (!isPlaying(player)) {
       const found = findPlayer();
       if (!found) return;
       if (found !== player) {
         applied = '';
-        startAtFullVolume(found);
+        startAtSavedVolume(found);
       }
       player = found;
     }
+    rememberVolume();
     const qualities = player.getQualities();
     if (!qualities?.length) return;
 

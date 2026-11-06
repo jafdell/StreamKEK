@@ -29,6 +29,11 @@
     }
   }
 
+  // What a chat frame gets in its address.
+  function chatSettings() {
+    return `#skek-theme=${theme()}&skek-twitch-font=${twitchChatFontSize()}`;
+  }
+
   function loadStream(channel, stream) {
     const { view } = state;
     const { refs } = view;
@@ -44,8 +49,7 @@
       return;
     }
 
-    const settings = `#skek-theme=${theme()}&skek-twitch-font=${twitchChatFontSize()}`;
-    const urls = siteOf(channel).frameUrls(channel, stream, settings);
+    const urls = siteOf(channel).frameUrls(channel, stream, chatSettings());
     refs.player.replaceChildren(
       frame('skek-player__frame', urls.player, 'autoplay; encrypted-media; picture-in-picture; fullscreen'),
     );
@@ -61,5 +65,5 @@
     chatFrame?.contentWindow.postMessage({ skekChatTransparent: view.layout === 'floating' }, new URL(chatFrame.src).origin);
   }
 
-  Object.assign(shared, { loadStream, syncChatFrame });
+  Object.assign(shared, { frame, chatSettings, loadStream, syncChatFrame });
 })();

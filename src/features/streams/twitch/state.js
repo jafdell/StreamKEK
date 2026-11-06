@@ -11,8 +11,12 @@
   // routeVideoId = the stream named in the address, if any.
   // pinnedVideoId = what's playing, so it doesn't change when viewer counts shift.
   // view = the open stream view: its elements, its stream and its layout. See stream-view.js.
+  // favorites = the saved copy of each favorite channel, from any site including Twitch, in your order.
+  // multi = the open multi-stream view: its elements and its streams. See multi-view.js.
   const state = {
     bySite: Object.fromEntries(Object.keys(sites).map((platform) => [platform, { own: [], followed: {}, live: {} }])),
+    favorites: [],
+    multi: null,
     channels: [],
     live: {},
     openId: null,
@@ -51,5 +55,11 @@
     return streams.find((s) => s.videoId === wanted) ?? streams[0] ?? null;
   }
 
-  skek.streams = { state, sites, platformOf, siteOf, mergeChannels, channelsOn, liveChannels, streamsOf, openStream };
+  // Every channel playing in this tab's stream view or multi-stream view.
+  function openIds() {
+    if (state.multi) return state.multi.entries.map((entry) => entry.id);
+    return state.openId ? [state.openId] : [];
+  }
+
+  skek.streams = { state, sites, platformOf, siteOf, mergeChannels, channelsOn, liveChannels, streamsOf, openStream, openIds };
 })();

@@ -165,4 +165,63 @@ a.setting:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px;
 
 .manager-frame { display: block; width: 100%; height: 340px; margin-top: 10px; border: 0; }
 
+/* Blocked words and Highlighted words. */
+.word-list { margin-top: 10px; }
+.word-form { display: flex; gap: 8px; }
+.word-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  outline: 0;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+}
+.word-input::placeholder { color: var(--muted); }
+.word-input:focus { background: var(--bg); box-shadow: inset 0 0 0 2px var(--focus); }
+.word-add {
+  flex: 0 0 auto;
+  height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 6px;
+  background: #9147ff;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.word-add:hover:not(:disabled) { background: #772ce8; }
+.word-add:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.word-add:disabled { background: var(--card); color: var(--muted); cursor: default; }
+.word-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.word-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  border-radius: 6px;
+  background: var(--hover);
+}
+.word-chip--highlight { background: #ffb31a; color: #000; }
+.word-chip__text { min-width: 0; padding: 3px 0 3px 10px; overflow-wrap: anywhere; }
+.word-chip__remove {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+.word-chip__remove:hover { background: rgba(128, 128, 128, 0.35); }
+.word-chip__remove:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+
 .no-results { flex: 1 1 auto; margin: 0; padding: 0 20px; color: var(--muted); }

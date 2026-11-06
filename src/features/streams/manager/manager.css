@@ -9,7 +9,8 @@ body {
   padding: 14px;
 }
 
-h1 { margin: 0 0 10px; font-size: 14px; font-weight: 600; }
+h1 { margin: 0 0 2px; font-size: 14px; font-weight: 600; }
+#hint { margin: 0 0 10px; color: var(--muted); }
 
 form { display: flex; gap: 6px; }
 
@@ -50,7 +51,7 @@ button[type='submit']:disabled { opacity: 0.6; cursor: default; }
 .subs-title { font-weight: 600; }
 
 ul {
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-height: 0;
   margin: 10px -14px 0;
   padding: 0;
@@ -58,6 +59,7 @@ ul {
   list-style: none;
   scrollbar-width: thin;
 }
+ul:empty { display: none; }
 
 li { display: flex; align-items: center; gap: 8px; height: 45px; padding: 5px 14px; }
 li:hover { background: var(--hover); }
@@ -96,7 +98,7 @@ li img { flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; object-f
 
 #empty { margin: 14px 0 0; color: var(--muted); }
 
-#hidden { flex: 0 0 auto; margin-top: 10px; }
+#hidden { flex: 0 0 auto; margin-top: auto; padding-top: 10px; }
 #hidden summary { font-weight: 600; cursor: pointer; }
 #hidden ul { max-height: 135px; }
 
@@ -116,6 +118,7 @@ li img { flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; object-f
 
 /* Inside the settings window: see manager.js. */
 html[data-embedded] h1,
+html[data-embedded] #hint,
 html[data-embedded] .subs { display: none; }
 html[data-embedded] body { width: auto; min-height: 0; padding: 0; background: transparent; }
 html[data-embedded] ul { margin: 10px 0 0; }

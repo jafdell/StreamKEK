@@ -4,7 +4,7 @@
 
   const shared = skek.streams;
   const { el, icon, send } = skek.helpers;
-  const { state, sites, channelsOn, liveChannels, platformOf, siteOf, streamsOf, avatarImg, compact } = shared;
+  const { state, sites, channelsOn, liveChannels, platformOf, siteOf, streamsOf, avatarImg, compact, isFavorite, starButton, openIds } = shared;
 
   // Twitch's channels first, then each site in the order sites.js has them.
   const SECTIONS = Object.entries(sites).map(([platform, { section }]) => ({ platform, ...section }));
@@ -17,12 +17,13 @@
   let confirmTimer = null;
 
   function sidebarHost() {
-    return document.querySelector('[data-a-target="side-nav-bar"] .side-bar-contents nav') ||
-      document.querySelector('[data-a-target="side-nav-bar"] .side-bar-contents');
+    // The collapsed sidebar's is side-nav-bar-collapsed.
+    return document.querySelector('[data-a-target^="side-nav-bar"] .side-bar-contents nav') ||
+      document.querySelector('[data-a-target^="side-nav-bar"] .side-bar-contents');
   }
 
   function canHide(channel) {
-    if (state.openId === channel.id) return false;
+    if (openIds().includes(channel.id)) return false;
     const { own, followed } = state.bySite[platformOf(channel)];
     return !!followed[channel.id] && !own.some((c) => c.id === channel.id);
   }
@@ -89,7 +90,8 @@
     return el(
       'a',
       {
-        class: `skek-card${state.openId === channel.id ? ' skek-card--active' : ''}`,
+        class: `skek-card${openIds().includes(channel.id) ? ' skek-card--active' : ''}`,
+        'data-skek-channel': channel.id,
         href: siteOf(channel).streamUrl(channel, live),
         on: {
           click: (event) => shared.openOnPlainClick(event, channel.id),
@@ -115,6 +117,7 @@
         el('span', { class: 'skek-dot' }),
         el('span', {}, live.viewers == null ? 'Live' : compact(live.viewers)),
       ),
+      starButton(channel),
       hideButton(channel),
     );
   }
@@ -127,7 +130,10 @@
       return;
     }
     const native = [...host.querySelectorAll('.side-nav-section')];
-    const followed = native.find((s) => s.querySelector('[data-test-selector="followed-channel"]'));
+    // Collapsed, the cards don't say what they are, but Followed Channels is the first list when
+    // there is one. Logged out, this section just goes under Twitch's first list until it's expanded.
+    const followed = native.find((s) => s.querySelector('[data-test-selector="followed-channel"]')) ??
+      (host.closest('.side-nav--collapsed') ? native[0] : null);
     if (followed) {
       if (followed.nextElementSibling !== section) followed.after(section);
     } else if (native[0]) {
@@ -141,7 +147,8 @@
     }
   }
 
-  function buildSection({ id, title, glyph }) {
+  function buildSection({ platform, id, title, glyph }) {
+    const manageLabel = `Manage ${sites[platform].name} channels`;
     return el(
       'div',
       { id, class: 'skek-section' },
@@ -155,9 +162,9 @@
           {
             class: 'skek-iconbtn skek-section__add skek-manager-toggle',
             type: 'button',
-            title: 'Manage channels',
-            ariaLabel: 'Manage channels',
-            on: { click: shared.toggleManager },
+            title: manageLabel,
+            ariaLabel: manageLabel,
+            on: { click: (event) => shared.toggleManager(event, platform) },
           },
           icon('plus'),
         ),
@@ -176,29 +183,31 @@
     placeSection(section, host, previous);
 
     const { platform } = config;
-    const signature = JSON.stringify([state.bySite[platform].own, channelsOn(platform), state.live, state.openId, confirmingHide]);
+    const signature = JSON.stringify([state.bySite[platform].own, channelsOn(platform), state.live, openIds(), confirmingHide, state.favorites]);
     if (!rebuilt && signature === lastRender[platform]) return section;
     lastRender[platform] = signature;
 
     shared.hideTipUnlessHovered();
-    const cards = liveChannels(platform).map((c) => (c.id === confirmingHide ? renderHideConfirm(c) : renderCard(c)));
+    const live = liveChannels(platform);
+    const others = live.filter((c) => !isFavorite(c));
+    const cards = others.map((c) => (c.id === confirmingHide ? renderHideConfirm(c) : renderCard(c)));
     const list = section.querySelector('.skek-section__list');
     if (cards.length) list.replaceChildren(...cards);
     else {
-      list.replaceChildren(
-        el(
-          'p',
-          { class: 'skek-section__empty' },
-          channelsOn(platform).length ? 'No channels live right now' : 'Press + to add a channel',
-        ),
-      );
+      let message = 'Press + to add a channel';
+      if (live.length) message = 'No other channels live right now';
+      else if (channelsOn(platform).length) message = 'No channels live right now';
+      list.replaceChildren(el('p', { class: 'skek-section__empty' }, message));
     }
     return section;
   }
 
   function renderSidebar(force) {
+    // Replacing the card being dragged would end the drag. Dropping it renders again.
+    if (shared.isDragging()) return;
     const host = sidebarHost();
     if (!host) return;
+    shared.renderFavorites(host, force);
     let previous = null;
     for (const config of SECTIONS) previous = renderSection(config, host, previous, force);
   }

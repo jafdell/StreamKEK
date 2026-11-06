@@ -1,0 +1,18 @@
+/* The Blocked words and Highlighted words settings; see chat-words.js, which sets these attributes
+   only on chat messages, and only in Twitch's chat or a chat frame inside Twitch. The attribute is
+   repeated to outrank youtube/frames/chat.css, which sets each message's display and background. */
+
+[data-skek-chat-blocked][data-skek-chat-blocked] {
+  display: none !important;
+}
+
+[data-skek-chat-highlight][data-skek-chat-highlight] {
+  background: rgba(255, 179, 26, 0.18) !important;
+  box-shadow: inset 3px 0 0 #ffb31a;
+}
+
+::highlight(skek-chat-word) {
+  background-color: #ffb31a;
+  color: #000;
+  text-shadow: none;
+}

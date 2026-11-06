@@ -110,6 +110,7 @@ test('every site in sites.js is complete', () => {
     for (const field of ['name', 'domain', 'routePrefix', 'placeholder', 'managerHint']) {
       assert.equal(typeof site[field], 'string', `${platform} needs ${field}`);
     }
+    assert.equal(typeof site.linkPattern?.test, 'function', `${platform} needs linkPattern`);
     for (const field of ['channelUrl', 'streamUrl', 'previewUrl', 'frameUrls']) {
       assert.equal(typeof site[field], 'function', `${platform} needs ${field}`);
     }

@@ -4,7 +4,7 @@
 (() => {
   'use strict';
 
-  const { SETTINGS, settingDefaults, sites } = skek;
+  const { SETTINGS, settingDefaults, sites, chatWords } = skek;
 
   const REPO = 'https://github.com/jafdell/StreamKEK';
   const VERSION = chrome.runtime.getManifest().version;
@@ -18,6 +18,18 @@
       hint: managerHint,
       build: () => channelManagerFrame(platform, `${name} channels`),
     })),
+    {
+      category: 'Chat',
+      label: 'Blocked words',
+      hint: 'Messages with any of these are removed from Twitch, YouTube and Kick chat, name and all. Matches whole words or phrases, in upper or lower case, and emote names. Separate several with commas.',
+      build: (saved) => wordList('chatBlockedWords', saved, 'Add a word to block'),
+    },
+    {
+      category: 'Chat',
+      label: 'Highlighted words',
+      hint: 'Messages with any of these stand out in Twitch, YouTube and Kick chat, with the word itself colored. Matches whole words or phrases, in upper or lower case, and emote names. Separate several with commas.',
+      build: (saved) => wordList('chatHighlightedWords', saved, 'Add a word to highlight', 'word-chip--highlight'),
+    },
     {
       category: 'Feedback',
       label: 'Report a bug',
@@ -158,11 +170,11 @@
     return row;
   }
 
-  function customCard(item) {
+  function customCard(item, saved) {
     const card = document.createElement('div');
     card.className = 'card';
     card.dataset.search = searchText(item);
-    card.append(cardText(item), item.build());
+    card.append(cardText(item), item.build(saved));
     return card;
   }
 
@@ -182,7 +194,88 @@
 
   function itemRow(item, saved) {
     if (item.href) return linkRow(item);
-    return item.build ? customCard(item) : settingRow(item, saved[item.key]);
+    return item.build ? customCard(item, saved) : settingRow(item, saved[item.key]);
+  }
+
+  // A box to type words into, and each saved word as a chip with a button that removes it.
+  function wordList(key, saved, placeholder, chipClass = '') {
+    let words = saved[key];
+
+    const input = document.createElement('input');
+    input.className = 'word-input';
+    input.type = 'text';
+    input.placeholder = placeholder;
+    input.setAttribute('aria-label', placeholder);
+    input.autocomplete = 'off';
+    input.spellcheck = false;
+
+    const add = document.createElement('button');
+    add.className = 'word-add';
+    add.type = 'submit';
+    add.textContent = 'Add';
+    add.disabled = true;
+    input.addEventListener('input', () => {
+      add.disabled = !input.value.trim();
+    });
+
+    const chips = document.createElement('ul');
+    chips.className = 'word-chips';
+
+    function draw() {
+      chips.hidden = !words.length;
+      chips.replaceChildren(...words.map(chip));
+    }
+
+    function save(next) {
+      words = next;
+      draw();
+      chrome.storage.local.set({ [key]: next });
+    }
+
+    function chip(word) {
+      const item = document.createElement('li');
+      item.className = `word-chip ${chipClass}`;
+      const text = document.createElement('span');
+      text.className = 'word-chip__text';
+      text.textContent = word;
+      const remove = document.createElement('button');
+      remove.className = 'word-chip__remove';
+      remove.type = 'button';
+      remove.title = `Remove ${word}`;
+      remove.setAttribute('aria-label', `Remove ${word}`);
+      remove.textContent = '×';
+      remove.addEventListener('click', () => {
+        save(words.filter((other) => other !== word));
+        input.focus();
+      });
+      item.append(text, remove);
+      return item;
+    }
+
+    const form = document.createElement('form');
+    form.className = 'word-form';
+    form.append(input, add);
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const next = chatWords.addWords(words, input.value);
+      input.value = '';
+      add.disabled = true;
+      input.focus();
+      if (next.length !== words.length) save(next);
+    });
+
+    // The settings window can be open as the popup and on Twitch at once.
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area !== 'local' || !changes[key]) return;
+      words = changes[key].newValue ?? chatWords.DEFAULTS[key];
+      draw();
+    });
+
+    const list = document.createElement('div');
+    list.className = 'word-list';
+    list.append(form, chips);
+    draw();
+    return list;
   }
 
   function channelManagerFrame(site, title) {
@@ -282,7 +375,7 @@
     }
   });
 
-  chrome.storage.local.get(settingDefaults).then((saved) => {
+  chrome.storage.local.get({ ...settingDefaults, ...chatWords.DEFAULTS }).then((saved) => {
     // The other sites sit together under a divider, each group still in alphabetical order.
     // Feedback sits apart at the bottom, so it isn't mistaken for a group of settings.
     const settingCategories = categories.filter((category) => category !== 'Feedback' && !SITE_CATEGORIES.includes(category));

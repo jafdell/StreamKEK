@@ -4,7 +4,7 @@
 
   const shared = skek.streams;
   const { isPlainClick } = skek.helpers;
-  const { state, sites, platformOf, siteOf } = shared;
+  const { state, sites, platformOf, siteOf, parseMultiHash, multiHash } = shared;
 
   // A route is what follows the first / in these addresses: /<route prefix>/<channel>, plus
   // whatever else the site's routeTail allows, like /yt/<channel>/<video id> for a stream you
@@ -20,6 +20,11 @@
   // its not-found page and shortens the address to /yt or /kick, sometimes before our popstate
   // listener runs. So each history entry also records its route in its state, and
   // twitchPageLost tracks whether Twitch has left the page you came from.
+  //
+  // The multi-stream view's address is the Following page, with its streams after the #. Not the
+  // page you came from, because Twitch strips the # from a channel's page as it loads. Twitch's router
+  // doesn't see this either, so the page you came from stays behind the view, and returnUrl says which.
+  const isMultiUrl = () => parseMultiHash(location.hash).length > 0;
 
   // Read synchronously while this file loads, before Twitch can shorten the address. Never move this behind init, a promise or a timer.
   let currentRoute = location.pathname.match(STREAM_PATH)?.[1] ?? null;
@@ -48,11 +53,16 @@
     return route ? { ...rest, skekRoute: route } : rest;
   }
 
+  // What to go back to, unless this address is one of ours and Twitch's page is another.
+  function rememberTwitchPage() {
+    // Twitch accepts an address like //example.com/x, which would leave Twitch if sent back to.
+    if (!location.pathname.match(STREAM_PATH) && !isMultiUrl()) returnUrl = location.pathname.replace(/^\/+/, '/') + location.search;
+  }
+
   function navigateTo(id, videoId = null) {
     const channel = id && state.channels.find((c) => c.id === id);
     if (channel) {
-      // Twitch accepts an address like //example.com/x, which would leave Twitch if sent back to.
-      if (!location.pathname.match(STREAM_PATH)) returnUrl = location.pathname.replace(/^\/+/, '/') + location.search;
+      rememberTwitchPage();
       const route = routeFor(channel, videoId);
       history.pushState(stateWithRoute(route), '', `/${route}`);
     } else if (twitchPageLost) {
@@ -63,6 +73,47 @@
       history.pushState(stateWithRoute(null), '', returnUrl ?? FALLBACK_PATH);
     }
     syncWithUrl();
+  }
+
+  // Twitch's router doesn't see pushState by itself, but it does follow popstate.
+  function openTwitchChannel(channel) {
+    history.pushState(stateWithRoute(null), '', `/${channel.login}`);
+    dispatchEvent(new PopStateEvent('popstate'));
+  }
+
+  // Opens the multi-stream view with these streams, or changes the ones in it, which isn't a new
+  // history entry: Back leaves the view rather than undoing each stream.
+  function showMulti(entries) {
+    const url = `${FALLBACK_PATH}${multiHash(entries)}`;
+    if (isMultiUrl()) {
+      history.replaceState(history.state, '', url);
+    } else {
+      rememberTwitchPage();
+      history.pushState(stateWithRoute(null), '', url);
+    }
+    syncWithUrl();
+  }
+
+  // Leaves the view for the one stream left in it, or the page behind it if there's none. A Twitch
+  // stream that's the page behind it just carries on playing.
+  function leaveMulti(channel, videoId = null) {
+    if (!channel) navigateTo(null);
+    else if (platformOf(channel) !== 'twitch') navigateTo(channel.id, videoId);
+    else if (!twitchPageLost && returnUrl?.toLowerCase() === `/${channel.login}`) navigateTo(null);
+    else openTwitchChannel(channel);
+  }
+
+  // Takes the view out of this history entry, so Back doesn't come straight back to it. Only for an
+  // address that never opened a view, so Twitch's page is the one it names.
+  function forgetMultiUrl() {
+    history.replaceState(stateWithRoute(null), '', `${location.pathname}${location.search}`);
+  }
+
+  // Keeps the address up to date when a YouTube channel moves on to its next stream.
+  function rememberMulti(entries) {
+    const hash = multiHash(entries);
+    if (location.hash !== hash) history.replaceState(history.state, '', `${location.pathname}${location.search}${hash}`);
+    state.multi.hash = hash;
   }
 
   function forgetRouteVideo(channel) {
@@ -82,10 +133,19 @@
     }
 
     currentRoute = location.pathname.match(STREAM_PATH)?.[1] ?? null;
-    if (!currentRoute) twitchPageLost = false;
+    const multi = parseMultiHash(location.hash);
+    // The view's address hides what's behind it, so that hasn't changed.
+    if (!currentRoute && !multi.length) twitchPageLost = false;
 
     shared.renderFollowing();
     if (!state.channelsLoaded) return;
+
+    if (multi.length) {
+      if (state.openId) shared.closeView();
+      shared.syncMulti(multi, location.hash);
+      return;
+    }
+    shared.closeMulti();
 
     const { channel, videoId } = currentRoute ? routeParts(currentRoute) : {};
     const id = channel?.id ?? null;
@@ -116,9 +176,24 @@
     if (route) {
       currentRoute = route;
       twitchPageLost = true;
+    } else if (isMultiUrl()) {
+      // Twitch's router saw this one, so the Following page is behind the view now.
+      returnUrl = null;
     }
     syncWithUrl();
   }
 
-  Object.assign(shared, { navigateTo, syncWithUrl, stateWithRoute, forgetRouteVideo, openOnPlainClick, handlePopState });
+  Object.assign(shared, {
+    navigateTo,
+    syncWithUrl,
+    stateWithRoute,
+    forgetRouteVideo,
+    openOnPlainClick,
+    handlePopState,
+    openTwitchChannel,
+    showMulti,
+    leaveMulti,
+    forgetMultiUrl,
+    rememberMulti,
+  });
 })();
