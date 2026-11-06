@@ -1,5 +1,7 @@
-// The Favorites section at the top of Twitch's sidebar: channels from Twitch, YouTube and Kick
-// together, in the order you drag them. A favorite leaves its usual list while it's up here.
+// The Favorites section at the top of Twitch's sidebar: live channels from Twitch, YouTube and Kick
+// together, in the order you drag them. A favorite leaves its usual list while it's up here. Offline
+// ones aren't shown, like the sections for YouTube and Kick. A Twitch one stays in Twitch's own list,
+// where its star removes it.
 (() => {
   'use strict';
 
@@ -19,13 +21,13 @@
   const DRAGGING = 'data-skek-dragging';
   const GQL_URL = 'https://gql.twitch.tv/gql';
   // Twitch's own website's public id, which needs no sign-in. Nothing else reads a channel that isn't
-  // in the sidebar's list, and if this stops working the cards just don't say whether they're live.
+  // in the sidebar's list, and if this stops working Twitch favorites just stay in Twitch's own list.
   const GQL_CLIENT = 'kimne78kx3ncx6brgo4mv6wki5h1ko';
   const GQL_QUERY = 'query($logins:[String!]){users(logins:$logins){login displayName profileImageURL(width:70) stream{viewersCount title game{displayName}}}}';
   const GQL_MAX_LOGINS = 100;
   const REFRESH_MS = 60_000;
 
-  // What Twitch last said about each Twitch favorite, by id. A channel missing here is unknown, not offline.
+  // What Twitch last said about each Twitch favorite, by id. Only one it says is live gets a card.
   let twitchStatus = {};
   let lastRender = null;
   let dragged = null;
@@ -61,22 +63,15 @@
     return status;
   }
 
-  // Live channels first, then offline ones, each in your order. Unknown counts as live, so a card
-  // doesn't move once Twitch has answered.
-  function liveFirst(cards) {
-    return [...cards.filter((card) => !card.offline), ...cards.filter((card) => card.offline)];
-  }
-
   // A favorite as it is now. Its saved copy is only for when its site has nothing newer to say.
   function cardInfo(favorite) {
     if (platformOf(favorite) === 'twitch') {
       const status = twitchStatus[favorite.id];
       const { name = favorite.name, avatar = favorite.avatar } = status ?? {};
-      return { channel: { ...favorite, name, avatar }, live: status?.live ?? null, offline: !!status && !status.live };
+      return { channel: { ...favorite, name, avatar }, live: status?.live ?? null };
     }
     const channel = state.channels.find((c) => c.id === favorite.id);
-    const live = channel ? state.live[channel.id] : null;
-    return { channel: channel ?? favorite, live: live ?? null, offline: !live };
+    return { channel: channel ?? favorite, live: (channel && state.live[channel.id]) ?? null };
   }
 
   function watchingTwitchLogin() {
@@ -123,51 +118,29 @@
     dispatchEvent(new PopStateEvent('popstate'));
   }
 
-  function openFavorite(event, channel, live) {
-    if (platformOf(channel) === 'twitch') {
-      if (!isPlainClick(event)) return;
-      event.preventDefault();
-      shared.hideTip();
-      openTwitchChannel(channel);
-    } else if (live) {
+  function openFavorite(event, channel) {
+    if (platformOf(channel) !== 'twitch') {
       shared.openOnPlainClick(event, channel.id);
+      return;
     }
+    if (!isPlainClick(event)) return;
+    event.preventDefault();
+    shared.hideTip();
+    openTwitchChannel(channel);
   }
 
-  function linkProps({ channel, live }) {
-    const site = siteOf(channel);
-    if (live || platformOf(channel) === 'twitch') return { href: site.streamUrl(channel, live) };
-    // There's nothing to show in the stream view, so an offline channel opens on its own site.
-    return { href: site.channelUrl(channel), target: '_blank', rel: 'noopener' };
-  }
-
-  function statusOf({ live, offline }) {
-    if (offline) return el('span', { class: 'skek-card__live skek-card__live--offline' }, 'Offline');
-    if (!live) return null;
-    return el(
-      'span',
-      { class: 'skek-card__live' },
-      el('span', { class: 'skek-dot' }),
-      el('span', {}, live.viewers == null ? 'Live' : compact(live.viewers)),
-    );
-  }
-
-  function renderCard(card) {
-    const { channel, live, offline } = card;
+  function renderCard({ channel, live }) {
     const platform = platformOf(channel);
     const streams = streamsOf(live);
     return el(
       'a',
       {
-        class: `skek-card skek-card--favorite${isActive(channel) ? ' skek-card--active' : ''}${offline ? ' skek-card--offline' : ''}`,
+        class: `skek-card skek-card--favorite${isActive(channel) ? ' skek-card--active' : ''}`,
         'data-skek-channel': channel.id,
-        ...linkProps(card),
-        ...(live ? {} : { title: channel.name }),
+        href: siteOf(channel).streamUrl(channel, live),
         on: {
-          click: (event) => openFavorite(event, channel, live),
-          mouseenter: (event) => {
-            if (live) shared.showTip(event.currentTarget, channel, live);
-          },
+          click: (event) => openFavorite(event, channel),
+          mouseenter: (event) => shared.showTip(event.currentTarget, channel, live),
           mouseleave: shared.hideTipSoon,
         },
       },
@@ -186,9 +159,14 @@
           el('span', { class: 'skek-card__name' }, channel.name),
           streams.length > 1 ? el('span', { class: 'skek-card__more' }, `+${streams.length - 1}`) : null,
         ),
-        live ? el('span', { class: 'skek-card__meta' }, live.category) : null,
+        el('span', { class: 'skek-card__meta' }, live.category),
       ),
-      statusOf(card),
+      el(
+        'span',
+        { class: 'skek-card__live' },
+        el('span', { class: 'skek-dot' }),
+        el('span', {}, live.viewers == null ? 'Live' : compact(live.viewers)),
+      ),
       starButton(channel),
     );
   }
@@ -229,15 +207,17 @@
     return state.favorites.find((c) => c.id === id) ?? { id, platform: 'twitch', login, name, avatar: link.querySelector('img')?.src ?? '' };
   }
 
-  // Twitch's list isn't ours to take a card out of, so a favorite's card is hidden there. This runs
-  // only once the section is in the page, so a Twitch markup change can't lose a channel. In the
+  // Twitch's list isn't ours to take a card out of, so a favorite's card is hidden there while it has
+  // a card in Favorites. Otherwise it's the only place left to find that channel and its star. This
+  // runs only once the section is in the page, so a Twitch markup change can't lose a channel. In the
   // collapsed sidebar the link is itself a .side-nav-card, so that's what gets hidden there.
   function hideTwitchCards() {
     for (const link of document.querySelectorAll(TWITCH_CARD)) {
       const card = link.closest('.side-nav-card');
       const login = link.pathname.match(CHANNEL_PATH)?.[1].toLowerCase();
-      const favorite = !!login && isFavorite({ id: `twitch:${login}` });
-      if (card.hasAttribute(HIDDEN_CARD) !== favorite) card.toggleAttribute(HIDDEN_CARD, favorite);
+      const id = `twitch:${login}`;
+      const hide = !!login && isFavorite({ id }) && !!twitchStatus[id]?.live;
+      if (card.hasAttribute(HIDDEN_CARD) !== hide) card.toggleAttribute(HIDDEN_CARD, hide);
     }
   }
 
@@ -257,8 +237,8 @@
 
     shared.hideTipUnlessHovered();
     const list = section.querySelector('.skek-section__list');
-    const cards = liveFirst(state.favorites.map(cardInfo)).map(renderCard);
-    section.classList.toggle('skek-section--no-favorites', !cards.length);
+    const cards = state.favorites.map(cardInfo).filter((card) => card.live).map(renderCard);
+    section.classList.toggle('skek-section--no-live-favorites', !cards.length);
     if (cards.length) list.replaceChildren(...cards);
     else list.replaceChildren(el('p', { class: 'skek-section__empty' }, 'Drop a channel here'));
   }
@@ -392,13 +372,14 @@
     document.addEventListener('mousemove', endDrag, true);
     document.addEventListener('mouseover', showStar);
     setInterval(refreshTwitchStatus, REFRESH_MS);
+    // A tab opened in the background hasn't asked yet, and live favorites wait on the answer.
+    document.addEventListener('visibilitychange', refreshTwitchStatus);
   });
 
   Object.assign(shared, {
     isFavorite,
     moveFavorite,
     twitchStatusFrom,
-    liveFirst,
     starButton,
     renderFavorites,
     refreshTwitchStatus,

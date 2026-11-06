@@ -14,17 +14,17 @@ html[data-skek-on~='hideForYou'] [data-a-target^='side-nav-bar'] .side-nav__titl
   visibility: hidden;
 }
 
-html[data-skek-on~='hideForYou'] [data-a-target^='side-nav-bar'] .side-nav__title:has(~ #skek-favorites:not(.skek-section--no-favorites), ~ .side-nav-section .followed-side-nav-header__dropdown-trigger) {
+html[data-skek-on~='hideForYou'] [data-a-target^='side-nav-bar'] .side-nav__title:has(~ #skek-favorites:not(.skek-section--no-live-favorites), ~ .side-nav-section .followed-side-nav-header__dropdown-trigger) {
   display: none;
 }
 
-/* The whole heading is Twitch's sort button, so only its icon moves. With favorites above it,
+/* The whole heading is Twitch's sort button, so only its icon moves. With live favorites above it,
    the arrow isn't on this row and the icon stays where Twitch put it. */
-html[data-skek-on~='hideForYou'] [data-a-target='side-nav-bar'] .side-nav-section:not(#skek-favorites:not(.skek-section--no-favorites) + *) .followed-side-nav-header__dropdown-trigger {
+html[data-skek-on~='hideForYou'] [data-a-target='side-nav-bar'] .side-nav-section:not(#skek-favorites:not(.skek-section--no-live-favorites) + *) .followed-side-nav-header__dropdown-trigger {
   padding-right: 36px;
 }
 
-html[data-skek-on~='hideForYou'] [data-a-target='side-nav-bar'] .side-nav-section:not(#skek-favorites:not(.skek-section--no-favorites) + *) .followed-side-nav-header__dropdown-trigger > :last-child {
+html[data-skek-on~='hideForYou'] [data-a-target='side-nav-bar'] .side-nav-section:not(#skek-favorites:not(.skek-section--no-live-favorites) + *) .followed-side-nav-header__dropdown-trigger > :last-child {
   align-self: flex-start;
   margin-top: 6px;
 }

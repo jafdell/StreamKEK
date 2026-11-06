@@ -20,7 +20,7 @@ Open the settings from the extension's icon in Twitch's top bar or the browser t
 
 - **YouTube live streams on Twitch:** watch them with chat in a Twitch-style view, from the sidebar or the Following page. Add channels with the **+** button in the sidebar. Your subscriptions appear on their own if you're signed in to YouTube in the same browser, and you can hide the ones you don't want.
 - **Kick live streams on Twitch:** the channels you follow on Kick get their own Kick Live section, with the same view as YouTube streams, if you're signed in to Kick in the same browser. Add other channels and hide the ones you don't want, the same way. Streams start at the volume you last chose.
-- **Favorites:** drag a Twitch, YouTube or Kick channel to the top of the sidebar, or press its star, to keep them together in your own order, each marked with its site.
+- **Favorites:** drag a Twitch, YouTube or Kick channel to the top of the sidebar, or press its star, to keep them together in your own order while they're live, each marked with its site.
 - **Floating chat (Alt+C):** watch Twitch, YouTube or Kick fullscreen with chat in a window you can move, resize and make see-through.
 - **Stacked mode (Alt+S):** Twitch, YouTube or Kick full width with chat under it, for narrow windows.
 - **Theatre mode (Alt+T)** on YouTube and Kick streams, like Twitch's own.

@@ -1,5 +1,5 @@
-/* The Favorites section only shows without favorites while a channel is being dragged to it. */
-html:not([data-skek-dragging]) .skek-section--no-favorites { display: none; }
+/* The Favorites section only shows with none live while a channel is being dragged to it. */
+html:not([data-skek-dragging]) .skek-section--no-live-favorites { display: none; }
 html[data-skek-dragging] #skek-favorites { outline: 1px dashed var(--color-border-base, rgba(83, 83, 95, 0.48)); outline-offset: -1px; }
 
 /* A favorite's own card in Twitch's list, while it's in Favorites instead. */
@@ -24,10 +24,6 @@ html[data-skek-dragging] #skek-favorites { outline: 1px dashed var(--color-borde
 .skek-card__platform--twitch { background: #9147ff; }
 .skek-card__platform--youtube { background: #f00; }
 .skek-card__platform--kick { background: #53fc18; color: #000; }
-
-.skek-card__live--offline { color: var(--color-text-alt-2); }
-.skek-card--offline .skek-card__img { filter: grayscale(1); opacity: 0.6; }
-.skek-card--offline .skek-card__name { color: var(--color-text-alt-2); }
 
 /* Takes the viewer count's place while you hover the card, beside the hide icon if it has one. */
 .skek-star {

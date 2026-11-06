@@ -21,7 +21,7 @@ const { compact } = context.skek.streams;
 
 const favoritesContext = { skek: { helpers: { onBodyReady() {} }, streams: {} } };
 vm.runInNewContext(readFileSync(new URL('../src/features/streams/twitch/favorites.js', import.meta.url), 'utf8'), favoritesContext);
-const { moveFavorite, twitchStatusFrom, liveFirst } = favoritesContext.skek.streams;
+const { moveFavorite, twitchStatusFrom } = favoritesContext.skek.streams;
 
 // Objects from another vm context have a different Object, which deepEqual tells apart.
 const plain = (value) => JSON.parse(JSON.stringify(value));
@@ -52,11 +52,6 @@ test('twitchStatusFrom tells live, offline and missing channels apart', () => {
   });
   assert.equal(status['twitch:off'].live, null);
   assert.equal(Object.keys(status).length, 2);
-});
-
-test('liveFirst keeps your order within live and offline channels', () => {
-  const cards = [{ id: 'a', offline: true }, { id: 'b', offline: false }, { id: 'c', offline: true }, { id: 'd', offline: false }];
-  assert.deepEqual(liveFirst(cards).map((c) => c.id).join(), 'b,d,a,c');
 });
 
 const sitesContext = { skek: {} };

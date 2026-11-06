@@ -82,7 +82,6 @@
   const TWITCH = {
     name: 'Twitch',
     streamUrl: (channel) => `https://www.twitch.tv/${channel.login}`,
-    channelUrl: (channel) => `https://www.twitch.tv/${channel.login}`,
     previewUrl: (stream) => stream.thumbnail ?? '',
   };
 
