@@ -77,8 +77,19 @@
     },
   };
 
+  // Not one of SITES, since it needs no stream view: this is only what a favorite's card needs when
+  // the channel is on Twitch. See streams/twitch/favorites.js.
+  const TWITCH = {
+    name: 'Twitch',
+    streamUrl: (channel) => `https://www.twitch.tv/${channel.login}`,
+    channelUrl: (channel) => `https://www.twitch.tv/${channel.login}`,
+    previewUrl: (stream) => stream.thumbnail ?? '',
+  };
+
   // YouTube's channels were saved before there were other sites, so they don't say.
   const platformOf = (channel) => channel?.platform ?? 'youtube';
 
-  Object.assign(skek, { sites: SITES, platformOf, siteOf: (channel) => SITES[platformOf(channel)] });
+  const siteOf = (channel) => (platformOf(channel) === 'twitch' ? TWITCH : SITES[platformOf(channel)]);
+
+  Object.assign(skek, { sites: SITES, platformOf, siteOf });
 })();

@@ -17,6 +17,10 @@
         if (changes[keys.followed]) site.followed = changes[keys.followed].newValue ?? {};
         if (changes[keys.live]) site.live = changes[keys.live].newValue ?? {};
       }
+      if (changes.favoriteChannels) {
+        state.favorites = changes.favoriteChannels.newValue ?? [];
+        shared.refreshTwitchStatus();
+      }
       mergeChannels();
       shared.renderSidebar();
       if (state.openId && !state.channels.some((c) => c.id === state.openId)) {
@@ -28,15 +32,17 @@
     });
 
     const keys = siteEntries.flatMap(([, { keys: k }]) => [k.own, k.followed, k.live]);
-    chrome.storage.local.get([...keys, 'chatHidden']).then((saved) => {
+    chrome.storage.local.get([...keys, 'chatHidden', 'favoriteChannels']).then((saved) => {
       for (const [platform, { keys: k }] of siteEntries) {
         state.bySite[platform] = { own: saved[k.own] ?? [], followed: saved[k.followed] ?? {}, live: saved[k.live] ?? {} };
       }
       mergeChannels();
       state.chatHidden = !!saved.chatHidden;
+      state.favorites = saved.favoriteChannels ?? [];
       state.channelsLoaded = true;
       shared.renderSidebar(true);
       shared.syncWithUrl();
+      shared.refreshTwitchStatus();
     });
 
     onPageChange(() => {

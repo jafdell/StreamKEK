@@ -19,6 +19,46 @@ const context = { skek: { helpers: { el() {} }, streams: {} } };
 vm.runInNewContext(readFileSync(new URL('../src/features/streams/twitch/format.js', import.meta.url), 'utf8'), context);
 const { compact } = context.skek.streams;
 
+const favoritesContext = { skek: { helpers: { onBodyReady() {} }, streams: {} } };
+vm.runInNewContext(readFileSync(new URL('../src/features/streams/twitch/favorites.js', import.meta.url), 'utf8'), favoritesContext);
+const { moveFavorite, twitchStatusFrom, liveFirst } = favoritesContext.skek.streams;
+
+// Objects from another vm context have a different Object, which deepEqual tells apart.
+const plain = (value) => JSON.parse(JSON.stringify(value));
+
+test('moveFavorite adds a new favorite where it was dropped, or last', () => {
+  const list = [{ id: 'a' }, { id: 'b' }];
+  assert.deepEqual(plain(moveFavorite(list, { id: 'c' }, 'b')), [{ id: 'a' }, { id: 'c' }, { id: 'b' }]);
+  assert.deepEqual(plain(moveFavorite(list, { id: 'c' }, undefined)), [{ id: 'a' }, { id: 'b' }, { id: 'c' }]);
+});
+
+test('moveFavorite moves a favorite without repeating it', () => {
+  const list = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
+  assert.deepEqual(plain(moveFavorite(list, { id: 'c' }, 'a')), [{ id: 'c' }, { id: 'a' }, { id: 'b' }]);
+  assert.deepEqual(plain(moveFavorite(list, { id: 'a' }, undefined)), [{ id: 'b' }, { id: 'c' }, { id: 'a' }]);
+});
+
+test('twitchStatusFrom tells live, offline and missing channels apart', () => {
+  const status = plain(twitchStatusFrom([
+    { login: 'on', displayName: 'On', profileImageURL: 'pic', stream: { viewersCount: 5, title: 'T', game: { displayName: 'G' } } },
+    { login: 'off', displayName: 'Off', profileImageURL: 'pic', stream: null },
+    null,
+  ]));
+  assert.deepEqual(status['twitch:on'].live, {
+    title: 'T',
+    category: 'G',
+    viewers: 5,
+    thumbnail: 'https://static-cdn.jtvnw.net/previews-ttv/live_user_on-440x248.jpg',
+  });
+  assert.equal(status['twitch:off'].live, null);
+  assert.equal(Object.keys(status).length, 2);
+});
+
+test('liveFirst keeps your order within live and offline channels', () => {
+  const cards = [{ id: 'a', offline: true }, { id: 'b', offline: false }, { id: 'c', offline: true }, { id: 'd', offline: false }];
+  assert.deepEqual(liveFirst(cards).map((c) => c.id).join(), 'b,d,a,c');
+});
+
 const sitesContext = { skek: {} };
 vm.runInNewContext(readFileSync(new URL('../src/features/streams/sites.js', import.meta.url), 'utf8'), sitesContext);
 const { sites, siteOf } = sitesContext.skek;

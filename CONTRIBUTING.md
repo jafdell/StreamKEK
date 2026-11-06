@@ -31,6 +31,7 @@ Features are in `src/features/`. `chat/`, `player/` and `sidebar/` match the set
 | Stream quality | `player/quality.js` (Twitch), and `frames/watch-start.js` in `youtube/` and `kick/` |
 | Theatre, stacked and floating chat modes | `src/features/player/` (Twitch, plus `floating-window.js` and `.css`, which both use) and `streams/twitch/view-layouts.js` and `stream-view.css` (other sites). `streams/frames/layout-keys.js` forwards the shortcuts from inside their frames, and `chat-settings.js` there and each site's `chat.css` make floating chat see-through. Theatre on Twitch is Twitch's own. Stacked and floating exist twice, so change both |
 | Sidebar previews | `sidebar/preview.js` (Twitch channels) and `streams/twitch/stream-tip.js` (other sites) |
+| Favorites | `streams/twitch/favorites.js` and `.css`. Twitch's channels there are read from Twitch's own API in the page, not from `sites.js` |
 | Tests | `tests/`, and `TESTING.md` for what to check by hand |
 
 ## Development setup
@@ -142,5 +143,6 @@ All in `chrome.storage.local`. A key in `SETTINGS` is written by the settings wi
 | `kickStatus` | `{checkedAt,signedOut,failed}` | background |
 | `showKickFollows` | boolean, default true | background |
 | `kickVolume` | number above 0, up to 1, default 1 | Kick's player frame |
+| `favoriteChannels` | `[{id,platform,slug,login,name,handle,avatar}]`, in your order. Fields as that site's channels have them; Twitch's have `login` and the id `twitch:<login>` | Twitch page |
 | `chatHidden` | boolean | Twitch page |
 | `floatingChat` | `{x,y,width,height,opacity}`, each optional | Twitch page |

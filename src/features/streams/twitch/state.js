@@ -11,8 +11,10 @@
   // routeVideoId = the stream named in the address, if any.
   // pinnedVideoId = what's playing, so it doesn't change when viewer counts shift.
   // view = the open stream view: its elements, its stream and its layout. See stream-view.js.
+  // favorites = the saved copy of each favorite channel, from any site including Twitch, in your order.
   const state = {
     bySite: Object.fromEntries(Object.keys(sites).map((platform) => [platform, { own: [], followed: {}, live: {} }])),
+    favorites: [],
     channels: [],
     live: {},
     openId: null,

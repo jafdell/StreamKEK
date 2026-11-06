@@ -13,6 +13,13 @@
 
   const SETTINGS = [
     {
+      key: 'hideForYou',
+      category: 'Sidebar',
+      label: 'Hide For You',
+      hint: "Removes the For You heading at the top of Twitch's sidebar, and the stories and watch streak under it.",
+      default: false,
+    },
+    {
       key: 'hideLiveChannels',
       category: 'Sidebar',
       label: 'Hide Live Channels',
