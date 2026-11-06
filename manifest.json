@@ -62,6 +62,7 @@
         "src/features/sidebar/preview.js",
         "src/features/sidebar/current-channel.js",
         "src/features/chat/claim-points.js",
+        "src/features/chat/chat-words.js",
         "src/features/player/floating-window.js",
         "src/features/player/modes.js"
       ],
@@ -74,6 +75,7 @@
         "src/features/chat/font-size.css",
         "src/features/chat/timestamps.css",
         "src/features/chat/sections.css",
+        "src/features/chat/chat-words.css",
         "src/features/player/extensions.css",
         "src/features/player/modes.css",
         "src/features/player/floating-window.css",
@@ -115,12 +117,14 @@
       "js": [
         "src/settings.js",
         "src/twitch/page-sync.js",
-        "src/features/streams/frames/layout-keys.js"
+        "src/features/streams/frames/layout-keys.js",
+        "src/features/chat/chat-words.js"
       ],
       "css": [
         "src/features/chat/font-size.css",
         "src/features/chat/timestamps.css",
-        "src/features/chat/sections.css"
+        "src/features/chat/sections.css",
+        "src/features/chat/chat-words.css"
       ],
       "all_frames": true,
       "run_at": "document_start"
@@ -133,10 +137,12 @@
         "src/settings.js",
         "src/features/streams/frames/layout-keys.js",
         "src/features/streams/frames/chat-settings.js",
-        "src/features/youtube/frames/chat.js"
+        "src/features/youtube/frames/chat.js",
+        "src/features/chat/chat-words.js"
       ],
       "css": [
-        "src/features/youtube/frames/chat.css"
+        "src/features/youtube/frames/chat.css",
+        "src/features/chat/chat-words.css"
       ],
       "all_frames": true,
       "run_at": "document_start"
@@ -177,10 +183,12 @@
         "src/settings.js",
         "src/features/streams/frames/layout-keys.js",
         "src/features/streams/frames/chat-settings.js",
-        "src/features/kick/frames/chat.js"
+        "src/features/kick/frames/chat.js",
+        "src/features/chat/chat-words.js"
       ],
       "css": [
-        "src/features/kick/frames/chat.css"
+        "src/features/kick/frames/chat.css",
+        "src/features/chat/chat-words.css"
       ],
       "all_frames": true,
       "run_at": "document_start"

@@ -27,6 +27,7 @@ Open the settings from the extension's icon in Twitch's top bar or the browser t
 - **Theatre mode (Alt+T)** on YouTube and Kick streams, like Twitch's own.
 - **Stream quality:** choose what streams start at on Twitch, YouTube and Kick, up to 1440p.
 - **Chat font size** for Twitch, YouTube and Kick chat.
+- **Blocked and highlighted words** in Twitch, YouTube and Kick chat: remove messages containing the words you choose, or make them stand out.
 - **Cleaner Twitch chat:** hide timestamps, the top strip, drops, pinned messages and the Hype Train.
 - **Stream previews:** hover a live channel in the sidebar to see an image of the stream, on Twitch, YouTube and Kick. You can turn this off.
 - **Cleaner sidebar:** hide For You, Live Channels, Recommended Categories, Viewers Also Watch, and turn off YouTube Live and Kick Live.

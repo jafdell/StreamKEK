@@ -26,6 +26,31 @@ const { moveFavorite, twitchStatusFrom } = favoritesContext.skek.streams;
 // Objects from another vm context have a different Object, which deepEqual tells apart.
 const plain = (value) => JSON.parse(JSON.stringify(value));
 
+const chatWordsContext = { skek: {}, window: {}, location: { hostname: 'www.twitch.tv', ancestorOrigins: [] } };
+vm.runInNewContext(readFileSync(new URL('../src/features/chat/chat-words.js', import.meta.url), 'utf8'), chatWordsContext);
+const { addWords, wordPattern } = chatWordsContext.skek.chatWords;
+const matchesWords = (words, text) => new RegExp(wordPattern(words), 'iu').test(text);
+
+test('addWords splits on commas, tidies spaces and skips repeats in any case', () => {
+  assert.deepEqual(plain(addWords(['Spoiler'], ' spoiler, new  phrase ,,KEKW\nother')), ['Spoiler', 'new phrase', 'KEKW', 'other']);
+  assert.deepEqual(plain(addWords([], 'x'.repeat(81))), []);
+});
+
+test('wordPattern matches whole words in any case, and nothing when there are none', () => {
+  assert.equal(wordPattern([]), null);
+  assert.ok(matchesWords(['ass'], 'what an ASS!'));
+  assert.ok(!matchesWords(['ass'], 'first class'));
+  assert.ok(!matchesWords(['las'], 'lås'));
+});
+
+test('wordPattern takes phrases, other alphabets and characters a pattern treats specially', () => {
+  assert.ok(matchesWords(['big spoiler'], 'a big   spoiler here'));
+  assert.ok(matchesWords(['c++'], 'I love C++ a lot'));
+  assert.ok(matchesWords(['a-b', '(x)'], 'see (x) now'));
+  assert.ok(matchesWords(['لا'], 'قال لا الآن'));
+  assert.ok(!matchesWords(['لا'], 'لاعب'));
+});
+
 test('moveFavorite adds a new favorite where it was dropped, or last', () => {
   const list = [{ id: 'a' }, { id: 'b' }];
   assert.deepEqual(plain(moveFavorite(list, { id: 'c' }, 'b')), [{ id: 'a' }, { id: 'c' }, { id: 'b' }]);
