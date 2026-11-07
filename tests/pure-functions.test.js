@@ -119,6 +119,98 @@ test('emoteSections lists each service in order, with only the emotes that won t
   ]);
 });
 
+const backupContext = { URL };
+vm.runInNewContext(readFileSync(new URL('../src/settings.js', import.meta.url), 'utf8'), backupContext);
+vm.runInNewContext(readFileSync(new URL('../src/features/streams/sites.js', import.meta.url), 'utf8'), backupContext);
+vm.runInNewContext(readFileSync(new URL('../src/settings-window/backup.js', import.meta.url), 'utf8'), backupContext);
+const { KEY_DEFAULTS, NOT_BACKED_UP, createBackup, parseBackup, describeBackup } = backupContext.skek.backup;
+const backupFile = (data, extra = {}) => JSON.stringify({ app: 'StreamKEK', backupVersion: 1, data, ...extra });
+
+test('a backup saves everything, and restoring it gives back the same', () => {
+  const saved = {
+    theme: 'light',
+    hideForYou: true,
+    channels: [{ id: 'UC554eY5jNUfDq3yDOJYirOQ', name: 'Destiny', handle: '@destiny', avatar: 'https://yt3.ggpht.com/a=s88' }],
+    subChannels: { UCabc: { id: 'UCabc', name: 'Sub', handle: '@sub.channel-1' } },
+    kickChannels: [{ id: 'kick:conner', platform: 'kick', slug: 'conner', name: 'Conner', handle: 'conner' }],
+    kickHidden: { 'kick:x_y-z': { id: 'kick:x_y-z', platform: 'kick', slug: 'x_y-z', name: 'X' } },
+    favoriteChannels: [{ id: 'twitch:summit1g', platform: 'twitch', login: 'summit1g', name: 'summit1g' }],
+    chatBlockedWords: ['a phrase'],
+    chatHighlightedWords: ['word'],
+    kickVolume: 0.5,
+    chatHidden: true,
+    floatingChat: { x: 10, y: 20, opacity: 0.5 },
+  };
+  const backup = createBackup(saved, '1.4.0', new Date('2026-11-07T00:00:00Z'));
+  assert.equal(backup.extensionVersion, '1.4.0');
+  const { data } = parseBackup(JSON.stringify(backup));
+  for (const key of Object.keys(saved)) assert.deepEqual(plain(data[key]), saved[key], key);
+  assert.equal(data.showKickLive, true, 'a setting never changed is saved with its default');
+  assert.deepEqual(plain(data.kickFollowed), {}, 'an empty list is saved too');
+  assert.equal(Object.keys(data).length, Object.keys(KEY_DEFAULTS).length);
+});
+
+test('parseBackup refuses a file that is not a backup, or is from a newer version', () => {
+  for (const text of ['not json', 'null', '[]', '{}', '{"app":"Other","backupVersion":1,"data":{}}', backupFile('x'), backupFile({ unknown: 1 })]) {
+    assert.throws(() => parseBackup(text), undefined, text);
+  }
+  assert.throws(() => parseBackup(backupFile({ theme: 'dark' }, { backupVersion: 2 })), /newer/);
+  assert.throws(() => parseBackup(backupFile({ theme: 'dark' }, { backupVersion: 'x' })));
+  assert.throws(() => parseBackup('x'.repeat(5_000_001)), /too big/);
+});
+
+test('parseBackup keeps only what is valid, and leaves out the rest', () => {
+  const { data } = parseBackup(backupFile({
+    theme: 'purple',
+    hideForYou: 'yes',
+    chatFontSize: '14',
+    live: { x: {} },
+    kickVolume: 5,
+    chatHidden: 1,
+    chatBlockedWords: ['ok', '', 3, 'x'.repeat(301)],
+    floatingChat: { x: 1, y: 'no', extra: 2, width: null },
+    channels: [
+      { id: 'UCgood', name: 'Good', avatar: 'http://example.com/a.png', extra: 'dropped', handle: '@a/../b', slug: '../x', login: 'a b', platform: 'a/b' },
+      { id: '../../evil', name: 'Bad' },
+      { id: '..', name: 'Bad' },
+      { id: 'UCnoName' },
+      'text',
+      null,
+    ],
+    hiddenChannels: { wrongKey: { id: 'UCright', name: 'Right', avatar: 'https://example.com/a.png' }, bad: { id: 'a/b', name: 'Bad' } },
+    subChannels: [],
+  }));
+  assert.deepEqual(plain(data), {
+    chatFontSize: '14',
+    chatBlockedWords: ['ok'],
+    floatingChat: { x: 1 },
+    channels: [{ id: 'UCgood', name: 'Good' }],
+    hiddenChannels: { UCright: { id: 'UCright', name: 'Right', avatar: 'https://example.com/a.png' } },
+  });
+});
+
+test('a backup file cannot change how objects work', () => {
+  const { data } = parseBackup('{"app":"StreamKEK","backupVersion":1,"data":{"__proto__":{"polluted":true},"theme":"dark","subChannels":{"a":{"id":"__proto__","name":"x"}}}}');
+  assert.equal(data.polluted, undefined);
+  assert.equal({}.polluted, undefined);
+  assert.equal(data.theme, 'dark');
+});
+
+test('describeBackup says what a backup holds', () => {
+  assert.equal(
+    describeBackup({ channels: [{}], kickChannels: [{}], favoriteChannels: [{}], hiddenChannels: {}, chatBlockedWords: ['a'], chatHighlightedWords: ['b', 'c'] }),
+    '2 added channels, 1 favorite, 0 hidden channels, 3 chat words, your settings',
+  );
+});
+
+test('every storage key is backed up or known to be temporary', () => {
+  const contributing = readFileSync(new URL('../CONTRIBUTING.md', import.meta.url), 'utf8').split('## Storage keys')[1];
+  const rows = contributing.split(String.fromCharCode(10)).filter((line) => line.startsWith('| `'));
+  const keys = rows.flatMap((row) => [...row.split('|')[1].matchAll(/`([a-zA-Z]+)`/g)].map((match) => match[1]));
+  assert.ok(keys.includes('favoriteChannels'), 'the table should be readable');
+  for (const key of keys) assert.ok(key in KEY_DEFAULTS || NOT_BACKED_UP.includes(key), `${key} needs a place in backup.js`);
+});
+
 test('chatBoxAddition keeps an emote apart from what is already in the chat box', () => {
   assert.equal(chatBoxAddition('', 'KEKW'), 'KEKW ');
   assert.equal(chatBoxAddition('\uFEFF', 'KEKW'), 'KEKW ');

@@ -4,7 +4,7 @@
 (() => {
   'use strict';
 
-  const { SETTINGS, settingDefaults, sites, chatWords } = skek;
+  const { SETTINGS, settingDefaults, sites, chatWords, backup } = skek;
 
   const REPO = 'https://github.com/jafdell/StreamKEK';
   const VERSION = chrome.runtime.getManifest().version;
@@ -31,6 +31,18 @@
       build: (saved) => wordList('chatHighlightedWords', saved, 'Add a word to highlight', 'word-chip--highlight'),
     },
     {
+      category: 'Backup',
+      label: 'Save a backup',
+      hint: 'Saves your settings, channels, favorites and chat words to a file, so you can put them back after reinstalling StreamKEK or moving its folder. No passwords or sign-ins are in it.',
+      build: () => backup.saveControl(),
+    },
+    {
+      category: 'Backup',
+      label: 'Restore a backup',
+      hint: 'Puts back what a backup file saved, replacing what you have now. You can check what it holds before anything changes.',
+      build: () => backup.restoreControl(),
+    },
+    {
       category: 'Feedback',
       label: 'Report a bug',
       hint: 'Something not working? Opens a short form on GitHub, which needs a GitHub account.',
@@ -54,6 +66,7 @@
   // Only ever fed into innerHTML from these constants.
   const LINK_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14 4h6v6h-2V7.4l-7.3 7.3-1.4-1.4L16.6 6H14V4ZM5 6h5v2H6v10h10v-4h2v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z"/></svg>';
   const CATEGORY_ICONS = {
+    Backup: '<path d="M12 3a1 1 0 0 1 1 1v9.6l3.3-3.3 1.4 1.4L12 17.4l-5.7-5.7 1.4-1.4 3.3 3.3V4a1 1 0 0 1 1-1ZM4 19h16v2H4v-2Z"/>',
     Appearance: '<path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 2v14a7 7 0 0 1 0-14Z"/>',
     Chat: '<path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9.5L5 21v-4H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/>',
     Feedback: '<path d="M3 20.5 22 12 3 3.5V10l12 2-12 2v6.5Z"/>',
@@ -64,6 +77,7 @@
   };
   const DEFAULT_CATEGORY_ICON = '<circle cx="12" cy="12" r="4"/>';
   const SITE_CATEGORIES = Object.values(sites).map((site) => site.name);
+  const BOTTOM_CATEGORIES = ['Backup', 'Feedback'];
 
   const search = document.getElementById('search');
   const categoryLinks = document.getElementById('categories');
@@ -75,7 +89,9 @@
 
   const framed = window !== window.top;
   const categories = [...new Set([...SETTINGS, ...CUSTOM_ITEMS].map((item) => item.category))].sort((a, b) => a.localeCompare(b));
-  let selectedCategory = categories[0];
+  // The toolbar popup opens a tab here to restore a backup.
+  const askedCategory = decodeURIComponent(location.hash.slice(1));
+  let selectedCategory = categories.includes(askedCategory) ? askedCategory : categories[0];
 
   function searchText(item) {
     const choices = item.choices?.map((choice) => choice.label).join(' ') ?? '';
@@ -377,8 +393,8 @@
 
   chrome.storage.local.get({ ...settingDefaults, ...chatWords.DEFAULTS }).then((saved) => {
     // The other sites sit together under a divider, each group still in alphabetical order.
-    // Feedback sits apart at the bottom, so it isn't mistaken for a group of settings.
-    const settingCategories = categories.filter((category) => category !== 'Feedback' && !SITE_CATEGORIES.includes(category));
+    // Backup and Feedback sit apart at the bottom, so they aren't mistaken for groups of settings.
+    const settingCategories = categories.filter((category) => !BOTTOM_CATEGORIES.includes(category) && !SITE_CATEGORIES.includes(category));
     const divider = document.createElement('hr');
     divider.className = 'categories__divider';
     categoryLinks.append(
@@ -386,7 +402,7 @@
       divider,
       ...categories.filter((category) => SITE_CATEGORIES.includes(category)).map(categoryLink),
     );
-    feedbackLink.append(categoryLink('Feedback'));
+    feedbackLink.append(...BOTTOM_CATEGORIES.map(categoryLink));
     // Rows are built with their saved state, so switches don't slide on every open.
     groups.append(...categories.map((category) => categoryGroup(category, saved)));
     render();
