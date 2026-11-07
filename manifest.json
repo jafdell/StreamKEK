@@ -43,6 +43,7 @@
         "src/features/streams/sites.js",
         "src/twitch/helpers.js",
         "src/twitch/page-sync.js",
+        "src/twitch/gql.js",
         "src/twitch/settings-button.js",
         "src/features/streams/twitch/state.js",
         "src/features/streams/twitch/format.js",
@@ -63,6 +64,7 @@
         "src/features/sidebar/current-channel.js",
         "src/features/chat/claim-points.js",
         "src/features/chat/chat-words.js",
+        "src/features/chat/emotes.js",
         "src/features/player/floating-window.js",
         "src/features/player/modes.js"
       ],
@@ -76,6 +78,7 @@
         "src/features/chat/timestamps.css",
         "src/features/chat/sections.css",
         "src/features/chat/chat-words.css",
+        "src/features/chat/emotes.css",
         "src/features/player/extensions.css",
         "src/features/player/modes.css",
         "src/features/player/floating-window.css",
@@ -117,14 +120,17 @@
       "js": [
         "src/settings.js",
         "src/twitch/page-sync.js",
+        "src/twitch/gql.js",
         "src/features/streams/frames/layout-keys.js",
-        "src/features/chat/chat-words.js"
+        "src/features/chat/chat-words.js",
+        "src/features/chat/emotes.js"
       ],
       "css": [
         "src/features/chat/font-size.css",
         "src/features/chat/timestamps.css",
         "src/features/chat/sections.css",
-        "src/features/chat/chat-words.css"
+        "src/features/chat/chat-words.css",
+        "src/features/chat/emotes.css"
       ],
       "all_frames": true,
       "run_at": "document_start"

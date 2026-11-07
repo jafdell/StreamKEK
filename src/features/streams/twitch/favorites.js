@@ -14,10 +14,8 @@
   // The collapsed sidebar's is side-nav-bar-collapsed.
   const SIDEBAR = '[data-a-target^="side-nav-bar"]';
   const HIDDEN_CARD = 'data-skek-favorite';
-  const GQL_URL = 'https://gql.twitch.tv/gql';
-  // Twitch's own website's public id, which needs no sign-in. Nothing else reads a channel that isn't
-  // in the sidebar's list, and if this stops working Twitch favorites just stay in Twitch's own list.
-  const GQL_CLIENT = 'kimne78kx3ncx6brgo4mv6wki5h1ko';
+  // Nothing else reads a channel that isn't in the sidebar's list, and if this stops working Twitch
+  // favorites just stay in Twitch's own list.
   const GQL_QUERY = 'query($logins:[String!]){users(logins:$logins){login displayName profileImageURL(width:70) stream{viewersCount title game{displayName}}}}';
   const GQL_MAX_LOGINS = 100;
   const REFRESH_MS = 60_000;
@@ -229,12 +227,7 @@
     const logins = [...new Set([...shared.multiTwitchLogins(), ...favorites])];
     if (!logins.length || document.hidden) return;
     try {
-      const response = await fetch(GQL_URL, {
-        method: 'POST',
-        headers: { 'Client-Id': GQL_CLIENT },
-        body: JSON.stringify({ query: GQL_QUERY, variables: { logins: logins.slice(0, GQL_MAX_LOGINS) } }),
-      });
-      const { data } = await response.json();
+      const data = await skek.twitchGql(GQL_QUERY, { logins: logins.slice(0, GQL_MAX_LOGINS) });
       if (!data?.users) return;
       twitchStatus = twitchStatusFrom(data.users);
       shared.renderSidebar();

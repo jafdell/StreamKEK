@@ -20,14 +20,14 @@ Features are in `src/features/`. `chat/`, `player/` and `sidebar/` match the set
 | To change... | Look in |
 | --- | --- |
 | Settings | `src/settings.js` (the registry). A CSS-only setting's rule lives with its feature, like `src/features/sidebar/sections.css` |
-| Code shared by every feature on Twitch pages | `src/twitch/`: `helpers.js`, `page-sync.js`, `base.css` |
+| Code shared by every feature on Twitch pages | `src/twitch/`: `helpers.js`, `page-sync.js`, `gql.js` (Twitch's own API), `base.css` |
 | The extension's button in Twitch's top bar and the window around the settings page | `src/twitch/settings-button.js` and `.css` |
 | The settings page: categories, search, rows. Also the toolbar popup | `src/settings-window/`. `src/extension-pages/` holds what it shares with the channel manager: `page.css` and `page-theme.js` |
 | The Theme setting's colors | Twitch's values for each theme, wherever `src/` matches `data-theme` or `data-skek-theme`, plus `READABLE` in `youtube/frames/chat.js` (chatters' name colors). Kick has no light theme, so `kick/frames/chat.css` stays dark |
 | Streams from other sites | `src/features/streams/`: `sites.js` (everything that differs per site), `twitch/` (sidebar sections, stream view, address, Following page), `manager/` (channel manager), `frames/` and `background/` (what every site's frames and service worker code share) |
 | One site in particular | `src/features/youtube/` and `src/features/kick/`: `background/` (polling, reading the site) and `frames/` (its chat and player) |
 | Stream view | `streams/twitch/`: `stream-view.js` (the info bar, opening and closing), `view-frames.js` (the two frames), `view-layouts.js` (theatre, stacked and floating) |
-| Chat: font size, timestamps, what sits over chat | `src/features/chat/`. A site's chat is styled in its `frames/chat.css` |
+| Chat: font size, timestamps, what sits over chat, 7TV, BTTV and FFZ emotes (`emotes.js`) | `src/features/chat/`. A site's chat is styled in its `frames/chat.css` |
 | Blocked and highlighted words | `chat/chat-words.js` and `.css`, for every site's chat, with each site's selectors in `MESSAGES`. Their lists are in `settings-window.js` |
 | Stream quality | `player/quality.js` (Twitch), and `frames/watch-start.js` in `youtube/` and `kick/` |
 | Theatre, stacked and floating chat modes | `src/features/player/` (Twitch, plus `floating-window.js` and `.css`, which both use) and `streams/twitch/view-layouts.js` and `stream-view.css` (other sites). `streams/frames/layout-keys.js` forwards the shortcuts from inside their frames, and `chat-settings.js` there and each site's `chat.css` make floating chat see-through. Theatre on Twitch is Twitch's own. Stacked and floating exist twice, so change both |

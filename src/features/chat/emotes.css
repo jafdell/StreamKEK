@@ -1,0 +1,40 @@
+/* The 7TV, BTTV and FFZ emotes setting; see emotes.js. The same height and alignment as Twitch's own
+   emotes, whatever size the image file is. Width follows from the image. */
+
+.skek-emote {
+  height: 28px;
+  width: auto;
+  vertical-align: middle;
+}
+
+/* The same look as the tooltip on Twitch's own emotes, in Twitch's colors for its current theme. Over
+   floating chat and level with Twitch's own tooltips (5000). */
+.skek-emote-tip {
+  position: fixed;
+  z-index: 5000;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--color-background-tooltip, #fff);
+  color: var(--color-text-tooltip, #0e0e10);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 19.6px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.skek-emote-tip::after {
+  content: '';
+  position: absolute;
+  left: calc(var(--skek-tip-arrow) - 4px);
+  bottom: -4px;
+  width: 8px;
+  height: 8px;
+  background: inherit;
+  transform: rotate(45deg);
+}
+
+.skek-emote-tip--below::after {
+  top: -4px;
+  bottom: auto;
+}
