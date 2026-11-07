@@ -58,7 +58,23 @@ test('videoFromPath finds the video in its address, and nothing elsewhere', () =
 
 const chatBoxContext = {};
 vm.runInNewContext(readFileSync(new URL('../src/features/chat/chat-box-emotes.js', import.meta.url), 'utf8'), chatBoxContext);
-const { finishedEmotes } = chatBoxContext.skekChatBoxEmotes;
+const { finishedEmotes, wordToComplete, emoteCompletions } = chatBoxContext.skekChatBoxEmotes;
+
+test('wordToComplete finds the word before the cursor, and leaves what Twitch completes itself', () => {
+  assert.deepEqual(plain(wordToComplete('hi KE', 5)), { word: 'KE', start: 3 });
+  assert.deepEqual(plain(wordToComplete('hi KE there', 5)), { word: 'KE', start: 3 });
+  assert.equal(wordToComplete('hi KEKW', 5), null, 'the cursor is inside the word');
+  assert.equal(wordToComplete('hi ', 3), null, 'there is no word yet');
+  assert.equal(wordToComplete('', 0), null);
+  for (const text of ['@name', ':emote', '/me']) assert.equal(wordToComplete(text, text.length), null, text);
+});
+
+test('emoteCompletions matches the start of a name in any case, with matching case first', () => {
+  const names = ['KEKW', 'kekw2', 'KEK', 'pepeKEK', 'KEK', 'Kappa'];
+  assert.deepEqual(plain(emoteCompletions('KE', names)), ['KEK', 'KEKW', 'kekw2']);
+  assert.deepEqual(plain(emoteCompletions('ke', names)), ['kekw2', 'KEK', 'KEKW']);
+  assert.deepEqual(plain(emoteCompletions('nothing', names)), []);
+});
 
 test('finishedEmotes only finds whole emote names the cursor has left, last first', () => {
   const table = new Map([['KEK', {}], ['KEKW', {}], ['EZ', {}]]);

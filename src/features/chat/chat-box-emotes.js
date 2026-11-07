@@ -21,14 +21,32 @@
     return words.reverse();
   }
 
-  // The tests have no page, and only need the function above.
+  // The word the cursor is at the end of, unless Twitch completes it itself: @ for names, : for its own
+  // emote list and / for commands.
+  function wordToComplete(text, caret) {
+    if (/\S/.test(text[caret] ?? ' ')) return null;
+    const word = text.slice(0, caret).match(/\S+$/)?.[0];
+    return word && !/^[@:/]/.test(word) ? { word, start: caret - word.length } : null;
+  }
+
+  // Every name that starts with the word, whatever its case, with those matching its case first.
+  function emoteCompletions(word, names) {
+    const lower = word.toLowerCase();
+    const alphabetical = [...new Set(names)]
+      .filter((name) => name.toLowerCase().startsWith(lower))
+      .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+    return [...alphabetical.filter((name) => name.startsWith(word)), ...alphabetical.filter((name) => !name.startsWith(word))];
+  }
+
+  // The tests have no page, and only need the functions above.
   if (typeof document === 'undefined') {
-    globalThis.skekChatBoxEmotes = { finishedEmotes };
+    globalThis.skekChatBoxEmotes = { finishedEmotes, wordToComplete, emoteCompletions };
     return;
   }
 
   const BOX = "[data-a-target='chat-input']";
   const BOX_IMAGE = "[data-a-target='wysiwyg-chat-input-emote'] img";
+  const AUTOCOMPLETE_ON = "[data-skek-on~='chatEmoteAutocomplete']";
   // Twitch builds the image's address from this, so it's what marks an image as one to correct.
   const FAKE_ID = 'skek-emote';
 
@@ -38,6 +56,8 @@
   const wrapped = new WeakSet();
   let currentBox = null;
   let imageObserver = null;
+  // The matches Tab is stepping through, kept while the word is still the one it last put there.
+  let completing = null;
 
   function editorOf(box) {
     const key = Object.keys(box).find((name) => name.startsWith('__reactFiber$'));
@@ -48,12 +68,12 @@
     return null;
   }
 
-  function emoteNode(emote) {
+  function emoteNode(emote, id = FAKE_ID) {
     const images = { '1x': emote.src, '2x': emote.src, '4x': emote.src };
     return {
       type: 'emote',
       // Type 6 is what Twitch gives its own emotes here.
-      emoteData: { type: 6, content: { alt: emote.name, emoteID: FAKE_ID, images: { dark: images, light: images, themed: images } } },
+      emoteData: { type: 6, content: { alt: emote.name, emoteID: id, images: { dark: images, light: images, themed: images } } },
       emoteName: emote.name,
       children: [{ type: 'text', text: '' }],
     };
@@ -123,6 +143,83 @@
     };
     return editor;
   }
+
+  // The Twitch emotes this person can use in this chat, by name. Twitch's list also has patterns for its
+  // smileys.
+  function twitchEmotes(box) {
+    const key = Object.keys(box).find((name) => name.startsWith('__reactFiber$'));
+    for (let fiber = box[key]; fiber; fiber = fiber.return) {
+      const sets = fiber.memoizedProps?.emotes;
+      if (Array.isArray(sets)) {
+        const emotes = sets.flatMap((set) => set?.emotes ?? []).filter((emote) => /^\w+$/.test(emote?.token ?? ''));
+        return new Map(emotes.map((emote) => [emote.token, emote.id]));
+      }
+    }
+    return new Map();
+  }
+
+  // Twitch's own emote comes first if a name is on both, as it does when the message is sent.
+  function completionNode(name, twitch) {
+    const id = twitch.get(name);
+    if (id) return emoteNode({ name, src: `https://static-cdn.jtvnw.net/emoticons/v2/${id}/default/dark/1.0` }, id);
+    drawn.set(name, table.get(name));
+    return emoteNode(table.get(name));
+  }
+
+  // Each match goes in as its image, so stepping through them shows what each one is. Without a match
+  // this leaves Tab alone, so it still moves on to the next control as it does on Twitch.
+  function completeEmote(event, box) {
+    const editor = editorOf(box);
+    const { anchor, focus } = editor?.selection ?? {};
+    if (!anchor || anchor.path.length !== 2 || anchor.path.join() !== focus.path.join() || anchor.offset !== focus.offset) return;
+    const [block, piece] = anchor.path;
+    const pieces = editor.children[block]?.children ?? [];
+    const text = pieces[piece]?.text;
+    if (typeof text !== 'string') return;
+
+    const step = event.shiftKey ? -1 : 1;
+    const before = anchor.offset === 0 ? pieces[piece - 1] : null;
+    const stepping = before?.type === 'emote' && completing?.options[completing.index] === before.emoteName;
+    const target = stepping ? null : wordToComplete(text, anchor.offset);
+    if (!stepping && !target) return;
+
+    const twitch = twitchEmotes(box);
+    const options = stepping ? completing.options : emoteCompletions(target.word, [...table.keys(), ...twitch.keys()]);
+    if (!options.length) return;
+    event.preventDefault();
+    event.stopPropagation();
+
+    let index;
+    if (stepping) index = (completing.index + step + options.length) % options.length;
+    else index = step < 0 ? options.length - 1 : 0;
+    completing = { options, index };
+    const node = completionNode(options[index], twitch);
+
+    if (stepping) {
+      if (options[index] === before.emoteName) return;
+      const path = [block, piece - 1];
+      editor.withoutNormalizing(() => {
+        editor.removeNodes({ at: path });
+        editor.insertNodes(node, { at: path });
+      });
+      editor.select({ path: anchor.path, offset: 0 });
+      return;
+    }
+    editor.withoutNormalizing(() => {
+      editor.delete({ at: { anchor: { path: anchor.path, offset: target.start }, focus: anchor } });
+      editor.insertNodes(node, { at: { path: anchor.path, offset: target.start } });
+    });
+    // The box always keeps a piece of text on both sides of an emote, so the emote is the next piece and
+    // the cursor goes in the one after it.
+    editor.select({ path: [block, piece + 2], offset: 0 });
+  }
+
+  // Before the page's own handling, which would move on to the next control.
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Tab' || event.altKey || event.ctrlKey || event.metaKey) return;
+    const box = event.target.closest?.(BOX);
+    if (box && table.size && document.documentElement.matches(AUTOCOMPLETE_ON)) completeEmote(event, box);
+  }, true);
 
   document.addEventListener('focusin', (event) => {
     const box = event.target.closest?.(BOX);

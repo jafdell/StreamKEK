@@ -123,6 +123,13 @@
       default: true,
     },
     {
+      key: 'chatEmoteAutocomplete',
+      category: 'Chat',
+      label: 'Autocomplete emotes with Tab',
+      hint: "In Twitch's chat box, type the start of an emote's name and press Tab to see it, then Tab again for the next match, or Shift+Tab to go back. Includes the Twitch emotes you can use there. Needs the 7TV, BTTV and FFZ emotes setting on. Names starting with @ still complete as usual.",
+      default: false,
+    },
+    {
       key: 'hidePlayerExtensions',
       category: 'Player',
       label: 'Hide extensions over the video',
