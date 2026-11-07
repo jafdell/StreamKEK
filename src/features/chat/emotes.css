@@ -1,8 +1,9 @@
 /* The 7TV, BTTV and FFZ emotes setting; see emotes.js. The same height and alignment as Twitch's own
-   emotes, whatever size the image file is. Width follows from the image. */
+   emotes, whatever size the image file is, including with the Chat font size setting (font-size.css).
+   Width follows from the image. */
 
 .skek-emote {
-  height: 28px;
+  height: var(--skek-emote-height, 28px);
   width: auto;
   vertical-align: middle;
 }
