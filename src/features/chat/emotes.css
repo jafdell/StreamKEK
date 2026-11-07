@@ -7,6 +7,10 @@
   vertical-align: middle;
 }
 
+.skek-emote--clickable {
+  cursor: pointer;
+}
+
 /* The same look as the tooltip on Twitch's own emotes, in Twitch's colors for its current theme. Over
    floating chat and level with Twitch's own tooltips (5000). */
 .skek-emote-tip {

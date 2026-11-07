@@ -33,7 +33,7 @@ const matchesWords = (words, text) => new RegExp(wordPattern(words), 'iu').test(
 
 const chatEmotesContext = { skek: {}, window: {}, location: { ancestorOrigins: [] }, URL };
 vm.runInNewContext(readFileSync(new URL('../src/features/chat/emotes.js', import.meta.url), 'utf8'), chatEmotesContext);
-const { channelFromPath, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts } = chatEmotesContext.skek.chatEmotes;
+const { channelFromPath, videoFromPath, chatBoxAddition, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts } = chatEmotesContext.skek.chatEmotes;
 const names = (emotes) => plain(emotes.map((emote) => emote.name));
 
 test('channelFromPath finds the channel in each address with chat, and nothing elsewhere', () => {
@@ -46,6 +46,21 @@ test('channelFromPath finds the channel in each address with chat, and nothing e
   for (const path of ['/', '/directory/following', '/videos/123', '/settings/profile', '/not.a.channel']) {
     assert.equal(channelFromPath(path), null, path);
   }
+});
+
+test('videoFromPath finds the video in its address, and nothing elsewhere', () => {
+  assert.equal(videoFromPath('/videos/2921120349'), '2921120349');
+  assert.equal(videoFromPath('/videos/2921120349/'), '2921120349');
+  for (const path of ['/', '/videos', '/videos/abc', '/sodapoppin/videos', '/sodapoppin']) {
+    assert.equal(videoFromPath(path), null, path);
+  }
+});
+
+test('chatBoxAddition keeps an emote apart from what is already in the chat box', () => {
+  assert.equal(chatBoxAddition('', 'KEKW'), 'KEKW');
+  assert.equal(chatBoxAddition('﻿', 'KEKW'), 'KEKW');
+  assert.equal(chatBoxAddition('hello', 'KEKW'), ' KEKW');
+  assert.equal(chatBoxAddition('hello ', 'KEKW'), 'KEKW');
 });
 
 test('sevenTvEmotes uses the name the channel gave it, and skips unlisted emotes and other image hosts', () => {

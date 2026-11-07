@@ -11,7 +11,7 @@
   const SERVICES = ['7TV', 'FFZ', 'BTTV'];
   const MAX_EMOTES = 10_000;
   const TIMEOUT_MS = 10_000;
-  // Twitch's addresses with a first part that isn't a channel. Chat on /videos/ has no list, so it stays as it is.
+  // Twitch's addresses with a first part that isn't a channel.
   const NOT_CHANNELS = new Set(['directory', 'videos', 'settings', 'search', 'subscriptions', 'inventory', 'drops', 'wallet', 'friends', 'downloads', 'jobs', 'turbo', 'store', 'prime', 'bits', 'subs', 'p', 'u']);
 
   function channelFromPath(pathname) {
@@ -20,6 +20,10 @@
     if (parts[0] === 'moderator') parts.shift();
     const login = parts[0];
     return login && /^\w+$/.test(login) && !NOT_CHANNELS.has(login) ? login : null;
+  }
+
+  function videoFromPath(pathname) {
+    return pathname.match(/^\/videos\/(\d+)(?:\/|$)/)?.[1] ?? null;
   }
 
   // These lists come from outside StreamKEK, so an image from anywhere else is dropped.
@@ -126,13 +130,24 @@
     return parts;
   }
 
-  skek.chatEmotes = { channelFromPath, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts };
+  // What to add to the chat box to put an emote after what's there, which it marks as empty with a
+  // zero-width character.
+  function chatBoxAddition(current, name) {
+    const text = current.replace(/﻿/g, '');
+    return text && !/\s$/.test(text) ? ` ${name}` : name;
+  }
+
+  skek.chatEmotes = { channelFromPath, videoFromPath, chatBoxAddition, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts };
 
   // Twitch's pages and its chat in the multi-stream view, but not that chat on other websites.
   if (window !== window.top && !location.ancestorOrigins[0]?.endsWith('.twitch.tv')) return;
 
   const MESSAGE_TEXT = "span[data-a-target='chat-message-text']";
-  const ID_QUERY = 'query($login:String!){user(login:$login){id}}';
+  const CHAT_BOX = "[data-a-target='chat-input']";
+  // How long the chat box takes to notice its caret moved. It throttles that to every 100 ms.
+  const CHAT_BOX_CARET_MS = 150;
+  const CHANNEL_ID_QUERY = 'query($login:String!){user(login:$login){id}}';
+  const VIDEO_OWNER_QUERY = 'query($id:ID!){video(id:$id){owner{id}}}';
   // How far the tooltip sits from its emote, and from the window's edge.
   const TIP_GAP = 10;
   const TIP_EDGE = 4;
@@ -198,6 +213,8 @@
     image.className = 'skek-emote';
     image.alt = emote.name;
     image.decoding = 'async';
+    // A video's chat has nowhere to type.
+    if (!videoFromPath(location.pathname)) image.classList.add('skek-emote--clickable');
     // Holds the emote's space while it loads, so its row jumps less. emotes.css sets the real height.
     if (emote.width && emote.height) {
       image.width = emote.width;
@@ -240,6 +257,26 @@
     if (event.target === tipEmote) hideTip();
   }
 
+  // Clicking an emote adds its name to the end of the message being written. It has to be a paste: text
+  // typed in by script shows in the box, but the box doesn't count it as part of the message.
+  function addToChatBox(name) {
+    const box = document.querySelector(CHAT_BOX);
+    if (!box) return;
+    box.focus();
+    const selection = getSelection();
+    selection.selectAllChildren(box);
+    selection.collapseToEnd();
+    setTimeout(() => {
+      const clipboardData = new DataTransfer();
+      clipboardData.setData('text/plain', chatBoxAddition(box.textContent, name));
+      box.dispatchEvent(new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }));
+    }, CHAT_BOX_CARET_MS);
+  }
+
+  function onClick(event) {
+    if (event.target.classList?.contains('skek-emote--clickable')) addToChatBox(event.target.alt);
+  }
+
   function swapEmotes(textElement) {
     for (const node of [...textElement.childNodes]) {
       if (node.nodeType !== Node.TEXT_NODE) continue;
@@ -248,18 +285,23 @@
     }
   }
 
-  async function loadChannel(login) {
+  // A video's chat uses the emotes of the channel that made it, as they are today.
+  async function channelId(login, videoId, signal) {
+    if (videoId) return (await skek.twitchGql(VIDEO_OWNER_QUERY, { id: videoId }, signal))?.video?.owner?.id;
+    return (await skek.twitchGql(CHANNEL_ID_QUERY, { login }, signal))?.user?.id;
+  }
+
+  async function loadChannel(login, videoId) {
     loading?.abort();
     table = null;
-    if (!login) return;
+    if (!login && !videoId) return;
     const controller = new AbortController();
     loading = controller;
     const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(TIMEOUT_MS)]);
     // Global lists aren't tied to this channel, so changing channel doesn't cancel them.
     globalLists ??= loadLists(globalLoaders(AbortSignal.timeout(TIMEOUT_MS)));
 
-    const data = await skek.twitchGql(ID_QUERY, { login }, signal).catch(() => null);
-    const id = data?.user?.id;
+    const id = await channelId(login, videoId, signal).catch(() => null);
     const [channelLists, global] = await Promise.all([
       /^\d+$/.test(id ?? '') ? loadLists(channelLoaders(id, signal)) : {},
       globalLists,
@@ -273,10 +315,13 @@
     if (location.pathname === lastPath) return;
     lastPath = location.pathname;
     // The stream view's address, like /kick/<channel>, isn't a Twitch channel.
-    const login = document.getElementById('skek-view') ? null : channelFromPath(lastPath);
-    if (login === channel) return;
-    channel = login;
-    loadChannel(login);
+    const inView = !!document.getElementById('skek-view');
+    const videoId = inView ? null : videoFromPath(lastPath);
+    const login = inView || videoId ? null : channelFromPath(lastPath);
+    const source = videoId ? `video ${videoId}` : login;
+    if (source === channel) return;
+    channel = source;
+    loadChannel(login, videoId);
   }
 
   // Nothing is downloaded until there's a message to show, so a page without chat costs nothing.
@@ -310,6 +355,7 @@
     observer.observe(document.documentElement, { childList: true, subtree: true });
     document.addEventListener('mouseover', onMouseOver);
     document.addEventListener('mouseout', onMouseOut);
+    document.addEventListener('click', onClick);
     // Scrolling moves the emote out from under the tooltip. Scroll events don't bubble, so this needs capture.
     document.addEventListener('scroll', hideTip, { capture: true, passive: true });
     handleMessages([...document.querySelectorAll(MESSAGE_TEXT)]);
@@ -319,6 +365,7 @@
     observer.disconnect();
     document.removeEventListener('mouseover', onMouseOver);
     document.removeEventListener('mouseout', onMouseOut);
+    document.removeEventListener('click', onClick);
     document.removeEventListener('scroll', hideTip, { capture: true });
     hideTip();
     loading?.abort();
