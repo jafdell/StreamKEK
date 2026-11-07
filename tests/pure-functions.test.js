@@ -76,7 +76,7 @@ test('loadLists leaves out a service that failed, and tries only that one again'
 
 test('chatBoxAddition keeps an emote apart from what is already in the chat box', () => {
   assert.equal(chatBoxAddition('', 'KEKW'), 'KEKW');
-  assert.equal(chatBoxAddition('FEFF', 'KEKW'), 'KEKW');
+  assert.equal(chatBoxAddition('\uFEFF', 'KEKW'), 'KEKW');
   assert.equal(chatBoxAddition('hello', 'KEKW'), ' KEKW');
   assert.equal(chatBoxAddition('hello ', 'KEKW'), 'KEKW');
 });

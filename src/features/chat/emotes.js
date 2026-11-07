@@ -133,7 +133,7 @@
   // What to add to the chat box to put an emote after what's there, which it marks as empty with a
   // zero-width character.
   function chatBoxAddition(current, name) {
-    const text = current.replace(/FEFF/g, '');
+    const text = current.replace(/\uFEFF/g, '');
     return text && !/\s$/.test(text) ? ` ${name}` : name;
   }
 
