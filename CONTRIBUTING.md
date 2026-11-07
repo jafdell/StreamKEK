@@ -1,6 +1,6 @@
 # Contributing to StreamKEK
 
-Bugs and feature requests go in issues. To send a change: fork the repo, make a branch, make your change, run `node --test` (you'll need Node), walk the relevant part of [TESTING.md](TESTING.md), and open a pull request saying what you tried.
+Bugs and feature requests go in issues. To send a change: fork the repo, make a branch, make your change, run `node --test` (you'll need Node), walk the relevant part of [TESTING.md](TESTING.md), and open a pull request saying what you tried. Start its title with a verb that says what changed, and fill in the template.
 
 ## How it fits together
 
@@ -22,12 +22,12 @@ Features are in `src/features/`. `chat/`, `player/` and `sidebar/` match the set
 | Settings | `src/settings.js` (the registry). A CSS-only setting's rule lives with its feature, like `src/features/sidebar/sections.css` |
 | Code shared by every feature on Twitch pages | `src/twitch/`: `helpers.js`, `page-sync.js`, `gql.js` (Twitch's own API), `base.css` |
 | The extension's button in Twitch's top bar and the window around the settings page | `src/twitch/settings-button.js` and `.css` |
-| The settings page: categories, search, rows. Also the toolbar popup | `src/settings-window/`. `src/extension-pages/` holds what it shares with the channel manager: `page.css` and `page-theme.js` |
+| The settings page: categories, search, rows, backups. Also the toolbar popup | `src/settings-window/`. `src/extension-pages/` holds what it shares with the channel manager: `page.css` and `page-theme.js` |
 | The Theme setting's colors | Twitch's values for each theme, wherever `src/` matches `data-theme` or `data-skek-theme`, plus `READABLE` in `youtube/frames/chat.js` (chatters' name colors). Kick has no light theme, so `kick/frames/chat.css` stays dark |
 | Streams from other sites | `src/features/streams/`: `sites.js` (everything that differs per site), `twitch/` (sidebar sections, stream view, address, Following page), `manager/` (channel manager), `frames/` and `background/` (what every site's frames and service worker code share) |
 | One site in particular | `src/features/youtube/` and `src/features/kick/`: `background/` (polling, reading the site) and `frames/` (its chat and player) |
 | Stream view | `streams/twitch/`: `stream-view.js` (the info bar, opening and closing), `view-frames.js` (the two frames), `view-layouts.js` (theatre, stacked and floating) |
-| Chat: font size, timestamps, what sits over chat, 7TV, BTTV and FFZ emotes (`emotes.js`) | `src/features/chat/`. A site's chat is styled in its `frames/chat.css` |
+| Chat: font size, timestamps, what sits over chat, 7TV, BTTV and FFZ emotes (`emotes.js`, `chat-box-emotes.js` for the chat box and `emote-picker.js` for its button) | `src/features/chat/`. A site's chat is styled in its `frames/chat.css` |
 | Blocked and highlighted words | `chat/chat-words.js` and `.css`, for every site's chat, with each site's selectors in `MESSAGES`. Their lists are in `settings-window.js` |
 | Stream quality | `player/quality.js` (Twitch), and `frames/watch-start.js` in `youtube/` and `kick/` |
 | Theatre, stacked and floating chat modes | `src/features/player/` (Twitch, plus `floating-window.js` and `.css`, which both use) and `streams/twitch/view-layouts.js` and `stream-view.css` (other sites). `streams/frames/layout-keys.js` forwards the shortcuts from inside their frames, and `chat-settings.js` there and each site's `chat.css` make floating chat see-through. Theatre on Twitch is Twitch's own. Stacked and floating exist twice, so change both |
@@ -110,7 +110,7 @@ Sites like YouTube and Kick share everything on Twitch's side, so a new one is m
 
    `startBackground` runs every time the worker wakes, not once, and the worker can stop between events. Register its listeners synchronously, keep state in storage rather than in variables, and don't recreate what already exists (see the alarm in `streams/background/site-background.js`). A handler takes `(msg)` and returns `{ ok: true, ... }`; anything it throws reaches the sender as `{ ok: false, error }`. Twitch pages send with `skek.helpers.send`.
 6. For something in the settings window that isn't a switch or a choice, add an entry to `CUSTOM_ITEMS` in `src/settings-window/settings-window.js`: its `category`, `label`, `hint` and a `build` function returning what goes under the label, or an `href` to make the row a link. It's searchable like a setting. `skek.helpers` isn't available on that page. Anything bigger should be its own page in a frame, as `channelManagerFrame` does with `manager.html`.
-7. Add any storage key that isn't in `SETTINGS`, and any setting with a `message`, to the table below. Name a key so it can't clash with another feature's, like `floatingChat`. Each key is written from one context, the background or one kind of page, never both: writers rewrite whole values, as `runPoll` does, so a second one loses updates.
+7. Add any storage key that isn't in `SETTINGS`, and any setting with a `message`, to the table below. Name a key so it can't clash with another feature's, like `floatingChat`. Each key is written from one context, the background or one kind of page, never both: writers rewrite whole values, as `runPoll` does, so a second one loses updates. Restoring a backup is the one exception. Add the key to `KEY_DEFAULTS` and `CLEANERS` in `src/settings-window/backup.js`, or to `NOT_BACKED_UP` if it can be worked out again.
 8. Add it to the feature list in `README.md`, what to check to `TESTING.md`, and a row to "Where do I...?" if it spans folders.
 9. Give any pure function a test in `tests/`: background modules import directly, which is why they can't touch `chrome.*` at load, and a content script runs through `vm` with a stub `skek`, as `format.js` does. Then run `node --test`, reload the extension and walk the relevant part of `TESTING.md`.
 

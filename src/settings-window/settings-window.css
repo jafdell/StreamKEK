@@ -68,8 +68,8 @@ html.framed body { width: 100%; height: 100%; }
 .categories__divider { margin: 8px 0 10px; border: 0; border-top: 1px solid var(--hover); }
 
 .feedback-category { flex: 0 0 auto; margin-top: 8px; padding-top: 10px; border-top: 1px solid var(--hover); }
-/* A quiet row the divider sets apart. Hovering and selecting it work like any other category. */
-.feedback-category .category-link { margin-bottom: 0; }
+/* Quiet rows the divider sets apart. Hovering and selecting them work like any other category. */
+.feedback-category .category-link:last-child { margin-bottom: 0; }
 .feedback-category .category-link:not([aria-current='true']) { color: var(--muted); }
 
 /* Lines up with the icon above it, and stays quieter than anything you can click. */
@@ -164,6 +164,27 @@ a.setting:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px;
 .dropdown__select option { background: var(--bg); color: var(--text); font-weight: 400; }
 
 .manager-frame { display: block; width: 100%; height: 340px; margin-top: 10px; border: 0; }
+
+/* Save a backup and Restore a backup. */
+.backup-controls { display: flex; gap: 8px; margin-top: 10px; }
+.backup-button {
+  height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 6px;
+  background: #9147ff;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.backup-button:hover { background: #772ce8; }
+.backup-button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.backup-button[hidden] { display: none; }
+.backup-button--quiet { background: var(--card); color: var(--text); }
+.backup-button--quiet:hover { background: var(--bg); }
+.backup-message { margin: 10px 0 0; color: var(--text); overflow-wrap: anywhere; }
+.backup-message--error { color: #ff6b6b; }
 
 /* Blocked words and Highlighted words. */
 .word-list { margin-top: 10px; }

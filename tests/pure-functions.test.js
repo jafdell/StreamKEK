@@ -33,7 +33,7 @@ const matchesWords = (words, text) => new RegExp(wordPattern(words), 'iu').test(
 
 const chatEmotesContext = { skek: {}, window: {}, location: { ancestorOrigins: [] }, URL };
 vm.runInNewContext(readFileSync(new URL('../src/features/chat/emotes.js', import.meta.url), 'utf8'), chatEmotesContext);
-const { channelFromPath, videoFromPath, chatBoxAddition, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts, loadLists, allLoaded } = chatEmotesContext.skek.chatEmotes;
+const { channelFromPath, videoFromPath, chatBoxAddition, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts, loadLists, allLoaded, emoteSections } = chatEmotesContext.skek.chatEmotes;
 const names = (emotes) => plain(emotes.map((emote) => emote.name));
 
 test('channelFromPath finds the channel in each address with chat, and nothing elsewhere', () => {
@@ -56,6 +56,38 @@ test('videoFromPath finds the video in its address, and nothing elsewhere', () =
   }
 });
 
+const chatBoxContext = {};
+vm.runInNewContext(readFileSync(new URL('../src/features/chat/chat-box-emotes.js', import.meta.url), 'utf8'), chatBoxContext);
+const { finishedEmotes, wordToComplete, emoteCompletions } = chatBoxContext.skekChatBoxEmotes;
+
+test('wordToComplete finds the word before the cursor, and leaves what Twitch completes itself', () => {
+  assert.deepEqual(plain(wordToComplete('hi KE', 5)), { word: 'KE', start: 3 });
+  assert.deepEqual(plain(wordToComplete('hi KE there', 5)), { word: 'KE', start: 3 });
+  assert.equal(wordToComplete('hi KEKW', 5), null, 'the cursor is inside the word');
+  assert.equal(wordToComplete('hi ', 3), null, 'there is no word yet');
+  assert.equal(wordToComplete('', 0), null);
+  for (const text of ['@name', ':emote', '/me']) assert.equal(wordToComplete(text, text.length), null, text);
+});
+
+test('emoteCompletions matches the start of a name in any case, with matching case first', () => {
+  const names = ['KEKW', 'kekw2', 'KEK', 'pepeKEK', 'KEK', 'Kappa'];
+  assert.deepEqual(plain(emoteCompletions('KE', names)), ['KEK', 'KEKW', 'kekw2']);
+  assert.deepEqual(plain(emoteCompletions('ke', names)), ['kekw2', 'KEK', 'KEKW']);
+  assert.deepEqual(plain(emoteCompletions('nothing', names)), []);
+});
+
+test('finishedEmotes only finds whole emote names the cursor has left, last first', () => {
+  const table = new Map([['KEK', {}], ['KEKW', {}], ['EZ', {}]]);
+  const found = (text, caret) => plain(finishedEmotes(text, caret, table)).map(({ name, start }) => `${name}@${start}`);
+  assert.deepEqual(found('hi KEK', 6), [], 'the cursor is right after it');
+  assert.deepEqual(found('hi KEK', 4), [], 'the cursor is inside it');
+  assert.deepEqual(found('hi KEK ', 7), ['KEK@3'], 'a space was typed after it');
+  assert.deepEqual(found('hi KEKW', 7), []);
+  assert.deepEqual(found('hi KEKW', 0), ['KEKW@3'], 'the cursor moved away');
+  assert.deepEqual(found('KEK EZ', null), ['EZ@4', 'KEK@0'], 'the cursor is in another piece of the text');
+  assert.deepEqual(found('KEKWW constructor', null), []);
+});
+
 test('loadLists leaves out a service that failed, and tries only that one again', async () => {
   const calls = [];
   const loaders = (ffzWorks) => ({
@@ -74,11 +106,116 @@ test('loadLists leaves out a service that failed, and tries only that one again'
   assert.deepEqual(plain(second.FFZ), ['b']);
 });
 
+test('emoteSections lists each service in order, with only the emotes that won their name', () => {
+  const emote = (name) => ({ name });
+  const channel = { '7TV': [emote('a')], FFZ: [], BTTV: [emote('b'), emote('a')] };
+  const global = { '7TV': [emote('b'), emote('c')], FFZ: [emote('d')] };
+  const sections = emoteSections(channel, global, mergeEmotes(channel, global));
+  assert.deepEqual(plain(sections.map(({ title, emotes }) => [title, emotes.map(({ name }) => name)])), [
+    ['7TV channel emotes', ['a']],
+    ['BTTV channel emotes', ['b']],
+    ['7TV global emotes', ['c']],
+    ['FFZ global emotes', ['d']],
+  ]);
+});
+
+const backupContext = { URL };
+vm.runInNewContext(readFileSync(new URL('../src/settings.js', import.meta.url), 'utf8'), backupContext);
+vm.runInNewContext(readFileSync(new URL('../src/features/streams/sites.js', import.meta.url), 'utf8'), backupContext);
+vm.runInNewContext(readFileSync(new URL('../src/settings-window/backup.js', import.meta.url), 'utf8'), backupContext);
+const { KEY_DEFAULTS, NOT_BACKED_UP, createBackup, parseBackup, describeBackup } = backupContext.skek.backup;
+const backupFile = (data, extra = {}) => JSON.stringify({ app: 'StreamKEK', backupVersion: 1, data, ...extra });
+
+test('a backup saves everything, and restoring it gives back the same', () => {
+  const saved = {
+    theme: 'light',
+    hideForYou: true,
+    channels: [{ id: 'UC554eY5jNUfDq3yDOJYirOQ', name: 'Destiny', handle: '@destiny', avatar: 'https://yt3.ggpht.com/a=s88' }],
+    subChannels: { UCabc: { id: 'UCabc', name: 'Sub', handle: '@sub.channel-1' } },
+    kickChannels: [{ id: 'kick:conner', platform: 'kick', slug: 'conner', name: 'Conner', handle: 'conner' }],
+    kickHidden: { 'kick:x_y-z': { id: 'kick:x_y-z', platform: 'kick', slug: 'x_y-z', name: 'X' } },
+    favoriteChannels: [{ id: 'twitch:summit1g', platform: 'twitch', login: 'summit1g', name: 'summit1g' }],
+    chatBlockedWords: ['a phrase'],
+    chatHighlightedWords: ['word'],
+    kickVolume: 0.5,
+    chatHidden: true,
+    floatingChat: { x: 10, y: 20, opacity: 0.5 },
+  };
+  const backup = createBackup(saved, '1.4.0', new Date('2026-11-07T00:00:00Z'));
+  assert.equal(backup.extensionVersion, '1.4.0');
+  const { data } = parseBackup(JSON.stringify(backup));
+  for (const key of Object.keys(saved)) assert.deepEqual(plain(data[key]), saved[key], key);
+  assert.equal(data.showKickLive, true, 'a setting never changed is saved with its default');
+  assert.deepEqual(plain(data.kickFollowed), {}, 'an empty list is saved too');
+  assert.equal(Object.keys(data).length, Object.keys(KEY_DEFAULTS).length);
+});
+
+test('parseBackup refuses a file that is not a backup, or is from a newer version', () => {
+  for (const text of ['not json', 'null', '[]', '{}', '{"app":"Other","backupVersion":1,"data":{}}', backupFile('x'), backupFile({ unknown: 1 })]) {
+    assert.throws(() => parseBackup(text), undefined, text);
+  }
+  assert.throws(() => parseBackup(backupFile({ theme: 'dark' }, { backupVersion: 2 })), /newer/);
+  assert.throws(() => parseBackup(backupFile({ theme: 'dark' }, { backupVersion: 'x' })));
+  assert.throws(() => parseBackup('x'.repeat(5_000_001)), /too big/);
+});
+
+test('parseBackup keeps only what is valid, and leaves out the rest', () => {
+  const { data } = parseBackup(backupFile({
+    theme: 'purple',
+    hideForYou: 'yes',
+    chatFontSize: '14',
+    live: { x: {} },
+    kickVolume: 5,
+    chatHidden: 1,
+    chatBlockedWords: ['ok', '', 3, 'x'.repeat(301)],
+    floatingChat: { x: 1, y: 'no', extra: 2, width: null },
+    channels: [
+      { id: 'UCgood', name: 'Good', avatar: 'http://example.com/a.png', extra: 'dropped', handle: '@a/../b', slug: '../x', login: 'a b', platform: 'a/b' },
+      { id: '../../evil', name: 'Bad' },
+      { id: '..', name: 'Bad' },
+      { id: 'UCnoName' },
+      'text',
+      null,
+    ],
+    hiddenChannels: { wrongKey: { id: 'UCright', name: 'Right', avatar: 'https://example.com/a.png' }, bad: { id: 'a/b', name: 'Bad' } },
+    subChannels: [],
+  }));
+  assert.deepEqual(plain(data), {
+    chatFontSize: '14',
+    chatBlockedWords: ['ok'],
+    floatingChat: { x: 1 },
+    channels: [{ id: 'UCgood', name: 'Good' }],
+    hiddenChannels: { UCright: { id: 'UCright', name: 'Right', avatar: 'https://example.com/a.png' } },
+  });
+});
+
+test('a backup file cannot change how objects work', () => {
+  const { data } = parseBackup('{"app":"StreamKEK","backupVersion":1,"data":{"__proto__":{"polluted":true},"theme":"dark","subChannels":{"a":{"id":"__proto__","name":"x"}}}}');
+  assert.equal(data.polluted, undefined);
+  assert.equal({}.polluted, undefined);
+  assert.equal(data.theme, 'dark');
+});
+
+test('describeBackup says what a backup holds', () => {
+  assert.equal(
+    describeBackup({ channels: [{}], kickChannels: [{}], favoriteChannels: [{}], hiddenChannels: {}, chatBlockedWords: ['a'], chatHighlightedWords: ['b', 'c'] }),
+    '2 added channels, 1 favorite, 0 hidden channels, 3 chat words, your settings',
+  );
+});
+
+test('every storage key is backed up or known to be temporary', () => {
+  const contributing = readFileSync(new URL('../CONTRIBUTING.md', import.meta.url), 'utf8').split('## Storage keys')[1];
+  const rows = contributing.split(String.fromCharCode(10)).filter((line) => line.startsWith('| `'));
+  const keys = rows.flatMap((row) => [...row.split('|')[1].matchAll(/`([a-zA-Z]+)`/g)].map((match) => match[1]));
+  assert.ok(keys.includes('favoriteChannels'), 'the table should be readable');
+  for (const key of keys) assert.ok(key in KEY_DEFAULTS || NOT_BACKED_UP.includes(key), `${key} needs a place in backup.js`);
+});
+
 test('chatBoxAddition keeps an emote apart from what is already in the chat box', () => {
-  assert.equal(chatBoxAddition('', 'KEKW'), 'KEKW');
-  assert.equal(chatBoxAddition('\uFEFF', 'KEKW'), 'KEKW');
-  assert.equal(chatBoxAddition('hello', 'KEKW'), ' KEKW');
-  assert.equal(chatBoxAddition('hello ', 'KEKW'), 'KEKW');
+  assert.equal(chatBoxAddition('', 'KEKW'), 'KEKW ');
+  assert.equal(chatBoxAddition('\uFEFF', 'KEKW'), 'KEKW ');
+  assert.equal(chatBoxAddition('hello', 'KEKW'), ' KEKW ');
+  assert.equal(chatBoxAddition('hello ', 'KEKW'), 'KEKW ');
 });
 
 test('sevenTvEmotes uses the name the channel gave it, and skips unlisted emotes and other image hosts', () => {

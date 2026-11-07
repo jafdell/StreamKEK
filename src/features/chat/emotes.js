@@ -131,10 +131,10 @@
   }
 
   // What to add to the chat box to put an emote after what's there, which it marks as empty with a
-  // zero-width character.
+  // zero-width character. The space after it finishes the word, so the box shows its image straight away.
   function chatBoxAddition(current, name) {
     const text = current.replace(/\uFEFF/g, '');
-    return text && !/\s$/.test(text) ? ` ${name}` : name;
+    return text && !/\s$/.test(text) ? ` ${name} ` : `${name} `;
   }
 
   // Each service on its own, so one being down doesn't stop the others. One that fails is left out of
@@ -151,7 +151,19 @@
 
   const allLoaded = (lists) => SERVICES.every((service) => lists[service]);
 
-  skek.chatEmotes = { channelFromPath, videoFromPath, chatBoxAddition, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts, loadLists, allLoaded };
+  // The picker's sections, in the same order as mergeEmotes, each with only the emotes that won their name.
+  function emoteSections(channelLists, globalLists, emotes) {
+    const sections = [];
+    for (const [lists, kind] of [[channelLists, 'channel'], [globalLists, 'global']]) {
+      for (const service of SERVICES) {
+        const shown = (lists[service] ?? []).filter((emote) => emotes.get(emote.name) === emote);
+        if (shown.length) sections.push({ title: `${service} ${kind} emotes`, emotes: shown });
+      }
+    }
+    return sections;
+  }
+
+  skek.chatEmotes = { channelFromPath, videoFromPath, chatBoxAddition, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts, loadLists, allLoaded, emoteSections };
 
   // Twitch's pages and its chat in the multi-stream view, but not that chat on other websites.
   if (window !== window.top && !location.ancestorOrigins[0]?.endsWith('.twitch.tv')) return;
@@ -177,6 +189,7 @@
   let lookup = null;
   let loading = null;
   let globalLists = null;
+  let loadedGlobalLists = {};
   let channelLists = {};
   let retryAt = null;
   let retriesLeft = 0;
@@ -225,11 +238,12 @@
     },
   });
 
-  function emoteImage(emote) {
+  function emoteImage(emote, lazy = false) {
     const image = document.createElement('img');
     image.className = 'skek-emote';
     image.alt = emote.name;
     image.decoding = 'async';
+    if (lazy) image.loading = 'lazy';
     // A video's chat has nowhere to type.
     if (!videoFromPath(location.pathname)) image.classList.add('skek-emote--clickable');
     // Holds the emote's space while it loads, so its row jumps less. emotes.css sets the real height.
@@ -246,7 +260,7 @@
   // tooltip, and it's on the page only while it's showing.
   function showTip(image) {
     tip ??= Object.assign(document.createElement('div'), { className: 'skek-emote-tip' });
-    tip.textContent = image.alt;
+    tip.textContent = image.alt ?? image.getAttribute('aria-label');
     // In fullscreen, only what's inside the fullscreen element can show.
     (document.fullscreenElement ?? document.body).append(tip);
     const emote = image.getBoundingClientRect();
@@ -267,7 +281,7 @@
   }
 
   function onMouseOver(event) {
-    if (event.target.classList?.contains('skek-emote')) showTip(event.target);
+    if (event.target.classList?.contains('skek-emote') || event.target.classList?.contains('skek-picker-button')) showTip(event.target);
   }
 
   function onMouseOut(event) {
@@ -308,6 +322,18 @@
     return (await skek.twitchGql(CHANNEL_ID_QUERY, { login }, signal))?.user?.id;
   }
 
+  // chat-box-emotes.js runs in Twitch's own page, so it can't read the table from here.
+  function tableChanged() {
+    document.dispatchEvent(new CustomEvent('skek-emote-table', { detail: JSON.stringify(table ? [...table] : []) }));
+    skek.emotePicker?.tableChanged();
+  }
+
+  Object.assign(skek.chatEmotes, {
+    emoteImage,
+    emotesReady: () => !!table,
+    pickerSections: () => (table ? emoteSections(channelLists, loadedGlobalLists, table) : []),
+  });
+
   async function loadMissingLists() {
     retryAt = null;
     const { login, videoId } = lookup;
@@ -332,7 +358,9 @@
     ]);
     if (controller.signal.aborted) return;
     channelLists = lists;
+    loadedGlobalLists = global;
     table = mergeEmotes(lists, global);
+    tableChanged();
     document.querySelectorAll(MESSAGE_TEXT).forEach(swapEmotes);
     const complete = !idFailed && allLoaded(global) && (!id || allLoaded(lists));
     if (!complete && retriesLeft > 0) {
@@ -344,6 +372,7 @@
   function loadChannel(login, videoId) {
     loading?.abort();
     table = null;
+    tableChanged();
     channelLists = {};
     retryAt = null;
     retriesLeft = MAX_RETRIES;
@@ -375,6 +404,7 @@
       return;
     }
     syncChannel();
+    skek.emotePicker?.sync();
     if (retryAt && Date.now() >= retryAt) loadMissingLists();
     if (table) textElements.forEach(swapEmotes);
   }
@@ -415,7 +445,9 @@
     loading?.abort();
     loading = null;
     table = null;
+    tableChanged();
     globalLists = null;
+    loadedGlobalLists = {};
     channelLists = {};
     lookup = null;
     retryAt = null;

@@ -28,7 +28,9 @@ Open the settings from the extension's icon in Twitch's top bar or the browser t
 - **Stream quality:** choose what streams start at on Twitch, YouTube and Kick, up to 1440p.
 - **Chat font size** for Twitch, YouTube and Kick chat.
 - **Blocked and highlighted words** in Twitch, YouTube and Kick chat: remove messages containing the words you choose, or make them stand out.
-- **7TV, BTTV and FFZ emotes** in Twitch chat, including animated ones, with no other extension needed. Click one to add it to your message. You can turn this off.
+- **7TV, BTTV and FFZ emotes** in Twitch chat, including animated ones, with no other extension needed. Click one to add it to your message, pick one from the button in the chat box, or type its name to see it there. You can turn this off.
+- **Autocomplete emotes with Tab** in Twitch chat, including the Twitch emotes you can use there. It's off by default.
+- **Backup and restore:** save your settings, channels, favorites and chat words to a file, and put them back after a reinstall.
 - **Cleaner Twitch chat:** hide timestamps, the top strip, drops, pinned messages and the Hype Train.
 - **Stream previews:** hover a live channel in the sidebar to see an image of the stream, on Twitch, YouTube and Kick. You can turn this off.
 - **Cleaner sidebar:** hide For You, Live Channels, Recommended Categories, Viewers Also Watch, and turn off YouTube Live and Kick Live.

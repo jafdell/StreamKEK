@@ -8,6 +8,17 @@
   vertical-align: middle;
 }
 
+/* In the chat box (chat-box-emotes.js), Twitch fixes each emote and the boxes around it at 28px square,
+   but these can be wider or narrower. */
+[data-a-target='wysiwyg-chat-input-emote'] div {
+  width: auto !important;
+}
+[data-a-target='wysiwyg-chat-input-emote'] img {
+  width: auto !important;
+  max-width: none !important;
+  height: 28px !important;
+}
+
 .skek-emote--clickable {
   cursor: pointer;
 }
