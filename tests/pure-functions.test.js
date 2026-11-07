@@ -33,7 +33,7 @@ const matchesWords = (words, text) => new RegExp(wordPattern(words), 'iu').test(
 
 const chatEmotesContext = { skek: {}, window: {}, location: { ancestorOrigins: [] }, URL };
 vm.runInNewContext(readFileSync(new URL('../src/features/chat/emotes.js', import.meta.url), 'utf8'), chatEmotesContext);
-const { channelFromPath, videoFromPath, chatBoxAddition, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts, loadLists, allLoaded } = chatEmotesContext.skek.chatEmotes;
+const { channelFromPath, videoFromPath, chatBoxAddition, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts, loadLists, allLoaded, emoteSections } = chatEmotesContext.skek.chatEmotes;
 const names = (emotes) => plain(emotes.map((emote) => emote.name));
 
 test('channelFromPath finds the channel in each address with chat, and nothing elsewhere', () => {
@@ -104,6 +104,19 @@ test('loadLists leaves out a service that failed, and tries only that one again'
   assert.deepEqual(calls, ['FFZ']);
   assert.ok(allLoaded(second));
   assert.deepEqual(plain(second.FFZ), ['b']);
+});
+
+test('emoteSections lists each service in order, with only the emotes that won their name', () => {
+  const emote = (name) => ({ name });
+  const channel = { '7TV': [emote('a')], FFZ: [], BTTV: [emote('b'), emote('a')] };
+  const global = { '7TV': [emote('b'), emote('c')], FFZ: [emote('d')] };
+  const sections = emoteSections(channel, global, mergeEmotes(channel, global));
+  assert.deepEqual(plain(sections.map(({ title, emotes }) => [title, emotes.map(({ name }) => name)])), [
+    ['7TV channel emotes', ['a']],
+    ['BTTV channel emotes', ['b']],
+    ['7TV global emotes', ['c']],
+    ['FFZ global emotes', ['d']],
+  ]);
 });
 
 test('chatBoxAddition keeps an emote apart from what is already in the chat box', () => {

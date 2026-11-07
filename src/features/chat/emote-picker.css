@@ -1,0 +1,109 @@
+/* The emote picker; see emote-picker.js. In Twitch's colors for its current theme, and over floating chat
+   (3002) but below the emote tooltip (5000). */
+
+.skek-picker-button {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-fill-button-icon, #efeff1);
+  cursor: pointer;
+}
+
+.skek-picker-button:hover {
+  background: var(--color-background-button-text-hover, rgba(83, 83, 95, 0.48));
+}
+
+.skek-picker-button svg {
+  pointer-events: none;
+}
+
+/* So long messages don't run under the button. */
+.chat-input__textarea:has(.skek-picker-button) [data-a-target='chat-input'] {
+  padding-right: 32px;
+}
+
+.skek-picker {
+  position: fixed;
+  z-index: 4999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid var(--color-border-base, rgba(83, 83, 95, 0.48));
+  border-radius: 6px;
+  background: var(--color-background-base, #18181b);
+  box-shadow: var(--shadow-elevation-2, 0 4px 8px rgba(0, 0, 0, 0.6));
+  color: var(--color-text-base, #efeff1);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.skek-picker__search {
+  flex: none;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--color-border-input, rgba(222, 222, 227, 0.95));
+  border-radius: 4px;
+  outline: none;
+  background: var(--color-background-input, #18181b);
+  color: var(--color-text-input, #efeff1);
+  font: inherit;
+}
+
+.skek-picker__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.skek-picker__heading {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  margin: 0;
+  padding: 4px 2px;
+  background: var(--color-background-base, #18181b);
+  color: var(--color-text-alt-2, #d3d3d9);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.skek-picker__grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+/* A fixed size here, whatever the chat's font size. BTTV gives no sizes, so an image that hasn't loaded yet
+   needs a width of its own to be seen as scrolling into view. */
+.skek-picker .skek-emote {
+  box-sizing: content-box;
+  min-width: 28px;
+  height: 28px;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.skek-picker .skek-emote:hover {
+  background: var(--color-background-button-text-hover, rgba(83, 83, 95, 0.48));
+}
+
+.skek-picker__empty {
+  margin: 16px 0;
+  color: var(--color-text-alt-2, #d3d3d9);
+  text-align: center;
+}

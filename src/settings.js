@@ -119,7 +119,7 @@
       key: 'chatEmotes',
       category: 'Chat',
       label: '7TV, BTTV and FFZ emotes',
-      hint: 'Shows these emotes in Twitch chat, including animated ones. Does nothing if you have one of their extensions, which shows them itself.',
+      hint: 'Shows these emotes in Twitch chat, including animated ones, with a button in the chat box to search and pick them. Does nothing if you have one of their extensions, which shows them itself.',
       default: true,
     },
     {
