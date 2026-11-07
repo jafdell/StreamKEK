@@ -31,6 +31,124 @@ vm.runInNewContext(readFileSync(new URL('../src/features/chat/chat-words.js', im
 const { addWords, wordPattern } = chatWordsContext.skek.chatWords;
 const matchesWords = (words, text) => new RegExp(wordPattern(words), 'iu').test(text);
 
+const chatEmotesContext = { skek: {}, window: {}, location: { ancestorOrigins: [] }, URL };
+vm.runInNewContext(readFileSync(new URL('../src/features/chat/emotes.js', import.meta.url), 'utf8'), chatEmotesContext);
+const { channelFromPath, videoFromPath, chatBoxAddition, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts, loadLists, allLoaded } = chatEmotesContext.skek.chatEmotes;
+const names = (emotes) => plain(emotes.map((emote) => emote.name));
+
+test('channelFromPath finds the channel in each address with chat, and nothing elsewhere', () => {
+  assert.equal(channelFromPath('/SodaPoppin'), 'sodapoppin');
+  assert.equal(channelFromPath('/sodapoppin/about'), 'sodapoppin');
+  assert.equal(channelFromPath('/popout/sodapoppin/chat'), 'sodapoppin');
+  assert.equal(channelFromPath('/embed/sodapoppin/chat'), 'sodapoppin');
+  assert.equal(channelFromPath('/moderator/sodapoppin'), 'sodapoppin');
+  assert.equal(channelFromPath('/popout/moderator/sodapoppin/chat'), 'sodapoppin');
+  for (const path of ['/', '/directory/following', '/videos/123', '/settings/profile', '/not.a.channel']) {
+    assert.equal(channelFromPath(path), null, path);
+  }
+});
+
+test('videoFromPath finds the video in its address, and nothing elsewhere', () => {
+  assert.equal(videoFromPath('/videos/2921120349'), '2921120349');
+  assert.equal(videoFromPath('/videos/2921120349/'), '2921120349');
+  for (const path of ['/', '/videos', '/videos/abc', '/sodapoppin/videos', '/sodapoppin']) {
+    assert.equal(videoFromPath(path), null, path);
+  }
+});
+
+test('loadLists leaves out a service that failed, and tries only that one again', async () => {
+  const calls = [];
+  const loaders = (ffzWorks) => ({
+    '7TV': async () => { calls.push('7TV'); return ['a']; },
+    FFZ: async () => { calls.push('FFZ'); if (!ffzWorks) throw new Error('down'); return ['b']; },
+    BTTV: async () => { calls.push('BTTV'); return []; },
+  });
+  const first = await loadLists(loaders(false));
+  assert.deepEqual(plain(Object.keys(first).sort()), ['7TV', 'BTTV']);
+  assert.ok(!allLoaded(first));
+
+  calls.length = 0;
+  const second = await loadLists(loaders(true), first);
+  assert.deepEqual(calls, ['FFZ']);
+  assert.ok(allLoaded(second));
+  assert.deepEqual(plain(second.FFZ), ['b']);
+});
+
+test('chatBoxAddition keeps an emote apart from what is already in the chat box', () => {
+  assert.equal(chatBoxAddition('', 'KEKW'), 'KEKW');
+  assert.equal(chatBoxAddition('\uFEFF', 'KEKW'), 'KEKW');
+  assert.equal(chatBoxAddition('hello', 'KEKW'), ' KEKW');
+  assert.equal(chatBoxAddition('hello ', 'KEKW'), 'KEKW');
+});
+
+test('sevenTvEmotes uses the name the channel gave it, and skips unlisted emotes and other image hosts', () => {
+  const emote = (name, listed = true, url = '//cdn.7tv.app/emote/abc') => ({
+    name,
+    data: { name: 'original', listed, host: { url, files: [{ width: 64, height: 32 }] } },
+  });
+  const emotes = sevenTvEmotes([emote('renamed'), emote('unlisted', false), emote('elsewhere', true, '//example.com/emote/abc'), emote('http', true, 'http://cdn.7tv.app/emote/abc'), {}]);
+  assert.deepEqual(plain(emotes), [{
+    name: 'renamed',
+    src: 'https://cdn.7tv.app/emote/abc/1x.webp',
+    srcset: 'https://cdn.7tv.app/emote/abc/1x.webp 1x, https://cdn.7tv.app/emote/abc/2x.webp 2x, https://cdn.7tv.app/emote/abc/4x.webp 4x',
+    width: 64,
+    height: 32,
+  }]);
+  assert.deepEqual(plain(sevenTvEmotes(undefined)), []);
+});
+
+test('bttvEmotes skips modifiers and an id that could change the address', () => {
+  const emotes = bttvEmotes([{ id: 'abc123', code: 'one' }, { id: 'def', code: 'w!', modifier: true }, { id: '../evil', code: 'two' }, { code: 'three' }]);
+  assert.deepEqual(names(emotes), ['one']);
+  assert.equal(emotes[0].src, 'https://cdn.betterttv.net/emote/abc123/1x.webp');
+});
+
+test('ffzEmotes prefers moving images, keeps the sizes that exist, and skips effects and other image hosts', () => {
+  const cdn = 'https://cdn.frankerfacez.com/emote';
+  const emotes = ffzEmotes([{
+    emoticons: [
+      { name: 'moving', width: 32, height: 32, urls: { 1: `${cdn}/1/1` }, animated: { 1: `${cdn}/1/animated/1`, 2: `${cdn}/1/animated/2` } },
+      { name: 'small', urls: { 1: `${cdn}/2/1` } },
+      { name: 'effect', modifier: true, urls: { 1: `${cdn}/3/1` } },
+      { name: 'elsewhere', urls: { 1: 'https://example.com/4/1' } },
+    ],
+  }]);
+  assert.deepEqual(names(emotes), ['moving', 'small']);
+  assert.equal(emotes[0].srcset, `${cdn}/1/animated/1 1x, ${cdn}/1/animated/2 2x`);
+  assert.equal(emotes[1].srcset, `${cdn}/2/1 1x`);
+});
+
+test('ffzGlobalSets leaves out sets not everyone gets', () => {
+  const sets = ffzGlobalSets({ default_sets: [3], sets: { 3: { title: 'everyone' }, 9: { title: 'subscribers' } } });
+  assert.deepEqual(plain(sets), [{ title: 'everyone' }]);
+  assert.deepEqual(plain(ffzGlobalSets(null)), []);
+});
+
+test('mergeEmotes puts channel emotes before global ones, then 7TV, FFZ and BTTV', () => {
+  const emote = (name, service) => ({ name, service });
+  const table = mergeEmotes(
+    { '7TV': [emote('a', '7TV')], FFZ: [emote('a', 'FFZ'), emote('b', 'FFZ')], BTTV: [emote('a', 'BTTV'), emote('b', 'BTTV'), emote('c', 'BTTV')] },
+    { '7TV': [emote('c', '7TV'), emote('d', '7TV')], FFZ: [emote('d', 'FFZ'), emote('e', 'FFZ')], BTTV: [emote('e', 'BTTV')] },
+  );
+  const winners = Object.fromEntries([...table].map(([name, { service }]) => [name, service]));
+  assert.deepEqual(plain(winners), { a: '7TV', b: 'FFZ', c: 'BTTV', d: '7TV', e: 'FFZ' });
+  assert.equal(table.has('constructor'), false);
+});
+
+test('mergeEmotes stops at its limit and copes with a service that failed', () => {
+  const many = Array.from({ length: 10_001 }, (_, index) => ({ name: `emote${index}` }));
+  assert.equal(mergeEmotes({ '7TV': many }, {}).size, 10_000);
+  assert.equal(mergeEmotes({}, {}).size, 0);
+});
+
+test('messageParts swaps only exact words and keeps the spacing around them', () => {
+  const kekw = { name: 'KEKW' };
+  const table = new Map([['KEKW', kekw]]);
+  assert.deepEqual(plain(messageParts('that was KEKW  great KEKW', table)), ['that was ', kekw, '  great ', kekw]);
+  assert.deepEqual(plain(messageParts('KEKW', table)), [kekw]);
+  assert.equal(messageParts('kekw KEKW, aKEKW constructor', table), null);
+});
+
 test('addWords splits on commas, tidies spaces and skips repeats in any case', () => {
   assert.deepEqual(plain(addWords(['Spoiler'], ' spoiler, new  phrase ,,KEKW\nother')), ['Spoiler', 'new phrase', 'KEKW', 'other']);
   assert.deepEqual(plain(addWords([], 'x'.repeat(81))), []);

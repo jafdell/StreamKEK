@@ -176,6 +176,11 @@ test("Twitch's page scripts load in their manifest order", () => {
   assert.doesNotThrow(loadTwitchScripts);
 });
 
+// Favorites swallows errors from this call, so a missing helper would only show as stale favorites.
+test("Twitch's API helper is there for the scripts that use it", () => {
+  assert.equal(typeof loadTwitchScripts().skek.twitchGql, 'function');
+});
+
 test('everything the streams files use from the shared object exists', () => {
   const { skek } = loadTwitchScripts();
   const files = filesIn('src/features/streams/twitch').filter((path) => path.endsWith('.js'));

@@ -7,6 +7,31 @@ html[data-skek-chat-font] .video-chat__message-list-wrapper {
   font-size: var(--skek-chat-font-size) !important;
 }
 
+/* Emotes follow the text, both ways, and stay about as tall as a line so rows don't jump. A font of
+   20px keeps the 28px Twitch normally uses. The custom emotes in emotes.css use this too. Twitch
+   fixes the size of the boxes around its own emotes as well, so those have to let go. */
+html[data-skek-chat-font] {
+  --skek-emote-height: calc(var(--skek-chat-font-size) + 8px);
+}
+html[data-skek-chat-font] .chat-line__message--emote-button,
+html[data-skek-chat-font] .chat-line__message--emote-button :is(div, button),
+html[data-skek-chat-font] .video-chat__message div:has(img.chat-line__message--emote) {
+  width: auto !important;
+  height: auto !important;
+}
+html[data-skek-chat-font] img.chat-line__message--emote {
+  width: auto !important;
+  height: var(--skek-emote-height) !important;
+  max-height: none !important;
+}
+
+/* The badges next to names too, keeping Twitch's 18px at a font of 20px. */
+html[data-skek-chat-font] [class*='chat-list--'] img.chat-badge,
+html[data-skek-chat-font] .video-chat__message-list-wrapper img.chat-badge {
+  width: calc(var(--skek-chat-font-size) * 0.9) !important;
+  height: calc(var(--skek-chat-font-size) * 0.9) !important;
+}
+
 /* Chat on videos has a separate list with a fixed line height and timestamp size, which
    would overlap or look tiny at bigger sizes. 1.5 is the line height of live chat. */
 html[data-skek-chat-font] .video-chat__message-list-wrapper {
