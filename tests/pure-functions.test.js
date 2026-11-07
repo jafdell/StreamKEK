@@ -56,6 +56,22 @@ test('videoFromPath finds the video in its address, and nothing elsewhere', () =
   }
 });
 
+const chatBoxContext = {};
+vm.runInNewContext(readFileSync(new URL('../src/features/chat/chat-box-emotes.js', import.meta.url), 'utf8'), chatBoxContext);
+const { finishedEmotes } = chatBoxContext.skekChatBoxEmotes;
+
+test('finishedEmotes only finds whole emote names the cursor has left, last first', () => {
+  const table = new Map([['KEK', {}], ['KEKW', {}], ['EZ', {}]]);
+  const found = (text, caret) => plain(finishedEmotes(text, caret, table)).map(({ name, start }) => `${name}@${start}`);
+  assert.deepEqual(found('hi KEK', 6), [], 'the cursor is right after it');
+  assert.deepEqual(found('hi KEK', 4), [], 'the cursor is inside it');
+  assert.deepEqual(found('hi KEK ', 7), ['KEK@3'], 'a space was typed after it');
+  assert.deepEqual(found('hi KEKW', 7), []);
+  assert.deepEqual(found('hi KEKW', 0), ['KEKW@3'], 'the cursor moved away');
+  assert.deepEqual(found('KEK EZ', null), ['EZ@4', 'KEK@0'], 'the cursor is in another piece of the text');
+  assert.deepEqual(found('KEKWW constructor', null), []);
+});
+
 test('loadLists leaves out a service that failed, and tries only that one again', async () => {
   const calls = [];
   const loaders = (ffzWorks) => ({
@@ -75,10 +91,10 @@ test('loadLists leaves out a service that failed, and tries only that one again'
 });
 
 test('chatBoxAddition keeps an emote apart from what is already in the chat box', () => {
-  assert.equal(chatBoxAddition('', 'KEKW'), 'KEKW');
-  assert.equal(chatBoxAddition('\uFEFF', 'KEKW'), 'KEKW');
-  assert.equal(chatBoxAddition('hello', 'KEKW'), ' KEKW');
-  assert.equal(chatBoxAddition('hello ', 'KEKW'), 'KEKW');
+  assert.equal(chatBoxAddition('', 'KEKW'), 'KEKW ');
+  assert.equal(chatBoxAddition('\uFEFF', 'KEKW'), 'KEKW ');
+  assert.equal(chatBoxAddition('hello', 'KEKW'), ' KEKW ');
+  assert.equal(chatBoxAddition('hello ', 'KEKW'), 'KEKW ');
 });
 
 test('sevenTvEmotes uses the name the channel gave it, and skips unlisted emotes and other image hosts', () => {

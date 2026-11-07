@@ -104,6 +104,17 @@
     },
     {
       "matches": [
+        "https://www.twitch.tv/*"
+      ],
+      "js": [
+        "src/features/chat/chat-box-emotes.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
         "https://player.twitch.tv/*"
       ],
       "js": [

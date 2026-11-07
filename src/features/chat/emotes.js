@@ -131,10 +131,10 @@
   }
 
   // What to add to the chat box to put an emote after what's there, which it marks as empty with a
-  // zero-width character.
+  // zero-width character. The space after it finishes the word, so the box shows its image straight away.
   function chatBoxAddition(current, name) {
     const text = current.replace(/\uFEFF/g, '');
-    return text && !/\s$/.test(text) ? ` ${name}` : name;
+    return text && !/\s$/.test(text) ? ` ${name} ` : `${name} `;
   }
 
   // Each service on its own, so one being down doesn't stop the others. One that fails is left out of
@@ -308,6 +308,11 @@
     return (await skek.twitchGql(CHANNEL_ID_QUERY, { login }, signal))?.user?.id;
   }
 
+  // chat-box-emotes.js runs in Twitch's own page, so it can't read the table from here.
+  function shareTable() {
+    document.dispatchEvent(new CustomEvent('skek-emote-table', { detail: JSON.stringify(table ? [...table] : []) }));
+  }
+
   async function loadMissingLists() {
     retryAt = null;
     const { login, videoId } = lookup;
@@ -333,6 +338,7 @@
     if (controller.signal.aborted) return;
     channelLists = lists;
     table = mergeEmotes(lists, global);
+    shareTable();
     document.querySelectorAll(MESSAGE_TEXT).forEach(swapEmotes);
     const complete = !idFailed && allLoaded(global) && (!id || allLoaded(lists));
     if (!complete && retriesLeft > 0) {
@@ -344,6 +350,7 @@
   function loadChannel(login, videoId) {
     loading?.abort();
     table = null;
+    shareTable();
     channelLists = {};
     retryAt = null;
     retriesLeft = MAX_RETRIES;
@@ -415,6 +422,7 @@
     loading?.abort();
     loading = null;
     table = null;
+    shareTable();
     globalLists = null;
     channelLists = {};
     lookup = null;
