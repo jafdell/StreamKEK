@@ -133,11 +133,25 @@
   // What to add to the chat box to put an emote after what's there, which it marks as empty with a
   // zero-width character.
   function chatBoxAddition(current, name) {
-    const text = current.replace(/﻿/g, '');
+    const text = current.replace(/FEFF/g, '');
     return text && !/\s$/.test(text) ? ` ${name}` : name;
   }
 
-  skek.chatEmotes = { channelFromPath, videoFromPath, chatBoxAddition, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts };
+  // Each service on its own, so one being down doesn't stop the others. One that fails is left out of
+  // the result, and passing that result back in tries only what's missing.
+  async function loadLists(loaders, held = {}) {
+    const missing = SERVICES.filter((service) => !held[service]);
+    const results = await Promise.allSettled(missing.map((service) => loaders[service]()));
+    const lists = { ...held };
+    missing.forEach((service, index) => {
+      if (results[index].status === 'fulfilled') lists[service] = results[index].value;
+    });
+    return lists;
+  }
+
+  const allLoaded = (lists) => SERVICES.every((service) => lists[service]);
+
+  skek.chatEmotes = { channelFromPath, videoFromPath, chatBoxAddition, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts, loadLists, allLoaded };
 
   // Twitch's pages and its chat in the multi-stream view, but not that chat on other websites.
   if (window !== window.top && !location.ancestorOrigins[0]?.endsWith('.twitch.tv')) return;
@@ -148,6 +162,9 @@
   const CHAT_BOX_CARET_MS = 150;
   const CHANNEL_ID_QUERY = 'query($login:String!){user(login:$login){id}}';
   const VIDEO_OWNER_QUERY = 'query($id:ID!){video(id:$id){owner{id}}}';
+  // A list that failed to download is tried again on the first message after this long, a few times.
+  const RETRY_MS = 60_000;
+  const MAX_RETRIES = 5;
   // How far the tooltip sits from its emote, and from the window's edge.
   const TIP_GAP = 10;
   const TIP_EDGE = 4;
@@ -155,10 +172,14 @@
   let tip = null;
   let tipEmote = null;
   let table = null;
-  let lastPath = null;
+  let lastPlace = null;
   let channel = null;
+  let lookup = null;
   let loading = null;
   let globalLists = null;
+  let channelLists = {};
+  let retryAt = null;
+  let retriesLeft = 0;
 
   // Someone with one of these already sees emotes the way they set it up. BTTV leaves no mark on the
   // page until it draws its first emote.
@@ -170,16 +191,12 @@
       || document.getElementsByClassName('bttv-emote').length > 0;
   }
 
-  // A channel that doesn't use a service gets a 404 from it.
+  // A channel that doesn't use a service gets a 404 from it. Any other error means try again later.
   async function fetchJson(url, signal) {
     const response = await fetch(url, { signal });
-    return response.ok ? response.json() : null;
-  }
-
-  // Each service on its own, so one being down doesn't stop the others.
-  async function loadLists(loaders) {
-    const results = await Promise.allSettled(SERVICES.map((service) => loaders[service]()));
-    return Object.fromEntries(SERVICES.map((service, index) => [service, results[index].value ?? []]));
+    if (response.status === 404) return null;
+    if (!response.ok) throw new Error(`${url} answered ${response.status}`);
+    return response.json();
   }
 
   const globalLoaders = (signal) => ({
@@ -291,33 +308,59 @@
     return (await skek.twitchGql(CHANNEL_ID_QUERY, { login }, signal))?.user?.id;
   }
 
-  async function loadChannel(login, videoId) {
-    loading?.abort();
-    table = null;
-    if (!login && !videoId) return;
+  async function loadMissingLists() {
+    retryAt = null;
+    const { login, videoId } = lookup;
     const controller = new AbortController();
     loading = controller;
     const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(TIMEOUT_MS)]);
     // Global lists aren't tied to this channel, so changing channel doesn't cancel them.
-    globalLists ??= loadLists(globalLoaders(AbortSignal.timeout(TIMEOUT_MS)));
+    const globalLoad = (globalLists ?? Promise.resolve({}))
+      .then((held) => loadLists(globalLoaders(AbortSignal.timeout(TIMEOUT_MS)), held));
+    globalLists = globalLoad;
 
-    const id = await channelId(login, videoId, signal).catch(() => null);
-    const [channelLists, global] = await Promise.all([
-      /^\d+$/.test(id ?? '') ? loadLists(channelLoaders(id, signal)) : {},
-      globalLists,
+    let id = null;
+    let idFailed = false;
+    try {
+      id = await channelId(login, videoId, signal);
+    } catch {
+      idFailed = true;
+    }
+    const [lists, global] = await Promise.all([
+      /^\d+$/.test(id ?? '') ? loadLists(channelLoaders(id, signal), channelLists) : channelLists,
+      globalLoad,
     ]);
     if (controller.signal.aborted) return;
-    table = mergeEmotes(channelLists, global);
+    channelLists = lists;
+    table = mergeEmotes(lists, global);
     document.querySelectorAll(MESSAGE_TEXT).forEach(swapEmotes);
+    const complete = !idFailed && allLoaded(global) && (!id || allLoaded(lists));
+    if (!complete && retriesLeft > 0) {
+      retriesLeft -= 1;
+      retryAt = Date.now() + RETRY_MS;
+    }
+  }
+
+  function loadChannel(login, videoId) {
+    loading?.abort();
+    table = null;
+    channelLists = {};
+    retryAt = null;
+    retriesLeft = MAX_RETRIES;
+    lookup = login || videoId ? { login, videoId } : null;
+    if (lookup) loadMissingLists();
   }
 
   function syncChannel() {
-    if (location.pathname === lastPath) return;
-    lastPath = location.pathname;
-    // The stream view's address, like /kick/<channel>, isn't a Twitch channel.
+    // The stream view can still be closing when the address has already changed to a Twitch channel,
+    // so the view going away counts as a change too.
     const inView = !!document.getElementById('skek-view');
-    const videoId = inView ? null : videoFromPath(lastPath);
-    const login = inView || videoId ? null : channelFromPath(lastPath);
+    const place = `${location.pathname} ${inView}`;
+    if (place === lastPlace) return;
+    lastPlace = place;
+    // The stream view's address, like /kick/<channel>, isn't a Twitch channel.
+    const videoId = inView ? null : videoFromPath(location.pathname);
+    const login = inView || videoId ? null : channelFromPath(location.pathname);
     const source = videoId ? `video ${videoId}` : login;
     if (source === channel) return;
     channel = source;
@@ -332,6 +375,7 @@
       return;
     }
     syncChannel();
+    if (retryAt && Date.now() >= retryAt) loadMissingLists();
     if (table) textElements.forEach(swapEmotes);
   }
 
@@ -372,7 +416,10 @@
     loading = null;
     table = null;
     globalLists = null;
-    lastPath = null;
+    channelLists = {};
+    lookup = null;
+    retryAt = null;
+    lastPlace = null;
     channel = null;
     for (const image of document.querySelectorAll('img.skek-emote')) image.replaceWith(image.alt);
   }

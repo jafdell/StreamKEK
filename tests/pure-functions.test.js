@@ -33,7 +33,7 @@ const matchesWords = (words, text) => new RegExp(wordPattern(words), 'iu').test(
 
 const chatEmotesContext = { skek: {}, window: {}, location: { ancestorOrigins: [] }, URL };
 vm.runInNewContext(readFileSync(new URL('../src/features/chat/emotes.js', import.meta.url), 'utf8'), chatEmotesContext);
-const { channelFromPath, videoFromPath, chatBoxAddition, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts } = chatEmotesContext.skek.chatEmotes;
+const { channelFromPath, videoFromPath, chatBoxAddition, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts, loadLists, allLoaded } = chatEmotesContext.skek.chatEmotes;
 const names = (emotes) => plain(emotes.map((emote) => emote.name));
 
 test('channelFromPath finds the channel in each address with chat, and nothing elsewhere', () => {
@@ -56,9 +56,27 @@ test('videoFromPath finds the video in its address, and nothing elsewhere', () =
   }
 });
 
+test('loadLists leaves out a service that failed, and tries only that one again', async () => {
+  const calls = [];
+  const loaders = (ffzWorks) => ({
+    '7TV': async () => { calls.push('7TV'); return ['a']; },
+    FFZ: async () => { calls.push('FFZ'); if (!ffzWorks) throw new Error('down'); return ['b']; },
+    BTTV: async () => { calls.push('BTTV'); return []; },
+  });
+  const first = await loadLists(loaders(false));
+  assert.deepEqual(plain(Object.keys(first).sort()), ['7TV', 'BTTV']);
+  assert.ok(!allLoaded(first));
+
+  calls.length = 0;
+  const second = await loadLists(loaders(true), first);
+  assert.deepEqual(calls, ['FFZ']);
+  assert.ok(allLoaded(second));
+  assert.deepEqual(plain(second.FFZ), ['b']);
+});
+
 test('chatBoxAddition keeps an emote apart from what is already in the chat box', () => {
   assert.equal(chatBoxAddition('', 'KEKW'), 'KEKW');
-  assert.equal(chatBoxAddition('﻿', 'KEKW'), 'KEKW');
+  assert.equal(chatBoxAddition('FEFF', 'KEKW'), 'KEKW');
   assert.equal(chatBoxAddition('hello', 'KEKW'), ' KEKW');
   assert.equal(chatBoxAddition('hello ', 'KEKW'), 'KEKW');
 });
