@@ -1,6 +1,6 @@
 # Contributing to StreamKEK
 
-Bugs and feature requests go in issues. To send a change: fork the repo, make a branch, make your change, run `node --test` (you'll need Node), walk the relevant part of [TESTING.md](TESTING.md), and open a pull request saying what you tried.
+Bugs and feature requests go in issues. To send a change: fork the repo, make a branch, make your change, run `node --test` (you'll need Node), walk the relevant part of [TESTING.md](TESTING.md), and open a pull request saying what you tried. Start its title with a verb that says what changed, and fill in the template.
 
 ## How it fits together
 

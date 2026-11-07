@@ -1,11 +1,17 @@
+One or two sentences on what this does and why.
+
 **What changed**
 
+- **Feature name:** what it does now.
 
-**What you tried** (see `TESTING.md`)
+**Tested** (see `TESTING.md`)
 
+- What you tried, and the `node --test` result.
 
-**What you couldn't try**
+**Not tested**
 
+- What you couldn't try, or "Nothing".
 
-**New permissions, and why** (or "none")
+**New permissions**
 
+None, or which ones and why.
