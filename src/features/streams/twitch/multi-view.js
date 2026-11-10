@@ -33,9 +33,13 @@
   // The stream whose bar is being dragged, with what shows while it is.
   let moving = null;
 
+  // The icon is only replaced when it changes, so the sound bars don't restart their animation each
+  // time the layout is worked out again, which happens many times while the window is resized.
   function setButton(button, label, iconName) {
     button.title = label;
     button.ariaLabel = label;
+    if (button.dataset.skekIcon === iconName) return;
+    button.dataset.skekIcon = iconName;
     button.replaceChildren(icon(iconName));
   }
 
@@ -294,7 +298,7 @@
     const { multi } = state;
     const { refs } = entry;
     const hasSound = multi.audioId === entry.id;
-    setButton(refs.audio, hasSound ? 'Mute this stream' : 'Listen to this stream', hasSound ? 'speaker' : 'speakerOff');
+    setButton(refs.audio, hasSound ? 'Mute this stream' : 'Listen to this stream', hasSound ? 'soundBars' : 'speakerOff');
     refs.audio.classList.toggle('skek-multi__button--on', hasSound);
     refs.chatButton.hidden = !multi.sharedChat;
     refs.chatButton.classList.toggle('skek-multi__button--on', entry.id === multi.chatId);
