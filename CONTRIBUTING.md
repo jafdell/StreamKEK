@@ -29,7 +29,7 @@ Features are in `src/features/`. `chat/`, `player/` and `sidebar/` match the set
 | Stream view | `streams/twitch/`: `stream-view.js` (the info bar, opening and closing), `view-frames.js` (the two frames), `view-layouts.js` (theatre, stacked and floating) |
 | Chat: font size, timestamps, what sits over chat, 7TV, BTTV and FFZ emotes (`emotes.js`, `chat-box-emotes.js` for the chat box and `emote-picker.js` for its button) | `src/features/chat/`. A site's chat is styled in its `frames/chat.css` |
 | Blocked and highlighted words | `chat/chat-words.js` and `.css`, for every site's chat, with each site's selectors in `MESSAGES`. Their lists are in `settings-window.js` |
-| Stream quality | `player/quality.js` (Twitch), and `frames/watch-start.js` in `youtube/` and `kick/` |
+| Stream quality | `player/quality.js` (Twitch, and Twitch's embedded player in multi-stream, which gets the setting from `player/embed-quality.js`), and `frames/watch-start.js` in `youtube/` and `kick/` |
 | Theatre, stacked and floating chat modes | `src/features/player/` (Twitch, plus `floating-window.js` and `.css`, which both use) and `streams/twitch/view-layouts.js` and `stream-view.css` (other sites). `streams/frames/layout-keys.js` forwards the shortcuts from inside their frames, and `chat-settings.js` there and each site's `chat.css` make floating chat see-through. Theatre on Twitch is Twitch's own. Stacked and floating exist twice, so change both |
 | Sidebar previews | `sidebar/preview.js` (Twitch channels) and `streams/twitch/stream-tip.js` (other sites) |
 | Favorites | `streams/twitch/favorites.js` and `.css`. Twitch's channels there are read from Twitch's own API in the page, not from `sites.js` |

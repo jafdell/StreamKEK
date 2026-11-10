@@ -22,7 +22,7 @@ In a pull request, say what you tried and what you couldn't.
 | Following page | The **YouTube** and **Kick** tabs and the **YouTube live** and **Kick live** sections |
 | Theatre, stacked or floating chat | The button, Alt key and Esc, on a YouTube stream, a Kick stream, a Twitch stream and a Twitch video. The video shouldn't restart |
 | Floating chat | Also dragging, resizing, the slider, typing a message, and double-clicking the video to leave fullscreen |
-| Stream quality | Each choice on a Twitch, a YouTube and a Kick stream, and a size the stream doesn't offer |
+| Stream quality | Each choice on a Twitch, a YouTube and a Kick stream, and a size the stream doesn't offer. A Twitch stream in multi-stream too, and changing the setting while it plays |
 | Chat settings | Twitch chat, chat on a Twitch video, YouTube chat and Kick chat, with and without [7TV](https://7tv.app) |
 | Show YouTube Live and Show Kick Live | Each section goes away when switched off, in the expanded and collapsed sidebar. Hide YouTube Live, if you had it on, carries over as Show YouTube Live off |
 | Sidebar previews | Hovering a live and an offline channel, near the top and bottom of the window, in the expanded and collapsed sidebar, on Twitch, YouTube and Kick channels, and each stream of a YouTube channel with several. With the setting off, no images show, and the titles and stream list still do |
