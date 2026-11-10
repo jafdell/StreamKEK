@@ -24,6 +24,7 @@ body:
         - Twitch streams
         - Twitch videos
         - YouTube streams
+        - Kick streams
         - Settings
     validations:
       required: false

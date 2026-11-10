@@ -2,7 +2,7 @@
 
 StreamKEK gives you more control over watching and chatting on Twitch, and brings YouTube and Kick live streams and their chat there too.
 
-Unofficial: not affiliated with or endorsed by Twitch or YouTube. It changes how their pages work, which their terms may not allow, so use it at your own risk.
+Unofficial: not affiliated with or endorsed by Twitch, YouTube or Kick. It changes how their pages work, which their terms may not allow, so use it at your own risk.
 
 Works in Chrome, Brave and other Chromium browsers. No API key or account needed.
 
@@ -50,7 +50,7 @@ Open the settings from the extension's icon in Twitch's top bar or the browser t
 
 ## Feedback and contributing
 
-Found a bug or have an idea? Open an issue, for both bug reports and feature requests, or use the **Feedback** links in the settings window. Before reporting a bug, please turn off your other Twitch extensions and check that it still happens, since they can change the same parts of the page. It also helps to say which browser you use and what you were watching: a Twitch stream, a Twitch video or a YouTube stream.
+Found a bug or have an idea? Open an issue, for both bug reports and feature requests, or use the **Feedback** links in the settings window. Before reporting a bug, please turn off your other Twitch extensions and check that it still happens, since they can change the same parts of the page. It also helps to say which browser you use and what you were watching: a Twitch stream, a Twitch video, a YouTube stream or a Kick stream.
 
 Pull requests are welcome too. For a bigger change, open an issue first so we can talk it through. [CONTRIBUTING.md](CONTRIBUTING.md) covers how the code is laid out and how to add a setting or a feature, and [TESTING.md](TESTING.md) lists what to check by hand.
 
