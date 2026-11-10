@@ -1,8 +1,8 @@
 // The settings shown in the settings window. Add a setting here and its searchable
 // row, its category and its storage default exist automatically; see CONTRIBUTING.md.
 // `key` is also the chrome.storage.local key, so never rename one after release.
-// Also loaded in YouTube's frames, for the defaults. It only adds `skek` to the extension's own
-// world there, which the page can't see.
+// Also loaded in YouTube's and Kick's frames and Twitch's embedded player, for the defaults.
+// It only adds `skek` to the extension's own world there, which the page can't see.
 // `category` is where it's listed. Categories, and the items in each, show in alphabetical order.
 // `message` is optional: the window sends { type: message, enabled } to the background instead
 // of writing storage itself, for a setting that has background work to do when it changes.

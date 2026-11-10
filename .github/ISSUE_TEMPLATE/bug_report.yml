@@ -14,7 +14,7 @@ body:
     attributes:
       label: StreamKEK version
       description: Shown at the bottom left of the settings window.
-      placeholder: 1.4.1
+      placeholder: 1.4.2
     validations:
       required: true
   - type: input
@@ -32,6 +32,7 @@ body:
         - A Twitch stream
         - A Twitch video
         - A YouTube stream
+        - A Kick stream
         - Something else
     validations:
       required: true
