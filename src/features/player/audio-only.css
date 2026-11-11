@@ -1,6 +1,6 @@
 /* Audio only on Twitch's own player. audio-only.js says what the attributes mean. */
 
-/* No answer from the player means it can't switch: a video, a clip, or Twitch changed its player. */
+/* No answer from the player means it can't switch: a clip, or Twitch changed its player. */
 html:not([data-skek-audio-state]) .skek-player-button--audio {
   display: none !important;
 }

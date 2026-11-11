@@ -1,6 +1,7 @@
-// Audio only on Twitch's own player: a live stream's sound with no video, which the browser then
-// neither downloads nor decodes. This file is the button in the player controls and Alt+A.
-// audio-only-player.js, in the page itself, switches the player. They talk through <html>:
+// Audio only on Twitch's own player: the sound of a live stream or a Twitch video with no
+// picture, which the browser then neither downloads nor decodes. This file is the button in the
+// player controls and Alt+A. audio-only-player.js, in the page itself, switches the player.
+// They talk through <html>:
 // data-skek-audio-only asks for audio, and data-skek-audio-state is the player's answer, 'off'
 // where it could switch and 'on' while it plays audio. audio-only.css shows the button only
 // where there's an answer.
