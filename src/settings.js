@@ -144,6 +144,13 @@
       default: true,
     },
     {
+      key: 'keepBackgroundQuality',
+      category: 'Player',
+      label: 'Keep quality in background tabs',
+      hint: "Stops Twitch lowering a live stream to 360p about a minute after you switch to another tab or minimize the window. A stream in the background then uses as much data as one you're watching.",
+      default: false,
+    },
+    {
       key: 'streamQuality',
       category: 'Player',
       label: 'Stream quality',

@@ -105,7 +105,8 @@
       "js": [
         "src/features/player/quality.js",
         "src/features/player/audio-only-player.js",
-        "src/features/player/auto-reload.js"
+        "src/features/player/auto-reload.js",
+        "src/features/player/background-quality.js"
       ],
       "run_at": "document_idle",
       "world": "MAIN"
@@ -140,7 +141,8 @@
       ],
       "js": [
         "src/features/player/quality.js",
-        "src/features/player/auto-reload.js"
+        "src/features/player/auto-reload.js",
+        "src/features/player/background-quality.js"
       ],
       "all_frames": true,
       "run_at": "document_idle",
