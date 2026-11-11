@@ -104,7 +104,8 @@
       ],
       "js": [
         "src/features/player/quality.js",
-        "src/features/player/audio-only-player.js"
+        "src/features/player/audio-only-player.js",
+        "src/features/player/auto-reload.js"
       ],
       "run_at": "document_idle",
       "world": "MAIN"
@@ -128,7 +129,7 @@
         "src/settings.js",
         "src/features/streams/frames/layout-keys.js",
         "src/features/streams/frames/audio.js",
-        "src/features/player/embed-quality.js"
+        "src/features/player/embed-settings.js"
       ],
       "all_frames": true,
       "run_at": "document_start"
@@ -138,7 +139,8 @@
         "https://player.twitch.tv/*"
       ],
       "js": [
-        "src/features/player/quality.js"
+        "src/features/player/quality.js",
+        "src/features/player/auto-reload.js"
       ],
       "all_frames": true,
       "run_at": "document_idle",

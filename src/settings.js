@@ -137,6 +137,13 @@
       default: false,
     },
     {
+      key: 'autoReloadPlayer',
+      category: 'Player',
+      label: 'Reload player on errors',
+      hint: "Reloads Twitch's player when a stream or video stops with an error like #2000, so you don't have to. Gives up after a few tries if the error keeps coming back.",
+      default: true,
+    },
+    {
       key: 'streamQuality',
       category: 'Player',
       label: 'Stream quality',
