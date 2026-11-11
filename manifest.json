@@ -67,8 +67,10 @@
         "src/features/chat/chat-words.js",
         "src/features/chat/emotes.js",
         "src/features/chat/emote-picker.js",
+        "src/features/player/control-buttons.js",
         "src/features/player/floating-window.js",
-        "src/features/player/modes.js"
+        "src/features/player/modes.js",
+        "src/features/player/audio-only.js"
       ],
       "css": [
         "src/twitch/base.css",
@@ -84,6 +86,7 @@
         "src/features/chat/emote-picker.css",
         "src/features/player/extensions.css",
         "src/features/player/modes.css",
+        "src/features/player/audio-only.css",
         "src/features/player/floating-window.css",
         "src/features/streams/twitch/sidebar.css",
         "src/features/streams/twitch/favorites.css",
@@ -100,7 +103,8 @@
         "https://www.twitch.tv/*"
       ],
       "js": [
-        "src/features/player/quality.js"
+        "src/features/player/quality.js",
+        "src/features/player/audio-only-player.js"
       ],
       "run_at": "document_idle",
       "world": "MAIN"

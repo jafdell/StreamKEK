@@ -8,7 +8,8 @@
 (() => {
   'use strict';
 
-  const { icon, onBodyReady, onPageChange } = skek.helpers;
+  const { onBodyReady, onPageChange } = skek.helpers;
+  const { FULLSCREEN, controlItem, theatreItems, buildButton } = skek.playerButtons;
 
   // In the order they sit in the control bar, left to right.
   const MODES = {
@@ -16,7 +17,6 @@
     stacked: { label: 'Stacked mode', shortcut: 'KeyS', tooltip: 'StreamKEK (Alt+S)', icon: 'stacked' },
   };
   const BUTTON_CLASS = 'skek-mode-button';
-  const FULLSCREEN = '[data-a-target="player-fullscreen-button"]';
   const COLLAPSE = '[data-a-target="right-column__toggle-collapse-btn"]';
   const root = document.documentElement;
 
@@ -60,39 +60,14 @@
 
   const toggleMode = (name) => setMode(mode === name ? null : name);
 
-  // The control-bar item a button sits in: the wrapper that has its neighbours beside it.
-  function controlItem(node) {
-    let item = node;
-    while (item.parentElement && item.parentElement.children.length < 3) item = item.parentElement;
-    return item;
-  }
-
-  function buildButton(template, name) {
-    const item = template.cloneNode(true);
-    item.classList.add(BUTTON_CLASS, `${BUTTON_CLASS}--${name}`);
-    // On the wrapper, because Twitch's button clips what's outside it.
-    item.dataset.skekTooltip = MODES[name].tooltip;
-    const button = item.querySelector('button');
-    const svg = icon(MODES[name].icon).firstElementChild;
-    svg.setAttribute('width', '24');
-    svg.setAttribute('height', '24');
-    button.querySelector('svg').replaceWith(svg);
-    button.addEventListener('click', () => toggleMode(name));
-    return item;
-  }
-
   function addButtons() {
     // A player with no chat beside it, like the front page's, has no chat to move.
     if (!document.querySelector('.right-column')) return;
-    for (const fullscreen of document.querySelectorAll(FULLSCREEN)) {
-      // Theatre's button is the one with nothing to identify it but its place before fullscreen's.
-      // It's the one to copy, too: other extensions add their buttons beside fullscreen's.
-      const theatre = controlItem(fullscreen).previousElementSibling;
-      if (!theatre?.querySelector('button')) continue;
-      for (const name of Object.keys(MODES)) {
-        if (!theatre.parentElement.querySelector(`:scope > .${BUTTON_CLASS}--${name}`)) {
-          theatre.before(buildButton(theatre, name));
-        }
+    for (const theatre of theatreItems()) {
+      for (const [name, { tooltip, icon }] of Object.entries(MODES)) {
+        if (theatre.parentElement.querySelector(`:scope > .${BUTTON_CLASS}--${name}`)) continue;
+        const classes = [BUTTON_CLASS, `${BUTTON_CLASS}--${name}`];
+        theatre.before(buildButton(theatre, { classes, tooltip, icon, onClick: () => toggleMode(name) }));
       }
     }
     updateButtons();

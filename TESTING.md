@@ -22,6 +22,7 @@ In a pull request, say what you tried and what you couldn't.
 | A site's `watch.js` | Its stream still plays, filling the frame. A `/watch` or Kick channel page in a frame nested inside another frame on Twitch still shows only the player |
 | Following page | The **YouTube** and **Kick** tabs and the **YouTube live** and **Kick live** sections |
 | Theatre, stacked or floating chat | The button, Alt key and Esc, on a YouTube stream, a Kick stream, a Twitch stream and a Twitch video. The video shouldn't restart |
+| Audio only | On a live Twitch stream, the headphones button and Alt+A each switch to sound with no video and back, with **Audio only** over the black player and chat still moving. The same in theatre, stacked and floating chat, without leaving the mode. More than 20 minutes after the stream loaded, switching reloads the page once, into audio or back to video, and switching again right after doesn't reload. Changing channel while in audio stays in audio. No button on a Twitch video or clip, the front page, a YouTube or Kick stream, or in multi-stream |
 | Floating chat | Also dragging, resizing, the slider, typing a message, and double-clicking the video to leave fullscreen |
 | Stream quality | Each choice on a Twitch, a YouTube and a Kick stream, and a size the stream doesn't offer. A Twitch stream in multi-stream too, and changing the setting while it plays |
 | Chat settings | Twitch chat, chat on a Twitch video, YouTube chat and Kick chat, with and without [7TV](https://7tv.app) |
