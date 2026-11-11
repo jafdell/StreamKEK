@@ -109,6 +109,13 @@
       default: false,
     },
     {
+      key: 'showDeletedMessages',
+      category: 'Chat',
+      label: 'See deleted messages',
+      hint: 'Keeps a message readable in Twitch chat after a moderator deletes it, or times out or bans whoever wrote it. It shows faded and crossed out, and its links no longer open. Only on live streams, and only for messages that were in chat before they were deleted.',
+      default: false,
+    },
+    {
       key: 'autoClaimPoints',
       category: 'Chat',
       label: 'Auto-claim channel points',
@@ -134,6 +141,20 @@
       category: 'Player',
       label: 'Hide extensions over the video',
       hint: "Removes what streamers' Twitch extensions show over the video, like Prime Benefits and the icons on its right edge. Twitch's own player controls stay.",
+      default: false,
+    },
+    {
+      key: 'autoReloadPlayer',
+      category: 'Player',
+      label: 'Reload player on errors',
+      hint: "Reloads Twitch's player when a stream or video stops with an error like #2000, so you don't have to. Gives up after a few tries if the error keeps coming back.",
+      default: true,
+    },
+    {
+      key: 'keepBackgroundQuality',
+      category: 'Player',
+      label: 'Keep quality in background tabs',
+      hint: "Stops Twitch lowering a live stream to 360p about a minute after you switch to another tab or minimize the window. A stream in the background then uses as much data as one you're watching.",
       default: false,
     },
     {

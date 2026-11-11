@@ -5,7 +5,7 @@
 // offer, so it can't fall back to the next one down. Runs in the page itself, because reaching
 // the player means going through React's internals. src/twitch/page-sync.js sets the attribute.
 // Also runs in Twitch's embedded player, player.twitch.tv, for the multi-stream view, where
-// embed-quality.js sets it. The player is found the same way there.
+// embed-settings.js sets it. The player is found the same way there.
 (() => {
   'use strict';
 

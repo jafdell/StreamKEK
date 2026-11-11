@@ -17,6 +17,9 @@ It works in Chrome, Brave and other Chromium browsers, with no API key and no ex
 - **Floating chat (Alt+C):** watch Twitch, YouTube or Kick fullscreen with chat in a window you can move, resize and make see-through.
 - **Stacked mode (Alt+S):** the stream at full width with chat under it, for narrow windows.
 - **Theatre mode (Alt+T):** on YouTube and Kick streams, like Twitch's own.
+- **Audio only (Alt+A):** listen to a Twitch stream or video without the picture, which saves data and battery.
+- **Keep quality in background tabs:** stop Twitch lowering a live stream to 360p when its tab is in the background. Off by default.
+- **Reload player on errors:** Twitch's player reloads itself when a stream stops with an error, instead of you doing it by hand.
 - **Stream quality:** choose what streams start at on Twitch, YouTube and Kick, up to 1440p.
 - **Stream previews:** hover a live channel in the sidebar to see an image of its stream.
 
@@ -26,6 +29,7 @@ It works in Chrome, Brave and other Chromium browsers, with no API key and no ex
 - **Autocomplete emotes with Tab:** type the start of an emote's name in Twitch chat and press Tab. Off by default.
 - **Blocked and highlighted words:** remove messages containing the words you choose, or make them stand out, in Twitch, YouTube and Kick chat.
 - **Chat font size:** one text size for Twitch, YouTube and Kick chat.
+- **See deleted messages:** keep reading a message in Twitch chat after a moderator deletes it. Off by default.
 - **Cleaner chat:** hide Twitch chat's timestamps, top strip, drops, pinned messages and Hype Train.
 
 ### A tidier Twitch

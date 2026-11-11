@@ -65,10 +65,13 @@
         "src/features/sidebar/current-channel.js",
         "src/features/chat/claim-points.js",
         "src/features/chat/chat-words.js",
+        "src/features/chat/deleted-messages.js",
         "src/features/chat/emotes.js",
         "src/features/chat/emote-picker.js",
+        "src/features/player/control-buttons.js",
         "src/features/player/floating-window.js",
-        "src/features/player/modes.js"
+        "src/features/player/modes.js",
+        "src/features/player/audio-only.js"
       ],
       "css": [
         "src/twitch/base.css",
@@ -80,10 +83,12 @@
         "src/features/chat/timestamps.css",
         "src/features/chat/sections.css",
         "src/features/chat/chat-words.css",
+        "src/features/chat/deleted-messages.css",
         "src/features/chat/emotes.css",
         "src/features/chat/emote-picker.css",
         "src/features/player/extensions.css",
         "src/features/player/modes.css",
+        "src/features/player/audio-only.css",
         "src/features/player/floating-window.css",
         "src/features/streams/twitch/sidebar.css",
         "src/features/streams/twitch/favorites.css",
@@ -100,7 +105,10 @@
         "https://www.twitch.tv/*"
       ],
       "js": [
-        "src/features/player/quality.js"
+        "src/features/player/quality.js",
+        "src/features/player/audio-only-player.js",
+        "src/features/player/auto-reload.js",
+        "src/features/player/background-quality.js"
       ],
       "run_at": "document_idle",
       "world": "MAIN"
@@ -124,7 +132,7 @@
         "src/settings.js",
         "src/features/streams/frames/layout-keys.js",
         "src/features/streams/frames/audio.js",
-        "src/features/player/embed-quality.js"
+        "src/features/player/embed-settings.js"
       ],
       "all_frames": true,
       "run_at": "document_start"
@@ -134,7 +142,9 @@
         "https://player.twitch.tv/*"
       ],
       "js": [
-        "src/features/player/quality.js"
+        "src/features/player/quality.js",
+        "src/features/player/auto-reload.js",
+        "src/features/player/background-quality.js"
       ],
       "all_frames": true,
       "run_at": "document_idle",
@@ -150,6 +160,7 @@
         "src/twitch/gql.js",
         "src/features/streams/frames/layout-keys.js",
         "src/features/chat/chat-words.js",
+        "src/features/chat/deleted-messages.js",
         "src/features/chat/emotes.js",
         "src/features/chat/emote-picker.js"
       ],
@@ -158,6 +169,7 @@
         "src/features/chat/timestamps.css",
         "src/features/chat/sections.css",
         "src/features/chat/chat-words.css",
+        "src/features/chat/deleted-messages.css",
         "src/features/chat/emotes.css",
         "src/features/chat/emote-picker.css"
       ],
