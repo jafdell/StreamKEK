@@ -6,7 +6,7 @@
 (() => {
   'use strict';
 
-  const { SETTINGS, settingDefaults, sites, chatWords, backup } = skek;
+  const { SETTINGS, settingDefaults, sites, chatWords, backup, changelog } = skek;
 
   const REPO = 'https://github.com/jafdell/StreamKEK';
   const VERSION = chrome.runtime.getManifest().version;
@@ -74,6 +74,7 @@
     Feedback: '<path d="M3 20.5 22 12 3 3.5V10l12 2-12 2v6.5Z"/>',
     Notifications: '<path d="M12 3a6 6 0 0 0-6 6v4l-2 3v1h16v-1l-2-3V9a6 6 0 0 0-6-6Zm-2 16a2 2 0 0 0 4 0h-4Z"/>',
     Player: '<path d="M8 5v14l11-7L8 5Z"/>',
+    "What's new": '<path d="m12 2 2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2Z"/>',
     Sidebar: '<path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm1 2v10h4V7H5Zm6 0v10h8V7h-8Z"/>',
     Kick: '<path d="M4 3h7v5h2V5h2V3h5v6h-2v2h-2v2h2v2h2v6h-5v-2h-2v-3h-2v5H4V3Z"/>',
     YouTube: '<path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.3 5 12 5 12 5s-6.3 0-7.8.4a2.5 2.5 0 0 0-1.8 1.8C2 8.7 2 12 2 12s0 3.3.4 4.8c.2.9.9 1.5 1.8 1.8 1.5.4 7.8.4 7.8.4s6.3 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.5.4-4.8.4-4.8s0-3.3-.4-4.8ZM10 15V9l5.2 3-5.2 3Z"/>',
@@ -81,6 +82,8 @@
   const DEFAULT_CATEGORY_ICON = '<circle cx="12" cy="12" r="4"/>';
   const SITE_CATEGORIES = Object.values(sites).map((site) => site.name);
   const BOTTOM_CATEGORIES = ['Backup', 'Feedback'];
+  // Each version's changes, from CHANGELOG.md. It goes after the bottom categories once that's been read.
+  const WHATS_NEW = "What's new";
 
   const search = document.getElementById('search');
   const categoryLinks = document.getElementById('categories');
@@ -88,6 +91,7 @@
   const groups = document.getElementById('groups');
   const noResults = document.getElementById('no-results');
   const closeButton = document.getElementById('close');
+  const versionLabel = document.getElementById('version');
 
   const framed = window !== window.top;
   const named = [...new Set([...SETTINGS, ...CUSTOM_ITEMS].map((item) => item.category))].sort((a, b) => a.localeCompare(b));
@@ -313,8 +317,16 @@
     frame.className = 'manager-frame';
     frame.title = title;
     frame.src = chrome.runtime.getURL(`src/features/streams/manager/manager.html?embedded&site=${site}`);
-    // Keys pressed inside a frame never reach this page's listener.
-    frame.addEventListener('load', () => frame.contentWindow.addEventListener('keydown', closeOnEscape));
+    frame.addEventListener('load', () => {
+      // Keys pressed inside a frame never reach this page's listener.
+      frame.contentWindow.addEventListener('keydown', closeOnEscape);
+      // As tall as the page inside it, which grows and shrinks with its channels. See manager.css.
+      // The frame's own observer, because this page's only hears about the first size.
+      const { body } = frame.contentDocument;
+      new frame.contentWindow.ResizeObserver(() => {
+        frame.style.height = `${body.offsetHeight}px`;
+      }).observe(body);
+    });
     return frame;
   }
 
@@ -322,7 +334,7 @@
     return `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd">${CATEGORY_ICONS[category] ?? DEFAULT_CATEGORY_ICON}</svg>`;
   }
 
-  function categoryGroup(category, saved) {
+  function categorySection(category, rows) {
     const group = document.createElement('section');
     group.className = 'category';
     group.dataset.category = category;
@@ -330,11 +342,67 @@
     heading.className = 'category__title';
     heading.innerHTML = categoryIcon(category);
     heading.append(category);
+    group.append(heading, ...rows);
+    return group;
+  }
+
+  function categoryGroup(category, saved) {
     const items = [...SETTINGS, ...CUSTOM_ITEMS]
       .filter((item) => item.category === category)
       .sort((a, b) => a.label.localeCompare(b.label));
-    group.append(heading, ...items.map((item) => itemRow(item, saved)));
-    return group;
+    return categorySection(category, items.map((item) => itemRow(item, saved)));
+  }
+
+  // One version of CHANGELOG.md: its number, the day it came out and what changed. Built from
+  // text, never as HTML, since it comes from a file.
+  function versionCard({ version, date, changes }) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.search = `${WHATS_NEW} version ${version} ${changes.join(' ').replaceAll('**', '')}`.toLowerCase();
+
+    const head = document.createElement('div');
+    head.className = 'version-card__head';
+    const label = document.createElement('span');
+    label.className = 'card__label';
+    label.textContent = `Version ${version}`;
+    head.append(label);
+    if (version === VERSION) {
+      const yours = document.createElement('span');
+      yours.className = 'version-card__yours';
+      yours.textContent = 'Installed';
+      head.append(yours);
+    }
+    if (date) {
+      const day = document.createElement('time');
+      day.className = 'version-card__date';
+      day.dateTime = date;
+      day.textContent = new Date(`${date}T00:00:00`).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+      head.append(day);
+    }
+
+    const list = document.createElement('ul');
+    list.className = 'version-card__changes';
+    for (const change of changes) {
+      const item = document.createElement('li');
+      for (const part of changelog.boldParts(change)) {
+        if (part.bold) item.append(Object.assign(document.createElement('strong'), { textContent: part.text }));
+        else item.append(part.text);
+      }
+      list.append(item);
+    }
+    card.append(head, list);
+    return card;
+  }
+
+  // The version under the list becomes the way to What's new.
+  function linkVersionLabel() {
+    const link = document.createElement('button');
+    link.className = 'version__link';
+    link.type = 'button';
+    link.title = "See what's new";
+    link.textContent = versionLabel.textContent;
+    link.addEventListener('click', () => showCategory(WHATS_NEW));
+    versionLabel.replaceChildren(link);
   }
 
   function categoryLink(category) {
@@ -433,7 +501,7 @@
   }
 
   document.documentElement.classList.toggle('framed', framed);
-  document.getElementById('version').textContent = `Version ${VERSION}`;
+  versionLabel.textContent = `Version ${VERSION}`;
   search.addEventListener('input', filterItems);
   groups.addEventListener('scroll', queueMarkCategory);
   groups.addEventListener('scrollend', () => {
@@ -461,13 +529,21 @@
     }
   });
 
-  chrome.storage.local.get({ ...settingDefaults, ...chatWords.DEFAULTS }).then((saved) => {
+  Promise.all([chrome.storage.local.get({ ...settingDefaults, ...chatWords.DEFAULTS }), changelog.loadChangelog()]).then(([saved, versions]) => {
     const divider = document.createElement('hr');
     divider.className = 'categories__divider';
     categoryLinks.append(...settingCategories.map(categoryLink), divider, ...siteCategories.map(categoryLink));
-    feedbackLink.append(...BOTTOM_CATEGORIES.map(categoryLink));
     // Rows are built with their saved state, so switches don't slide on every open.
     groups.append(...categories.map((category) => categoryGroup(category, saved)));
+    feedbackLink.append(...BOTTOM_CATEGORIES.map(categoryLink));
+    // What's new comes last, since it grows with every version and would bury what's after it. It
+    // isn't there at all without the file.
+    if (versions.length) {
+      groups.append(categorySection(WHATS_NEW, versions.map(versionCard)));
+      categories.push(WHATS_NEW);
+      feedbackLink.append(categoryLink(WHATS_NEW));
+      linkVersionLabel();
+    }
     filterItems();
     if (categories.includes(askedCategory)) scrollToCategory(askedCategory, false);
   });

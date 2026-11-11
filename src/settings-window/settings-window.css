@@ -74,6 +74,11 @@ html.framed body { width: 100%; height: 100%; }
 
 /* Lines up with the icon above it, and stays quieter than anything you can click. */
 .version { flex: 0 0 auto; margin: 10px 0 0; padding: 0 10px; color: var(--muted); font-size: 12px; line-height: 1; opacity: 0.7; }
+/* It leads to What's new, once there is one. */
+.version:has(.version__link) { opacity: 1; }
+.version__link { padding: 0; border: 0; background: none; color: inherit; font: inherit; opacity: 0.7; cursor: pointer; }
+.version__link:hover { opacity: 1; text-decoration: underline; }
+.version__link:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; opacity: 1; }
 
 /* --- right column: every category, or search results ------------------------ */
 
@@ -141,6 +146,14 @@ a.setting:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px;
 .card__label { font-weight: 600; }
 .card__hint { color: var(--muted); }
 
+/* What's new: a card for each version, with its changes as a list. */
+.version-card__head { display: flex; align-items: baseline; gap: 8px; }
+.version-card__yours { padding: 1px 8px; border-radius: 9000px; background: var(--selected); color: var(--accent); font-size: 12px; font-weight: 600; }
+.version-card__date { margin-left: auto; color: var(--muted); font-size: 12px; }
+.version-card__changes { margin: 6px 0 0; padding-left: 18px; color: var(--muted); }
+.version-card__changes li { margin-top: 4px; }
+.version-card__changes strong { color: var(--text); font-weight: 600; }
+
 /* Pick one of a few values: radio buttons drawn as one joined control. */
 .choices { flex: 0 0 auto; display: flex; gap: 2px; padding: 2px; border-radius: 8px; background: var(--card); }
 .choice { position: relative; }
@@ -181,7 +194,9 @@ a.setting:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px;
 .dropdown__select:focus-visible { box-shadow: inset 0 0 0 2px var(--focus); }
 .dropdown__select option { background: var(--bg); color: var(--text); font-weight: 400; }
 
-.manager-frame { display: block; width: 100%; height: 340px; margin-top: 10px; border: 0; }
+/* Its height is set to fit the page inside it, once that has loaded. Until then it's the box to add
+   a channel with, which is always there. */
+.manager-frame { display: block; width: 100%; height: 32px; margin-top: 10px; border: 0; }
 
 /* Save a backup and Restore a backup. */
 .backup-controls { display: flex; gap: 8px; margin-top: 10px; }

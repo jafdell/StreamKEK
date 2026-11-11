@@ -839,3 +839,53 @@ test('isSamePage finds a tab that is already on the stream', () => {
   assert.ok(!isSamePage('https://m.twitch.tv/kaicenat', address));
   assert.ok(!isSamePage(undefined, address));
 });
+
+const changelogContext = { skek: {} };
+vm.runInNewContext(readFileSync(new URL('../src/settings-window/changelog.js', import.meta.url), 'utf8'), changelogContext);
+const { parseChangelog, boldParts } = changelogContext.skek.changelog;
+
+test('parseChangelog reads each version, its day and its changes', () => {
+  const versions = plain(parseChangelog([
+    '# Changelog',
+    '',
+    'An introduction.',
+    '- A line before any version.',
+    '<!-- A note for whoever edits it. -->',
+    '',
+    '## 1.2.0 - 2026-11-06',
+    '',
+    '- **Favorites:** keep channels together.',
+    '- A change that goes on',
+    '  over a second line.',
+    '* A star works as a dash does.',
+    '',
+    '## [1.1.0] - 2026-11-05',
+    '- **Fixed:** something.',
+    '',
+    '## 1.0.0',
+    '- The first version.',
+  ].join('\r\n')));
+  assert.deepEqual(versions, [
+    { version: '1.2.0', date: '2026-11-06', changes: ['**Favorites:** keep channels together.', 'A change that goes on over a second line.', 'A star works as a dash does.'] },
+    { version: '1.1.0', date: '2026-11-05', changes: ['**Fixed:** something.'] },
+    { version: '1.0.0', date: null, changes: ['The first version.'] },
+  ]);
+});
+
+test('parseChangelog leaves out what is not a version with changes', () => {
+  assert.deepEqual(plain(parseChangelog('')), []);
+  assert.deepEqual(plain(parseChangelog('## 1.0.0 - 2026-11-05\n\nNothing listed.\n')), []);
+  // A heading that isn't a version ends the one before it.
+  const versions = plain(parseChangelog('## 1.0.0\n- One.\n## Notes\n- Not a change.\n### Smaller\n- Nor this.'));
+  assert.deepEqual(versions, [{ version: '1.0.0', date: null, changes: ['One.'] }]);
+});
+
+test('boldParts splits a change where ** is', () => {
+  assert.deepEqual(plain(boldParts('**Favorites:** keep **all** together.')), [
+    { text: 'Favorites:', bold: true },
+    { text: ' keep ', bold: false },
+    { text: 'all', bold: true },
+    { text: ' together.', bold: false },
+  ]);
+  assert.deepEqual(plain(boldParts('Plain <b>text</b>, with one ** left over.')), [{ text: 'Plain <b>text</b>, with one ** left over.', bold: false }]);
+});

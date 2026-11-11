@@ -156,6 +156,16 @@ test('the notifications setting is off until you turn it on, as the background a
   assert.ok(manifest.permissions.includes('notifications'));
 });
 
+// The settings window shows CHANGELOG.md, so a version without an entry would show nothing new.
+test('the changelog starts with the version in the manifest', () => {
+  const changelog = { skek: {} };
+  vm.runInNewContext(read('src/settings-window/changelog.js'), changelog);
+  const versions = changelog.skek.changelog.parseChangelog(read('CHANGELOG.md'));
+  assert.equal(versions[0]?.version, manifest.version, 'add this version to the top of CHANGELOG.md');
+  const numbers = versions.map((entry) => entry.version);
+  assert.equal(new Set(numbers).size, numbers.length, 'a version is in CHANGELOG.md twice');
+});
+
 // Runs Twitch's page scripts in their manifest order, with stubs for the browser. This catches what
 // a syntax check can't: a name that doesn't exist, or a file that loads before something it needs.
 function loadTwitchScripts() {
