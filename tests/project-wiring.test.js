@@ -10,6 +10,7 @@ import { messageHandlers as kickHandlers } from '../src/features/kick/background
 import { messageHandlers as youtubeHandlers } from '../src/features/youtube/background/index.js';
 import { KEYS as kickKeys } from '../src/features/kick/background/poller.js';
 import { KEYS as youtubeKeys } from '../src/features/youtube/background/poller.js';
+import { ROUTE_PREFIXES, SITE_NAMES, streamAddress } from '../src/features/notifications/background/live-changes.js';
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const exists = (path) => existsSync(new URL(`../${path}`, import.meta.url));
@@ -138,6 +139,21 @@ test('saved storage keys keep the names they were released with', () => {
 test('the background uses the same storage keys as sites.js', () => {
   assert.deepEqual({ ...context.skek.sites.youtube.keys }, youtubeKeys);
   assert.deepEqual({ ...context.skek.sites.kick.keys }, kickKeys);
+});
+
+test('notifications name and address each site as sites.js does', () => {
+  for (const [platform, site] of Object.entries(context.skek.sites)) {
+    assert.equal(ROUTE_PREFIXES[platform], site.routePrefix, `${platform} needs its route in live-changes.js`);
+    assert.equal(SITE_NAMES[platform], site.name, `${platform} needs its name in live-changes.js`);
+  }
+  const twitch = { id: 'twitch:a', platform: 'twitch', login: 'a' };
+  assert.equal(SITE_NAMES.twitch, context.skek.siteOf(twitch).name);
+  assert.equal(streamAddress(twitch), context.skek.siteOf(twitch).streamUrl(twitch));
+});
+
+test('the notifications setting is off until you turn it on, as the background assumes', () => {
+  assert.equal(context.skek.settingDefaults.liveNotifications, false);
+  assert.ok(manifest.permissions.includes('notifications'));
 });
 
 // Runs Twitch's page scripts in their manifest order, with stubs for the browser. This catches what

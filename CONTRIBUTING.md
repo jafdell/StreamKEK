@@ -4,7 +4,7 @@ Bugs and feature requests go in issues. To send a change: fork the repo, make a 
 
 ## How it fits together
 
-- **Service worker** (`src/background/service-worker.js`, feature code in `background/` folders): works out what's live on YouTube and Kick, for all tabs at once. It also allows both sites' cookies on Twitch, `rules/youtube-watch-frame.json` lets YouTube's watch page load in a frame, and `sendRequestsAsSite` in `streams/background/site-background.js` lets it read what's live.
+- **Service worker** (`src/background/service-worker.js`, feature code in `background/` folders): works out what's live on YouTube and Kick, for all tabs at once, and notifies you when a favorite goes live. It also allows both sites' cookies on Twitch, `rules/youtube-watch-frame.json` lets YouTube's watch page load in a frame, and `sendRequestsAsSite` in `streams/background/site-background.js` lets it read what's live.
 - **Twitch page scripts** (the first `content_scripts` entry in `manifest.json`): run in every Twitch tab and share one global, `skek`.
 - **Stream view:** the `/yt/<channel>` or `/kick/<channel>` page those scripts draw over Twitch's. It holds two frames from that site, the player and the chat. Twitch's own page stays alive behind it, with its video paused and the address showing `/yt/...` or `/kick/...`, so a Twitch feature's scripts and shortcuts keep running there. Check for `#skek-view` where that matters, as `player/modes.js` does.
 - **Frame scripts** (`frames/` folders): load on the site itself too, wherever their manifest entry matches, and switch themselves on only inside those two frames.
@@ -29,10 +29,11 @@ Features are in `src/features/`. `chat/`, `player/` and `sidebar/` match the set
 | Stream view | `streams/twitch/`: `stream-view.js` (the info bar, opening and closing), `view-frames.js` (the two frames), `view-layouts.js` (theatre, stacked and floating) |
 | Chat: font size, timestamps, what sits over chat, 7TV, BTTV and FFZ emotes (`emotes.js`, `chat-box-emotes.js` for the chat box and `emote-picker.js` for its button) | `src/features/chat/`. A site's chat is styled in its `frames/chat.css` |
 | Blocked and highlighted words | `chat/chat-words.js` and `.css`, for every site's chat, with each site's selectors in `MESSAGES`. Their lists are in `settings-window.js` |
-| Stream quality | `player/quality.js` (Twitch), and `frames/watch-start.js` in `youtube/` and `kick/` |
+| Stream quality | `player/quality.js` (Twitch, and Twitch's embedded player in multi-stream, which gets the setting from `player/embed-quality.js`), and `frames/watch-start.js` in `youtube/` and `kick/` |
 | Theatre, stacked and floating chat modes | `src/features/player/` (Twitch, plus `floating-window.js` and `.css`, which both use) and `streams/twitch/view-layouts.js` and `stream-view.css` (other sites). `streams/frames/layout-keys.js` forwards the shortcuts from inside their frames, and `chat-settings.js` there and each site's `chat.css` make floating chat see-through. Theatre on Twitch is Twitch's own. Stacked and floating exist twice, so change both |
 | Sidebar previews | `sidebar/preview.js` (Twitch channels) and `streams/twitch/stream-tip.js` (other sites) |
 | Favorites | `streams/twitch/favorites.js` and `.css`. Twitch's channels there are read from Twitch's own API in the page, not from `sites.js` |
+| Go-live notifications | `notifications/background/`: `index.js` (the checks and the notification), `live-changes.js` (what counts as going live) and `twitch-live.js` (asking Twitch, which the page does itself in `favorites.js`). `pollIfWanted` in `streams/background/site-background.js` keeps YouTube's and Kick's checks running with no Twitch tab while a favorite there needs them |
 | Dragging a channel from the sidebar | `streams/twitch/sidebar-drag.js`, which Favorites and multi-stream each register a drop target with |
 | Multi-stream | `streams/twitch/multi-view.js` and `.css`, with its sizes and address in `multi-layout.js`, and `routes.js` for going in and out of it. `streams/frames/audio.js` mutes the frames. It's a view of its own, not a mode of the stream view, and its frames never move in the page, since that would reload them. Twitch's streams there use Twitch's embedded player and chat, through its entry in `sites.js` |
 | Tests | `tests/`, and `TESTING.md` for what to check by hand |
@@ -145,6 +146,7 @@ All in `chrome.storage.local`. A key in `SETTINGS` is written by the settings wi
 | `kickLive` | like `live`, and each stream also has `thumbnail` | background |
 | `kickStatus` | `{checkedAt,signedOut,failed}` | background |
 | `showKickFollows` | boolean, default true | background |
+| `liveNotificationsSeen` | `{[platform]:{at,streams:{[id]:[streamId]}}}`: each favorite's last known streams, by site | background |
 | `kickVolume` | number above 0, up to 1, default 1 | Kick's player frame |
 | `favoriteChannels` | `[{id,platform,slug,login,name,handle,avatar}]`, in your order. Fields as that site's channels have them; Twitch's have `login` and the id `twitch:<login>` | Twitch page |
 | `chatHidden` | boolean | Twitch page |

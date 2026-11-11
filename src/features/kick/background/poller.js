@@ -7,7 +7,7 @@ import { fetchChannel, fetchFollowedLive } from './kick-api.js';
 
 export const KEYS = { own: 'kickChannels', followed: 'kickFollowed', live: 'kickLive', status: 'kickStatus', hidden: 'kickHidden' };
 
-export const background = createSiteBackground({ keys: KEYS, followsSetting: 'showKickFollows', runPoll });
+export const background = createSiteBackground({ platform: 'kick', keys: KEYS, followsSetting: 'showKickFollows', runPoll });
 
 async function checkOwnChannels(channels, previous) {
   const result = { live: {}, avatars: {} };

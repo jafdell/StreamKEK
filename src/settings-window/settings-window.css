@@ -75,20 +75,16 @@ html.framed body { width: 100%; height: 100%; }
 /* Lines up with the icon above it, and stays quieter than anything you can click. */
 .version { flex: 0 0 auto; margin: 10px 0 0; padding: 0 10px; color: var(--muted); font-size: 12px; line-height: 1; opacity: 0.7; }
 
-/* --- right column: the selected category, or search results ----------------- */
+/* --- right column: every category, or search results ------------------------ */
 
-.content { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.content { position: relative; flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
 
-.content__head {
-  flex: 0 0 60px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 14px 0 20px;
-}
-.content__head h1 { margin: 0; font-size: 18px; font-weight: 600; }
-
+/* Over the right end of whichever heading is at the top. */
 .close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  z-index: 3;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -104,13 +100,35 @@ html.framed body { width: 100%; height: 100%; }
 .close:hover { background: var(--hover); }
 .close:focus-visible { outline: 2px solid var(--focus); }
 
-.groups { flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: thin; padding: 0 20px 12px; }
+/* Positioned, so a category's offsetTop is how far to scroll to reach it. */
+.groups { position: relative; flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: thin; padding: 0 20px 12px; }
 
-/* The heading already names the category, except when results span several. */
-.category__title { display: none; margin: 0; padding: 8px 0; color: var(--muted); font-size: 12px; font-weight: 600; }
-.groups--searching .category__title { display: block; }
+/* The categories follow each other down the page. Each heading stays at the top while its settings
+   scroll under it, until the next category's heading pushes it out, so it always says where you
+   are. The space above a heading and the line under it are what set two categories apart. */
+.category { padding-bottom: 28px; }
+/* Tall enough for its heading to reach the top, so the list can scroll to the last category too. */
+.category:last-child { min-height: 100%; padding-bottom: 0; }
+.category__title {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 56px;
+  margin: 0 0 12px;
+  border-bottom: 1px solid var(--hover);
+  background: var(--bg);
+  font-size: 18px;
+  font-weight: 600;
+}
+.category__title svg { flex: 0 0 auto; color: var(--accent); }
+/* Search results can be a row or two per category, so they sit closer together. */
+.groups--searching .category { min-height: 0; padding-bottom: 12px; }
 
 .card { margin-bottom: 8px; padding: 12px 14px; border-radius: 8px; background: var(--card); }
+.card:last-child { margin-bottom: 0; }
 
 .setting { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 label.setting { cursor: pointer; }
@@ -245,4 +263,4 @@ a.setting:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px;
 .word-chip__remove:hover { background: rgba(128, 128, 128, 0.35); }
 .word-chip__remove:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
 
-.no-results { flex: 1 1 auto; margin: 0; padding: 0 20px; color: var(--muted); }
+.no-results { flex: 1 1 auto; margin: 0; padding: 18px 20px 0; color: var(--muted); }

@@ -13,6 +13,8 @@ import { liveChannelsFromGuide } from '../src/features/youtube/background/subscr
 import { flippedSettings } from '../src/background/renamed-settings.js';
 import { channelPageToLive, followedStreamToLive, slugFromInput, startedAtIso } from '../src/features/kick/background/kick-api.js';
 import { copyExpiry, isRealCookie } from '../src/features/kick/background/twitch-frame-cookies.js';
+import { isSamePage, liveChanges, notificationAddress, notificationFor, notificationId, streamAddress } from '../src/features/notifications/background/live-changes.js';
+import { twitchLiveFrom } from '../src/features/notifications/background/twitch-live.js';
 
 // format.js is a classic content script, so it runs in a context holding the globals it expects.
 const context = { skek: { helpers: { el() {} }, streams: {} } };
@@ -409,6 +411,66 @@ test('multiLayout makes the first of three streams the biggest', () => {
   assert.equal(players[1].w, players[2].w);
 });
 
+test('multiLayout gives a divider between the streams, two where they split both ways', () => {
+  const dividers = (count, chat, width = 1600) => plain(multiLayout({ count, width, height: 900, chat }).dividers).map((d) => `${d.split} ${d.axis}`);
+  assert.deepEqual(dividers(2, true), ['main x']);
+  assert.deepEqual(dividers(2, false), ['main x']);
+  assert.deepEqual(dividers(2, false, 700), ['main y']);
+  assert.deepEqual(dividers(3, false), ['main x', 'cross y']);
+  assert.deepEqual(dividers(3, false, 700), ['main y', 'cross x']);
+  assert.deepEqual(dividers(4, true), ['main x', 'cross y']);
+});
+
+test('multiLayout makes the first stream bigger when its dividers are dragged away from it', () => {
+  for (const count of [2, 3, 4]) {
+    for (const chat of [true, false]) {
+      const sizes = (splits) => plain(multiLayout({ count, width: 1600, height: 900, chat, splits }).players).map((p) => p.w);
+      const before = sizes({});
+      const after = sizes({ main: 0.7, cross: 0.7 });
+      assert.ok(after[0] > before[0], `${count} streams, chat ${chat}: ${after[0]} > ${before[0]}`);
+      assert.ok(after[1] < before[1], `${count} streams, chat ${chat}: ${after[1]} < ${before[1]}`);
+    }
+  }
+});
+
+test('multiLayout puts a dragged divider where the pointer is', () => {
+  const { dividers, players } = plain(multiLayout({ count: 4, width: 1600, height: 900, chat: false, splits: { main: 0.25, cross: 0.6 } }));
+  const [main, cross] = dividers;
+  assert.equal((main.x - main.start) / main.length, 0.25);
+  assert.equal((cross.y - cross.start) / cross.length, 0.6);
+  // Each stream sits against both dividers.
+  assert.equal(players[0].x + players[0].w, main.x);
+  assert.equal(players[0].y + players[0].h, cross.y);
+  assert.deepEqual([players[3].x, players[3].y], [main.x, cross.y]);
+});
+
+test('multiLayout stops a divider before a stream or a chat gets too small', () => {
+  const widths = (width, main) => plain(multiLayout({ count: 2, width, height: 900, chat: true, splits: { main } }).players).map((p) => p.w);
+  assert.deepEqual(widths(1600, 0), [320, 1280]);
+  assert.deepEqual(widths(1600, 3), [1280, 320]);
+  // Two chats side by side each stay wide enough to read.
+  assert.deepEqual(widths(700, 0), [280, 420]);
+});
+
+test('multiLayout keeps dragged streams from overlapping or leaving the view', () => {
+  for (const [width, height] of [[1600, 900], [2560, 1300], [900, 400], [700, 1200]]) {
+    for (const count of [2, 3, 4]) {
+      for (const chat of [true, false]) {
+        for (const splits of [{ main: 0 }, { main: 0.37, cross: 0.3 }, { main: 0.8, cross: 0.9 }, { cross: 1.4 }]) {
+          const { players } = plain(multiLayout({ count, width, height, chat, splits }));
+          players.forEach((a, i) => {
+            assertInside(a, width, height);
+            players.slice(i + 1).forEach((b) => {
+              const apart = a.x + a.w <= b.x + 1 || b.x + b.w <= a.x + 1 || a.y + a.h <= b.y + 1 || b.y + b.h <= a.y + 1;
+              assert.ok(apart, `${JSON.stringify(a)} overlaps ${JSON.stringify(b)} at ${width}x${height}, ${count} streams, ${JSON.stringify(splits)}`);
+            });
+          });
+        }
+      }
+    }
+  }
+});
+
 test('parseMultiHash reads streams from every site, and writes them back the same', () => {
   const hash = '#skek-multi=twitch/kaicenat,kick/some-name,youtube/UCabc_-/abcdefghijk';
   const entries = plain(parseMultiHash(hash));
@@ -673,4 +735,107 @@ test('compact shortens thousands', () => {
 test('compact shortens millions', () => {
   assert.equal(compact(1200000), '1.2M');
   assert.equal(compact(2000000), '2M');
+});
+
+const favorites = [{ id: 'twitch:a' }, { id: 'twitch:b' }];
+const MINUTE = 60_000;
+
+test('liveChanges only notes who is live on the first check, and after the browser was closed', () => {
+  const first = liveChanges(undefined, favorites, { 'twitch:a': ['1'] }, 1000);
+  assert.deepEqual(first, { seen: { at: 1000, streams: { 'twitch:a': ['1'], 'twitch:b': [] } }, started: [] });
+
+  const afterGap = liveChanges(first.seen, favorites, { 'twitch:a': ['2'], 'twitch:b': ['3'] }, 1000 + 11 * MINUTE);
+  assert.deepEqual(afterGap.started, []);
+  assert.deepEqual(afterGap.seen.streams, { 'twitch:a': ['2'], 'twitch:b': ['3'] });
+});
+
+test('liveChanges says who started a stream since the last check', () => {
+  const seen = { at: 1000, streams: { 'twitch:a': ['1'], 'twitch:b': [] } };
+  const { started, seen: next } = liveChanges(seen, favorites, { 'twitch:a': ['1'], 'twitch:b': ['3'] }, 1000 + MINUTE);
+  assert.deepEqual(started, ['twitch:b']);
+  assert.deepEqual(next, { at: 1000 + MINUTE, streams: { 'twitch:a': ['1'], 'twitch:b': ['3'] } });
+});
+
+test('liveChanges notifies once for a stream that drops out and comes back', () => {
+  const live = { at: 1000, streams: { 'twitch:a': ['1'], 'twitch:b': [] } };
+  const gone = liveChanges(live, favorites, {}, 1000 + MINUTE);
+  assert.deepEqual(gone.started, []);
+  assert.deepEqual(gone.seen.streams['twitch:a'], ['1'], 'its last stream is remembered while it is offline');
+  assert.deepEqual(liveChanges(gone.seen, favorites, { 'twitch:a': ['1'] }, 1000 + 2 * MINUTE).started, []);
+  assert.deepEqual(liveChanges(gone.seen, favorites, { 'twitch:a': ['2'] }, 1000 + 2 * MINUTE).started, ['twitch:a']);
+});
+
+test('liveChanges treats a channel with several streams as live once', () => {
+  const seen = { at: 1000, streams: { 'twitch:a': ['1', '2'], 'twitch:b': [] } };
+  assert.deepEqual(liveChanges(seen, favorites, { 'twitch:a': ['2', '3'] }, 1000 + MINUTE).started, []);
+  assert.deepEqual(liveChanges(seen, favorites, { 'twitch:a': ['3'] }, 1000 + MINUTE).started, ['twitch:a']);
+});
+
+test('liveChanges only notes a channel that is new to Favorites, and forgets one that left', () => {
+  const seen = { at: 1000, streams: { 'twitch:gone': ['9'] } };
+  const { started, seen: next } = liveChanges(seen, favorites, { 'twitch:a': ['1'] }, 1000 + MINUTE);
+  assert.deepEqual(started, []);
+  assert.deepEqual(next.streams, { 'twitch:a': ['1'], 'twitch:b': [] });
+});
+
+test('streamAddress is where the channel opens on Twitch', () => {
+  assert.equal(streamAddress({ id: 'twitch:kaicenat', platform: 'twitch', login: 'kaicenat' }), 'https://www.twitch.tv/kaicenat');
+  assert.equal(streamAddress({ id: 'kick:Some-Name', platform: 'kick', slug: 'Some-Name' }), 'https://www.twitch.tv/kick/some-name');
+  assert.equal(streamAddress({ id: 'UCabc', handle: '@Some Channel' }), 'https://www.twitch.tv/yt/some%20channel');
+  assert.equal(streamAddress({ id: 'UCabc' }), 'https://www.twitch.tv/yt/ucabc');
+});
+
+test('notificationFor says who is live, where and with what', () => {
+  assert.deepEqual(notificationFor({ name: 'kai', platform: 'twitch' }, { name: 'Kai', title: ' Hello\n  there ', category: 'Just Chatting' }), {
+    title: 'Kai is live on Twitch',
+    message: 'Hello there',
+    contextMessage: 'Just Chatting',
+  });
+  // The message can't be empty, so the category or a plain line stands in for a missing title.
+  assert.deepEqual(notificationFor({ name: 'KC', platform: 'kick' }, { title: '', category: 'Slots' }), {
+    title: 'KC is live on Kick',
+    message: 'Slots',
+    contextMessage: '',
+  });
+  assert.deepEqual(notificationFor({ name: 'Some Channel' }, {}), {
+    title: 'Some Channel is live on YouTube',
+    message: 'Streaming now',
+    contextMessage: '',
+  });
+});
+
+test('twitchLiveFrom keeps only the channels that are live', () => {
+  const live = twitchLiveFrom([
+    { login: 'on', displayName: 'On', stream: { id: '42', title: 'Hi', game: { displayName: 'Chess' } } },
+    { login: 'nogame', displayName: 'NoGame', stream: { id: '43', title: null, game: null } },
+    { login: 'off', displayName: 'Off', stream: null },
+    null,
+  ]);
+  assert.deepEqual(live, {
+    'twitch:on': { ids: ['42'], name: 'On', title: 'Hi', category: 'Chess' },
+    'twitch:nogame': { ids: ['43'], name: 'NoGame', title: '', category: '' },
+  });
+  assert.deepEqual(twitchLiveFrom(null), {});
+});
+
+test('notificationId is new each time and still says what to open', () => {
+  const address = 'https://www.twitch.tv/yt/some%20channel';
+  const id = notificationId(1000, address);
+  assert.notEqual(id, notificationId(1001, address));
+  assert.equal(notificationAddress(id), address);
+  assert.equal(notificationAddress(notificationId(1000, 'https://www.twitch.tv/kick/a:b')), 'https://www.twitch.tv/kick/a:b');
+  // Another extension's, and ones that could open anything but Twitch.
+  for (const other of ['someone-elses', 'test', 'live:1000:', 'live:1000:https://example.com/', 'live:x:https://www.twitch.tv/a', 'live:https://www.twitch.tv/a']) {
+    assert.equal(notificationAddress(other), null, other);
+  }
+});
+
+test('isSamePage finds a tab that is already on the stream', () => {
+  const address = 'https://www.twitch.tv/kaicenat';
+  assert.ok(isSamePage('https://www.twitch.tv/KaiCenat', address));
+  assert.ok(isSamePage('https://www.twitch.tv/kaicenat/?referrer=raid#x', address));
+  assert.ok(!isSamePage('https://www.twitch.tv/kaicenat/videos', address));
+  assert.ok(!isSamePage('https://www.twitch.tv/kai', address));
+  assert.ok(!isSamePage('https://m.twitch.tv/kaicenat', address));
+  assert.ok(!isSamePage(undefined, address));
 });

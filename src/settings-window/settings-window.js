@@ -1,4 +1,6 @@
 // The settings window: categories, search and the settings from src/settings.js.
+// Every category is on the one page, each under a heading that stays at the top while its
+// settings scroll by. The list on the left scrolls to a category and shows which one you're in.
 // One page with two ways in: framed on Twitch by src/twitch/settings-button.js, and as
 // the toolbar popup.
 (() => {
@@ -70,6 +72,7 @@
     Appearance: '<path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 2v14a7 7 0 0 1 0-14Z"/>',
     Chat: '<path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9.5L5 21v-4H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/>',
     Feedback: '<path d="M3 20.5 22 12 3 3.5V10l12 2-12 2v6.5Z"/>',
+    Notifications: '<path d="M12 3a6 6 0 0 0-6 6v4l-2 3v1h16v-1l-2-3V9a6 6 0 0 0-6-6Zm-2 16a2 2 0 0 0 4 0h-4Z"/>',
     Player: '<path d="M8 5v14l11-7L8 5Z"/>',
     Sidebar: '<path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm1 2v10h4V7H5Zm6 0v10h8V7h-8Z"/>',
     Kick: '<path d="M4 3h7v5h2V5h2V3h5v6h-2v2h-2v2h2v2h2v6h-5v-2h-2v-3h-2v5H4V3Z"/>',
@@ -82,16 +85,27 @@
   const search = document.getElementById('search');
   const categoryLinks = document.getElementById('categories');
   const feedbackLink = document.getElementById('feedback-category');
-  const title = document.getElementById('title');
   const groups = document.getElementById('groups');
   const noResults = document.getElementById('no-results');
   const closeButton = document.getElementById('close');
 
   const framed = window !== window.top;
-  const categories = [...new Set([...SETTINGS, ...CUSTOM_ITEMS].map((item) => item.category))].sort((a, b) => a.localeCompare(b));
+  const named = [...new Set([...SETTINGS, ...CUSTOM_ITEMS].map((item) => item.category))].sort((a, b) => a.localeCompare(b));
+  // The order of the list and of the page. The other sites sit together under a divider, each
+  // group still in alphabetical order. Backup and Feedback sit apart at the bottom, so they aren't
+  // mistaken for groups of settings.
+  const settingCategories = named.filter((category) => !BOTTOM_CATEGORIES.includes(category) && !SITE_CATEGORIES.includes(category));
+  const siteCategories = named.filter((category) => SITE_CATEGORIES.includes(category));
+  const categories = [...settingCategories, ...siteCategories, ...BOTTOM_CATEGORIES.filter((category) => named.includes(category))];
   // The toolbar popup opens a tab here to restore a backup.
   const askedCategory = decodeURIComponent(location.hash.slice(1));
-  let selectedCategory = categories.includes(askedCategory) ? askedCategory : categories[0];
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  // A category counts as reached this far before its heading touches the top: by then it has
+  // pushed the heading before it half out, and nearly everything showing belongs to it.
+  const REACHED_PX = 28;
+  // The category a click in the list is scrolling to, which stays marked on the way there.
+  let scrollingTo = null;
+  let markQueued = false;
 
   function searchText(item) {
     const choices = item.choices?.map((choice) => choice.label).join(' ') ?? '';
@@ -304,12 +318,18 @@
     return frame;
   }
 
+  function categoryIcon(category) {
+    return `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd">${CATEGORY_ICONS[category] ?? DEFAULT_CATEGORY_ICON}</svg>`;
+  }
+
   function categoryGroup(category, saved) {
     const group = document.createElement('section');
+    group.className = 'category';
     group.dataset.category = category;
     const heading = document.createElement('h2');
     heading.className = 'category__title';
-    heading.textContent = category;
+    heading.innerHTML = categoryIcon(category);
+    heading.append(category);
     const items = [...SETTINGS, ...CUSTOM_ITEMS]
       .filter((item) => item.category === category)
       .sort((a, b) => a.label.localeCompare(b.label));
@@ -322,21 +342,67 @@
     link.className = 'category-link';
     link.type = 'button';
     link.dataset.category = category;
-    link.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd">${CATEGORY_ICONS[category] ?? DEFAULT_CATEGORY_ICON}</svg>`;
+    link.innerHTML = categoryIcon(category);
     link.append(category);
-    link.addEventListener('click', () => {
-      selectedCategory = category;
-      search.value = '';
-      render();
-    });
+    link.addEventListener('click', () => showCategory(category));
     return link;
   }
 
-  // Shows the selected category. While searching, shows every item with all the typed
-  // words in its label, hint or category, whichever category it's in.
-  function render() {
+  // The category at the top of the page: the last one whose heading has reached it.
+  function categoryInView() {
+    let current = null;
+    for (const group of groups.children) {
+      if (group.hidden) continue;
+      if (current && group.offsetTop > groups.scrollTop + REACHED_PX) break;
+      current = group;
+    }
+    return current?.dataset.category ?? null;
+  }
+
+  function markCategory() {
+    const current = scrollingTo ?? categoryInView();
+    for (const link of [...categoryLinks.children, ...feedbackLink.children]) {
+      if (!link.dataset.category) continue;
+      const isCurrent = link.dataset.category === current;
+      if (link.getAttribute('aria-current') === String(isCurrent)) continue;
+      link.setAttribute('aria-current', String(isCurrent));
+      // The list scrolls too, when the window is short.
+      if (isCurrent) link.scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  // Scrolling asks for this far more often than the page is drawn.
+  function queueMarkCategory() {
+    if (markQueued) return;
+    markQueued = true;
+    requestAnimationFrame(() => {
+      markQueued = false;
+      markCategory();
+    });
+  }
+
+  function scrollToCategory(category, smooth) {
+    const group = [...groups.children].find((candidate) => candidate.dataset.category === category);
+    if (!group) return;
+    const top = Math.min(group.offsetTop, groups.scrollHeight - groups.clientHeight);
+    // A scroll that goes nowhere never says it has ended.
+    scrollingTo = smooth && Math.abs(groups.scrollTop - top) >= 1 ? category : null;
+    groups.scrollTo({ top, behavior: scrollingTo ? 'smooth' : 'instant' });
+    markCategory();
+  }
+
+  function showCategory(category) {
+    if (search.value) {
+      search.value = '';
+      filterItems();
+    }
+    scrollToCategory(category, !reducedMotion.matches);
+  }
+
+  // While searching, leaves only the items with all the typed words in their label, hint or
+  // category, under the headings of the categories they're in.
+  function filterItems() {
     const words = search.value.toLowerCase().split(/\s+/).filter(Boolean);
-    const searching = words.length > 0;
     let anyMatch = false;
     for (const group of groups.children) {
       let groupMatches = false;
@@ -345,16 +411,15 @@
         item.hidden = !matches;
         groupMatches ||= matches;
       }
-      group.hidden = searching ? !groupMatches : group.dataset.category !== selectedCategory;
+      group.hidden = !groupMatches;
       anyMatch ||= groupMatches;
     }
-    groups.classList.toggle('groups--searching', searching);
+    groups.classList.toggle('groups--searching', words.length > 0);
     groups.hidden = !anyMatch;
     noResults.hidden = anyMatch;
-    title.textContent = searching ? 'Search results' : selectedCategory;
-    for (const link of [...categoryLinks.children, ...feedbackLink.children]) {
-      link.setAttribute('aria-current', String(!searching && link.dataset.category === selectedCategory));
-    }
+    scrollingTo = null;
+    groups.scrollTop = 0;
+    markCategory();
   }
 
   function closeWindow() {
@@ -369,7 +434,12 @@
 
   document.documentElement.classList.toggle('framed', framed);
   document.getElementById('version').textContent = `Version ${VERSION}`;
-  search.addEventListener('input', render);
+  search.addEventListener('input', filterItems);
+  groups.addEventListener('scroll', queueMarkCategory);
+  groups.addEventListener('scrollend', () => {
+    scrollingTo = null;
+    markCategory();
+  });
   closeButton.hidden = !framed;
   closeButton.addEventListener('click', closeWindow);
   addEventListener('keydown', closeOnEscape);
@@ -392,19 +462,13 @@
   });
 
   chrome.storage.local.get({ ...settingDefaults, ...chatWords.DEFAULTS }).then((saved) => {
-    // The other sites sit together under a divider, each group still in alphabetical order.
-    // Backup and Feedback sit apart at the bottom, so they aren't mistaken for groups of settings.
-    const settingCategories = categories.filter((category) => !BOTTOM_CATEGORIES.includes(category) && !SITE_CATEGORIES.includes(category));
     const divider = document.createElement('hr');
     divider.className = 'categories__divider';
-    categoryLinks.append(
-      ...settingCategories.map(categoryLink),
-      divider,
-      ...categories.filter((category) => SITE_CATEGORIES.includes(category)).map(categoryLink),
-    );
+    categoryLinks.append(...settingCategories.map(categoryLink), divider, ...siteCategories.map(categoryLink));
     feedbackLink.append(...BOTTOM_CATEGORIES.map(categoryLink));
     // Rows are built with their saved state, so switches don't slide on every open.
     groups.append(...categories.map((category) => categoryGroup(category, saved)));
-    render();
+    filterItems();
+    if (categories.includes(askedCategory)) scrollToCategory(askedCategory, false);
   });
 })();

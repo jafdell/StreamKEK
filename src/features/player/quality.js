@@ -4,8 +4,13 @@
 // works afterwards. Twitch's saved quality is left alone: it ignores a size the stream doesn't
 // offer, so it can't fall back to the next one down. Runs in the page itself, because reaching
 // the player means going through React's internals. src/twitch/page-sync.js sets the attribute.
+// Also runs in Twitch's embedded player, player.twitch.tv, for the multi-stream view, where
+// embed-quality.js sets it. The player is found the same way there.
 (() => {
   'use strict';
+
+  // Twitch's embedded player on other websites.
+  if (window !== window.top && !location.ancestorOrigins[0]?.endsWith('.twitch.tv')) return;
 
   const CHECK_MS = 1000;
 

@@ -2,10 +2,12 @@
 // switching them off. How a site works out what's live is its own runPoll. The storage keys are the
 // ones in ../sites.js, which a module can't import, so a test checks that they match.
 
+import { notifiedFavorites, platformOf } from '../../notifications/background/live-changes.js';
+
 const POLL_MINUTES = 1;
 const STALE_MS = 60_000;
 
-export function createSiteBackground({ keys, followsSetting, runPoll }) {
+export function createSiteBackground({ platform, keys, followsSetting, runPoll }) {
   let polling = null;
 
   function poll() {
@@ -15,9 +17,11 @@ export function createSiteBackground({ keys, followsSetting, runPoll }) {
     return polling;
   }
 
-  async function pollIfTwitchOpen() {
+  // With no Twitch tab there's nobody to show what's live to, unless a favorite on this site is to
+  // notify you when it starts. See notifications/background/index.js.
+  async function pollIfWanted() {
     const tabs = await chrome.tabs.query({ url: 'https://www.twitch.tv/*' });
-    if (tabs.length) await poll();
+    if (tabs.length || (await notifiedFavorites()).some((c) => platformOf(c) === platform)) await poll();
   }
 
   // Turning it off clears what came from followed channels at once, keeping channels you added.
@@ -82,7 +86,7 @@ export function createSiteBackground({ keys, followsSetting, runPoll }) {
 
   function startPolling(alarmName) {
     chrome.alarms.onAlarm.addListener((alarm) => {
-      if (alarm.name === alarmName) pollIfTwitchOpen();
+      if (alarm.name === alarmName) pollIfWanted();
     });
     // Creating an alarm restarts its countdown, and this runs each time the service worker
     // wakes, so only create it when it's missing or has an old interval.
