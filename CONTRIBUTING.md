@@ -22,6 +22,7 @@ Features are in `src/features/`. `chat/`, `player/` and `sidebar/` match the set
 | Settings | `src/settings.js` (the registry). A CSS-only setting's rule lives with its feature, like `src/features/sidebar/sections.css` |
 | Code shared by every feature on Twitch pages | `src/twitch/`: `helpers.js`, `page-sync.js`, `gql.js` (Twitch's own API), `base.css` |
 | The extension's button in Twitch's top bar and the window around the settings page | `src/twitch/settings-button.js` and `.css` |
+| What's new in each version | `CHANGELOG.md` in the root, newest version first. `src/settings-window/changelog.js` reads that same file for the settings window's **What's new** category, so keep its shape: a `## 1.5.0 - 2026-11-11` heading, then one `- ` line per change, with `**` around the part to show in bold. Write what people can do now, not how the code changed. `node --test` checks that it starts with the manifest's version |
 | The settings page: categories, search, rows, backups. Also the toolbar popup | `src/settings-window/`. `src/extension-pages/` holds what it shares with the channel manager: `page.css` and `page-theme.js` |
 | The Theme setting's colors | Twitch's values for each theme, wherever `src/` matches `data-theme` or `data-skek-theme`, plus `READABLE` in `youtube/frames/chat.js` (chatters' name colors). Kick has no light theme, so `kick/frames/chat.css` stays dark |
 | Streams from other sites | `src/features/streams/`: `sites.js` (everything that differs per site), `twitch/` (sidebar sections, stream view, address, Following page), `manager/` (channel manager), `frames/` and `background/` (what every site's frames and service worker code share) |
@@ -125,7 +126,7 @@ Sites like YouTube and Kick share everything on Twitch's side, so a new one is m
 - A `message` listener checks `event.source` before trusting what it receives, as `view-layouts.js` does.
 - Don't add a script loader, a router or other shared machinery until a second feature really needs it. Code moves to `src/twitch/` when a second feature needs it. The stream view's half of a feature doesn't count: `view-layouts.js` uses `player/floating-window.js` because floating chat is one feature on two players.
 - New permissions need a stated reason in the PR.
-- Leave `version` in `manifest.json` alone; the maintainer sets it.
+- Leave `version` in `manifest.json` alone; the maintainer sets it, and adds that version to `CHANGELOG.md`.
 - Don't lower `minimum_chrome_version` below 145. The `topDomains` limit in `rules/youtube-watch-frame.json` only exists from Chrome 145.
 - Test YouTube's player in a real browser before tightening `rules/youtube-watch-frame.json`. Its `initiatorDomains` limit is fine alone, but adding it and narrowing `topDomains` to `www.twitch.tv`, tried together, made the browser refuse the player.
 
