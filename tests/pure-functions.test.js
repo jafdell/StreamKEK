@@ -13,6 +13,8 @@ import { liveChannelsFromGuide } from '../src/features/youtube/background/subscr
 import { flippedSettings } from '../src/background/renamed-settings.js';
 import { channelPageToLive, followedStreamToLive, slugFromInput, startedAtIso } from '../src/features/kick/background/kick-api.js';
 import { copyExpiry, isRealCookie } from '../src/features/kick/background/twitch-frame-cookies.js';
+import { isSamePage, liveChanges, notificationAddress, notificationFor, notificationId, streamAddress } from '../src/features/notifications/background/live-changes.js';
+import { twitchLiveFrom } from '../src/features/notifications/background/twitch-live.js';
 
 // format.js is a classic content script, so it runs in a context holding the globals it expects.
 const context = { skek: { helpers: { el() {} }, streams: {} } };
@@ -733,4 +735,107 @@ test('compact shortens thousands', () => {
 test('compact shortens millions', () => {
   assert.equal(compact(1200000), '1.2M');
   assert.equal(compact(2000000), '2M');
+});
+
+const favorites = [{ id: 'twitch:a' }, { id: 'twitch:b' }];
+const MINUTE = 60_000;
+
+test('liveChanges only notes who is live on the first check, and after the browser was closed', () => {
+  const first = liveChanges(undefined, favorites, { 'twitch:a': ['1'] }, 1000);
+  assert.deepEqual(first, { seen: { at: 1000, streams: { 'twitch:a': ['1'], 'twitch:b': [] } }, started: [] });
+
+  const afterGap = liveChanges(first.seen, favorites, { 'twitch:a': ['2'], 'twitch:b': ['3'] }, 1000 + 11 * MINUTE);
+  assert.deepEqual(afterGap.started, []);
+  assert.deepEqual(afterGap.seen.streams, { 'twitch:a': ['2'], 'twitch:b': ['3'] });
+});
+
+test('liveChanges says who started a stream since the last check', () => {
+  const seen = { at: 1000, streams: { 'twitch:a': ['1'], 'twitch:b': [] } };
+  const { started, seen: next } = liveChanges(seen, favorites, { 'twitch:a': ['1'], 'twitch:b': ['3'] }, 1000 + MINUTE);
+  assert.deepEqual(started, ['twitch:b']);
+  assert.deepEqual(next, { at: 1000 + MINUTE, streams: { 'twitch:a': ['1'], 'twitch:b': ['3'] } });
+});
+
+test('liveChanges notifies once for a stream that drops out and comes back', () => {
+  const live = { at: 1000, streams: { 'twitch:a': ['1'], 'twitch:b': [] } };
+  const gone = liveChanges(live, favorites, {}, 1000 + MINUTE);
+  assert.deepEqual(gone.started, []);
+  assert.deepEqual(gone.seen.streams['twitch:a'], ['1'], 'its last stream is remembered while it is offline');
+  assert.deepEqual(liveChanges(gone.seen, favorites, { 'twitch:a': ['1'] }, 1000 + 2 * MINUTE).started, []);
+  assert.deepEqual(liveChanges(gone.seen, favorites, { 'twitch:a': ['2'] }, 1000 + 2 * MINUTE).started, ['twitch:a']);
+});
+
+test('liveChanges treats a channel with several streams as live once', () => {
+  const seen = { at: 1000, streams: { 'twitch:a': ['1', '2'], 'twitch:b': [] } };
+  assert.deepEqual(liveChanges(seen, favorites, { 'twitch:a': ['2', '3'] }, 1000 + MINUTE).started, []);
+  assert.deepEqual(liveChanges(seen, favorites, { 'twitch:a': ['3'] }, 1000 + MINUTE).started, ['twitch:a']);
+});
+
+test('liveChanges only notes a channel that is new to Favorites, and forgets one that left', () => {
+  const seen = { at: 1000, streams: { 'twitch:gone': ['9'] } };
+  const { started, seen: next } = liveChanges(seen, favorites, { 'twitch:a': ['1'] }, 1000 + MINUTE);
+  assert.deepEqual(started, []);
+  assert.deepEqual(next.streams, { 'twitch:a': ['1'], 'twitch:b': [] });
+});
+
+test('streamAddress is where the channel opens on Twitch', () => {
+  assert.equal(streamAddress({ id: 'twitch:kaicenat', platform: 'twitch', login: 'kaicenat' }), 'https://www.twitch.tv/kaicenat');
+  assert.equal(streamAddress({ id: 'kick:Some-Name', platform: 'kick', slug: 'Some-Name' }), 'https://www.twitch.tv/kick/some-name');
+  assert.equal(streamAddress({ id: 'UCabc', handle: '@Some Channel' }), 'https://www.twitch.tv/yt/some%20channel');
+  assert.equal(streamAddress({ id: 'UCabc' }), 'https://www.twitch.tv/yt/ucabc');
+});
+
+test('notificationFor says who is live, where and with what', () => {
+  assert.deepEqual(notificationFor({ name: 'kai', platform: 'twitch' }, { name: 'Kai', title: ' Hello\n  there ', category: 'Just Chatting' }), {
+    title: 'Kai is live on Twitch',
+    message: 'Hello there',
+    contextMessage: 'Just Chatting',
+  });
+  // The message can't be empty, so the category or a plain line stands in for a missing title.
+  assert.deepEqual(notificationFor({ name: 'KC', platform: 'kick' }, { title: '', category: 'Slots' }), {
+    title: 'KC is live on Kick',
+    message: 'Slots',
+    contextMessage: '',
+  });
+  assert.deepEqual(notificationFor({ name: 'Some Channel' }, {}), {
+    title: 'Some Channel is live on YouTube',
+    message: 'Streaming now',
+    contextMessage: '',
+  });
+});
+
+test('twitchLiveFrom keeps only the channels that are live', () => {
+  const live = twitchLiveFrom([
+    { login: 'on', displayName: 'On', stream: { id: '42', title: 'Hi', game: { displayName: 'Chess' } } },
+    { login: 'nogame', displayName: 'NoGame', stream: { id: '43', title: null, game: null } },
+    { login: 'off', displayName: 'Off', stream: null },
+    null,
+  ]);
+  assert.deepEqual(live, {
+    'twitch:on': { ids: ['42'], name: 'On', title: 'Hi', category: 'Chess' },
+    'twitch:nogame': { ids: ['43'], name: 'NoGame', title: '', category: '' },
+  });
+  assert.deepEqual(twitchLiveFrom(null), {});
+});
+
+test('notificationId is new each time and still says what to open', () => {
+  const address = 'https://www.twitch.tv/yt/some%20channel';
+  const id = notificationId(1000, address);
+  assert.notEqual(id, notificationId(1001, address));
+  assert.equal(notificationAddress(id), address);
+  assert.equal(notificationAddress(notificationId(1000, 'https://www.twitch.tv/kick/a:b')), 'https://www.twitch.tv/kick/a:b');
+  // Another extension's, and ones that could open anything but Twitch.
+  for (const other of ['someone-elses', 'test', 'live:1000:', 'live:1000:https://example.com/', 'live:x:https://www.twitch.tv/a', 'live:https://www.twitch.tv/a']) {
+    assert.equal(notificationAddress(other), null, other);
+  }
+});
+
+test('isSamePage finds a tab that is already on the stream', () => {
+  const address = 'https://www.twitch.tv/kaicenat';
+  assert.ok(isSamePage('https://www.twitch.tv/KaiCenat', address));
+  assert.ok(isSamePage('https://www.twitch.tv/kaicenat/?referrer=raid#x', address));
+  assert.ok(!isSamePage('https://www.twitch.tv/kaicenat/videos', address));
+  assert.ok(!isSamePage('https://www.twitch.tv/kai', address));
+  assert.ok(!isSamePage('https://m.twitch.tv/kaicenat', address));
+  assert.ok(!isSamePage(undefined, address));
 });

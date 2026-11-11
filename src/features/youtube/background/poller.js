@@ -12,7 +12,7 @@ import { fetchLiveSubscriptions } from './subscriptions.js';
 
 export const KEYS = { own: 'channels', followed: 'subChannels', live: 'live', status: 'status', hidden: 'hiddenChannels' };
 
-export const background = createSiteBackground({ keys: KEYS, followsSetting: 'showSubscriptions', runPoll });
+export const background = createSiteBackground({ platform: 'youtube', keys: KEYS, followsSetting: 'showSubscriptions', runPoll });
 
 async function checkChannels(channels, previous) {
   const result = { live: {}, avatars: {}, consentRequired: false };

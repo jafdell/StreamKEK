@@ -70,6 +70,7 @@
     Appearance: '<path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 2v14a7 7 0 0 1 0-14Z"/>',
     Chat: '<path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9.5L5 21v-4H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/>',
     Feedback: '<path d="M3 20.5 22 12 3 3.5V10l12 2-12 2v6.5Z"/>',
+    Notifications: '<path d="M12 3a6 6 0 0 0-6 6v4l-2 3v1h16v-1l-2-3V9a6 6 0 0 0-6-6Zm-2 16a2 2 0 0 0 4 0h-4Z"/>',
     Player: '<path d="M8 5v14l11-7L8 5Z"/>',
     Sidebar: '<path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm1 2v10h4V7H5Zm6 0v10h8V7h-8Z"/>',
     Kick: '<path d="M4 3h7v5h2V5h2V3h5v6h-2v2h-2v2h2v2h2v6h-5v-2h-2v-3h-2v5H4V3Z"/>',

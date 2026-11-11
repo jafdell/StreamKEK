@@ -150,6 +150,13 @@
       ],
     },
     {
+      key: 'liveNotifications',
+      category: 'Notifications',
+      label: 'Notify me when a favorite goes live',
+      hint: "Shows a notification when a channel in your Favorites starts a stream on Twitch, YouTube or Kick. Works while the browser is open, also with no Twitch tab, and checks every minute. Clicking it opens the stream. Your computer's Do Not Disturb or Focus can hold them back.",
+      default: false,
+    },
+    {
       key: 'showSubscriptions',
       category: 'YouTube',
       label: 'Show my live YouTube subscriptions',

@@ -14,7 +14,8 @@
     "alarms",
     "contentSettings",
     "cookies",
-    "declarativeNetRequestWithHostAccess"
+    "declarativeNetRequestWithHostAccess",
+    "notifications"
   ],
   "host_permissions": [
     "https://www.youtube.com/*",
