@@ -109,6 +109,13 @@
       default: false,
     },
     {
+      key: 'showDeletedMessages',
+      category: 'Chat',
+      label: 'See deleted messages',
+      hint: 'Keeps a message readable in Twitch chat after a moderator deletes it, or times out or bans whoever wrote it. It shows faded and crossed out, and its links no longer open. Only on live streams, and only for messages that were in chat before they were deleted.',
+      default: false,
+    },
+    {
       key: 'autoClaimPoints',
       category: 'Chat',
       label: 'Auto-claim channel points',

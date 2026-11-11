@@ -29,6 +29,7 @@ It works in Chrome, Brave and other Chromium browsers, with no API key and no ex
 - **Autocomplete emotes with Tab:** type the start of an emote's name in Twitch chat and press Tab. Off by default.
 - **Blocked and highlighted words:** remove messages containing the words you choose, or make them stand out, in Twitch, YouTube and Kick chat.
 - **Chat font size:** one text size for Twitch, YouTube and Kick chat.
+- **See deleted messages:** keep reading a message in Twitch chat after a moderator deletes it. Off by default.
 - **Cleaner chat:** hide Twitch chat's timestamps, top strip, drops, pinned messages and Hype Train.
 
 ### A tidier Twitch

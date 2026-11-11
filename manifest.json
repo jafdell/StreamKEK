@@ -65,6 +65,7 @@
         "src/features/sidebar/current-channel.js",
         "src/features/chat/claim-points.js",
         "src/features/chat/chat-words.js",
+        "src/features/chat/deleted-messages.js",
         "src/features/chat/emotes.js",
         "src/features/chat/emote-picker.js",
         "src/features/player/control-buttons.js",
@@ -82,6 +83,7 @@
         "src/features/chat/timestamps.css",
         "src/features/chat/sections.css",
         "src/features/chat/chat-words.css",
+        "src/features/chat/deleted-messages.css",
         "src/features/chat/emotes.css",
         "src/features/chat/emote-picker.css",
         "src/features/player/extensions.css",
@@ -158,6 +160,7 @@
         "src/twitch/gql.js",
         "src/features/streams/frames/layout-keys.js",
         "src/features/chat/chat-words.js",
+        "src/features/chat/deleted-messages.js",
         "src/features/chat/emotes.js",
         "src/features/chat/emote-picker.js"
       ],
@@ -166,6 +169,7 @@
         "src/features/chat/timestamps.css",
         "src/features/chat/sections.css",
         "src/features/chat/chat-words.css",
+        "src/features/chat/deleted-messages.css",
         "src/features/chat/emotes.css",
         "src/features/chat/emote-picker.css"
       ],

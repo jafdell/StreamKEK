@@ -1,0 +1,12 @@
+/* The See deleted messages setting; see deleted-messages.js, which sets the attribute only on a
+   chat line it has put the text back in, so Twitch's notice is never hidden with nothing in its
+   place. */
+
+[data-skek-deleted] [data-a-target='chat-deleted-message-placeholder'] {
+  display: none !important;
+}
+
+[data-skek-deleted] [data-a-target='chat-line-message-body'] {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
