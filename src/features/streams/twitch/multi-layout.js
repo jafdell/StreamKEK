@@ -14,78 +14,104 @@
   // Two chats side by side stop being readable under this.
   const MIN_COLUMN_WIDTH = 280;
   const BOTTOM_CHAT_SHARE = 0.35;
+  // The least of the room a divider leaves on either side, so a stream can't be dragged away to nothing.
+  const MIN_SPLIT = 0.2;
 
   const HASH_PREFIX = '#skek-multi=';
   const ENTRY = /^(twitch|youtube|kick)\/([\w-]+)(?:\/([\w-]{11}))?$/;
 
   const round = ({ x, y, w, h }) => ({ x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) });
 
-  // Each stream is a 16:9 video with its bar on top, as big as it fits. Three get one bigger than the
-  // others, on top or to the left, whichever leaves it biggest.
-  function fitStreams(count, area) {
-    const { w, h } = area;
-    const cellHeight = (width) => width * ASPECT + HEAD_HEIGHT;
-    const fitting = (rowsWidth, rows) => Math.max(0, Math.min(rowsWidth, (h / rows - HEAD_HEIGHT) / ASPECT));
+  // Where a divider is: where it was dragged to, as a share of the room, or where it starts out.
+  function dividerAt(split, natural, length, least = MIN_SPLIT) {
+    return split == null ? natural : Math.min(1 - least, Math.max(least, split)) * length;
+  }
 
-    let cells;
+  // Each stream is a 16:9 video with its bar on top, as big as fits its part of the room. The dividers
+  // between those parts can be dragged, which `splits` remembers: `main` is between the first stream
+  // and the rest, `cross` the other one. Three get one bigger than the others, on top or to the left,
+  // whichever leaves it biggest before any dragging.
+  // A divider's `start` and `length` are the room it moves in, so a split is (position - start) / length.
+  function fitStreams(count, area, splits = {}) {
+    const { w, h } = area;
+    const widthIn = (tileWidth, tileHeight) => Math.max(0, Math.min(tileWidth, (tileHeight - HEAD_HEIGHT) / ASPECT));
+    const cellHeight = (width) => width * ASPECT + HEAD_HEIGHT;
+    const vertical = (split, at, from = 0) => ({ split, axis: 'x', x: at, y: from, w: 0, h: h - from, start: area.x, length: w });
+    const horizontal = (split, at, from = 0) => ({ split, axis: 'y', x: from, y: at, w: w - from, h: 0, start: area.y, length: h });
+
+    // Each tile is [x, y, width, height, alignX, alignY]. Its stream sits against the sides its dividers
+    // are on, so the streams stay together: 0 is the start, 1 the end and 0.5 the middle.
+    let tiles;
+    let dividers = [];
     if (count === 2) {
-      const beside = fitting(w / 2, 1);
-      const above = fitting(w, 2);
-      cells =
-        beside >= above
-          ? [{ x: 0, y: 0, w: beside, h: cellHeight(beside) }, { x: beside, y: 0, w: beside, h: cellHeight(beside) }]
-          : [{ x: 0, y: 0, w: above, h: cellHeight(above) }, { x: 0, y: cellHeight(above), w: above, h: cellHeight(above) }];
+      if (widthIn(w / 2, h) >= widthIn(w, h / 2)) {
+        const edge = dividerAt(splits.main, w / 2, w);
+        tiles = [[0, 0, edge, h, 1, 0.5], [edge, 0, w - edge, h, 0, 0.5]];
+        dividers = [vertical('main', edge)];
+      } else {
+        const edge = dividerAt(splits.main, h / 2, h);
+        tiles = [[0, 0, w, edge, 0.5, 1], [0, edge, w, h - edge, 0.5, 0]];
+        dividers = [horizontal('main', edge)];
+      }
     } else if (count === 3) {
       // The two small ones' bars take up room too, so the big one on the left isn't exactly twice their size.
       const barsShift = (HEAD_HEIGHT * 8) / 9;
       const onTop = Math.max(0, Math.min(w, (h - 2 * HEAD_HEIGHT) / (ASPECT * 1.5)));
       const onLeft = Math.max(0, Math.min((w + barsShift) / 1.5, (h - HEAD_HEIGHT) / ASPECT));
+      // The main divider starts where the big one ends when all three are centered together.
       if (onTop >= onLeft) {
-        const small = onTop / 2;
-        const top = cellHeight(onTop);
-        cells = [
-          { x: 0, y: 0, w: onTop, h: top },
-          { x: 0, y: top, w: small, h: cellHeight(small) },
-          { x: small, y: top, w: small, h: cellHeight(small) },
-        ];
+        const edge = dividerAt(splits.main, (h + cellHeight(onTop) - cellHeight(onTop / 2)) / 2, h);
+        const middle = dividerAt(splits.cross, w / 2, w);
+        tiles = [[0, 0, w, edge, 0.5, 1], [0, edge, middle, h - edge, 1, 0], [middle, edge, w - middle, h - edge, 0, 0]];
+        dividers = [horizontal('main', edge), vertical('cross', middle, edge)];
       } else {
         const small = Math.max(0, onLeft / 2 - barsShift);
-        cells = [
-          { x: 0, y: 0, w: onLeft, h: cellHeight(onLeft) },
-          { x: onLeft, y: 0, w: small, h: cellHeight(small) },
-          { x: onLeft, y: cellHeight(small), w: small, h: cellHeight(small) },
-        ];
+        const edge = dividerAt(splits.main, (w + onLeft - small) / 2, w);
+        const middle = dividerAt(splits.cross, h / 2, h);
+        tiles = [[0, 0, edge, h, 1, 0.5], [edge, 0, w - edge, middle, 0, 1], [edge, middle, w - edge, h - middle, 0, 0]];
+        dividers = [vertical('main', edge), horizontal('cross', middle, edge)];
       }
     } else if (count === 4) {
-      const width = fitting(w / 2, 2);
-      const height = cellHeight(width);
-      cells = [0, 1, 2, 3].map((i) => ({ x: (i % 2) * width, y: Math.floor(i / 2) * height, w: width, h: height }));
+      const column = dividerAt(splits.main, w / 2, w);
+      const row = dividerAt(splits.cross, h / 2, h);
+      tiles = [
+        [0, 0, column, row, 1, 1],
+        [column, 0, w - column, row, 0, 1],
+        [0, row, column, h - row, 1, 0],
+        [column, row, w - column, h - row, 0, 0],
+      ];
+      dividers = [vertical('main', column), horizontal('cross', row)];
     } else {
-      const width = fitting(w, 1);
-      cells = [{ x: 0, y: 0, w: width, h: cellHeight(width) }];
+      tiles = [[0, 0, w, h, 0.5, 0.5]];
     }
 
-    const usedWidth = Math.max(...cells.map((c) => c.x + c.w));
-    const usedHeight = Math.max(...cells.map((c) => c.y + c.h));
-    const left = area.x + (w - usedWidth) / 2;
-    const top = area.y + (h - usedHeight) / 2;
-    return cells.map((c) => round({ ...c, x: c.x + left, y: c.y + top }));
+    const inArea = (rect) => round({ ...rect, x: rect.x + area.x, y: rect.y + area.y });
+    return {
+      players: tiles.map(([x, y, tileWidth, tileHeight, alignX, alignY]) => {
+        const width = widthIn(tileWidth, tileHeight);
+        const height = cellHeight(width);
+        return inArea({ x: x + (tileWidth - width) * alignX, y: y + (tileHeight - height) * alignY, w: width, h: height });
+      }),
+      dividers: dividers.map((divider) => ({ ...divider, ...inArea(divider) })),
+    };
   }
 
   // Two streams each keep their chat under them. More than that share one chat with a picker: beside
   // them, or under them if the window is too narrow. `chats` is one per stream, `chat` the shared one.
-  function multiLayout({ count, width, height, chat }) {
+  function multiLayout({ count, width, height, chat, splits = {} }) {
     const whole = { x: 0, y: 0, w: width, h: height };
-    if (!chat) return { players: fitStreams(count, whole), chats: null, chat: null, picker: null };
+    if (!chat) return { ...fitStreams(count, whole, splits), chats: null, chat: null, picker: null };
 
     if (count === 2 && width / 2 >= MIN_COLUMN_WIDTH) {
-      const columnWidth = width / 2;
-      const video = Math.max(0, Math.min(columnWidth * ASPECT, height - HEAD_HEIGHT - MIN_CHAT_HEIGHT));
-      const top = video + HEAD_HEIGHT;
-      const columns = [0, 1].map((i) => i * columnWidth);
+      const edge = dividerAt(splits.main, width / 2, width, Math.max(MIN_SPLIT, MIN_COLUMN_WIDTH / width));
+      const columns = [{ x: 0, w: edge }, { x: edge, w: width - edge }].map((column) => {
+        const video = Math.max(0, Math.min(column.w * ASPECT, height - HEAD_HEIGHT - MIN_CHAT_HEIGHT));
+        return { ...column, top: video + HEAD_HEIGHT };
+      });
       return {
-        players: columns.map((x) => round({ x, y: 0, w: columnWidth, h: top })),
-        chats: columns.map((x) => round({ x, y: top, w: columnWidth, h: height - top })),
+        players: columns.map(({ x, w, top }) => round({ x, y: 0, w, h: top })),
+        dividers: [{ split: 'main', axis: 'x', ...round({ x: edge, y: 0, w: 0, h: height }), start: 0, length: width }],
+        chats: columns.map(({ x, w, top }) => round({ x, y: top, w, h: height - top })),
         chat: null,
         picker: null,
       };
@@ -102,7 +128,7 @@
       side = { x: 0, y: height - chatHeight, w: width, h: chatHeight };
     }
     return {
-      players: fitStreams(count, streams),
+      ...fitStreams(count, streams, splits),
       chats: null,
       chat: round({ ...side, y: side.y + PICKER_HEIGHT, h: side.h - PICKER_HEIGHT }),
       picker: round({ ...side, h: PICKER_HEIGHT }),

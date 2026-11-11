@@ -1,6 +1,7 @@
 // The multi-stream view: two to four streams at once, from any site, opened by dragging a channel from
 // the sidebar onto the page. Its streams are in the address, like the stream view's, so reloading and
-// Back work: routes.js reads it and calls syncMulti. Its sizes are worked out in multi-layout.js.
+// Back work: routes.js reads it and calls syncMulti. Its sizes are worked out in multi-layout.js, and
+// dragging between streams changes them until the number of streams changes or the page reloads.
 // Every frame stays where it was put in this element and only its position changes, because moving a
 // frame in the page would reload it.
 (() => {
@@ -18,10 +19,18 @@
   const TITLE = 'Multi-stream - Twitch';
   const DROP_CLASS = 'skek-drop';
   const MOVING_CLASS = 'skek-multi--moving';
+  const RESIZING_CLASS = 'skek-multi--resizing';
+  const DIVIDER_ACTIVE_CLASS = 'skek-multi__divider--active';
+  // The two dividers multi-layout.js can give. A divider's grip is this far to each side of its line,
+  // and where two dividers meet a bigger grip drags both.
+  const SPLITS = ['main', 'cross'];
+  const DIVIDER_GRIP_PX = 4;
+  const CORNER_GRIP_PX = 8;
   // Further than a click wanders, so a click on a stream's name still opens its channel.
   const MOVE_THRESHOLD_PX = 5;
   const HINT_ADD = 'Drag a channel from the sidebar to add it.';
   const HINT_MOVE = "Drag a stream's name onto another to swap them.";
+  const HINT_RESIZE = 'Drag between streams to resize them.';
 
   // Channels seen in a drag, for their name until their site has said more. Lasts for this page.
   const knownChannels = new Map();
@@ -32,6 +41,7 @@
   let dropOverlay = null;
   // The stream whose bar is being dragged, with what shows while it is.
   let moving = null;
+  let layoutQueued = false;
 
   // The icon is only replaced when it changes, so the sound bars don't restart their animation each
   // time the layout is worked out again, which happens many times while the window is resized.
@@ -118,8 +128,10 @@
       width: stage.clientWidth,
       height: stage.clientHeight,
       chat: !multi.chatHidden,
+      splits: multi.splits,
     });
     multi.sharedChat = !!layout.chat;
+    multi.dividers = layout.dividers;
 
     multi.entries.forEach((entry, i) => {
       place(entry.cell, layout.players[i]);
@@ -130,6 +142,91 @@
     });
     place(picker, layout.picker);
     if (layout.picker) renderPicker();
+    placeDividers(layout.dividers);
+  }
+
+  function placeDividers(dividers) {
+    const { refs } = state.multi;
+    for (const split of SPLITS) {
+      const divider = dividers.find((d) => d.split === split);
+      const grip = refs[`${split}Divider`];
+      if (!divider) {
+        place(grip, null);
+        continue;
+      }
+      const sideways = divider.axis === 'x';
+      grip.dataset.skekAxis = divider.axis;
+      grip.ariaOrientation = sideways ? 'vertical' : 'horizontal';
+      place(
+        grip,
+        sideways
+          ? { x: divider.x - DIVIDER_GRIP_PX, y: divider.y, w: DIVIDER_GRIP_PX * 2, h: divider.h }
+          : { x: divider.x, y: divider.y - DIVIDER_GRIP_PX, w: divider.w, h: DIVIDER_GRIP_PX * 2 },
+      );
+    }
+    const upright = dividers.find((d) => d.axis === 'x');
+    const level = dividers.find((d) => d.axis === 'y');
+    const meet = upright && level ? { x: upright.x - CORNER_GRIP_PX, y: level.y - CORNER_GRIP_PX, w: CORNER_GRIP_PX * 2, h: CORNER_GRIP_PX * 2 } : null;
+    place(refs.cornerDivider, meet);
+  }
+
+  // A drag asks for a new layout far more often than the screen is drawn.
+  function queueLayout() {
+    if (layoutQueued) return;
+    layoutQueued = true;
+    requestAnimationFrame(() => {
+      layoutQueued = false;
+      applyLayout();
+    });
+  }
+
+  // Dragging a divider makes the streams on one side bigger and the others smaller. It holds on to the
+  // pointer, so the frames it passes over can't take the mouse, and it ends however the pointer goes.
+  function beginResize(event, splits) {
+    const { multi } = state;
+    const along = (divider, e) => (divider.axis === 'x' ? e.clientX : e.clientY);
+    // With where on the grip each was caught, so a divider doesn't jump to the pointer.
+    const dragged = multi.dividers
+      .filter((divider) => splits.includes(divider.split) && divider.length)
+      .map((divider) => ({ divider, offset: along(divider, event) - (divider.axis === 'x' ? divider.x : divider.y) }));
+    if (event.button !== 0 || !dragged.length) return;
+    const grip = event.currentTarget;
+    try {
+      grip.setPointerCapture(event.pointerId);
+    } catch {
+      return;
+    }
+    const onMove = (e) => {
+      if (state.multi !== multi) return;
+      for (const { divider, offset } of dragged) multi.splits[divider.split] = (along(divider, e) - offset - divider.start) / divider.length;
+      queueLayout();
+    };
+    multi.root.classList.add(RESIZING_CLASS);
+    grip.classList.add(DIVIDER_ACTIVE_CLASS);
+    grip.addEventListener('pointermove', onMove);
+    grip.addEventListener(
+      'lostpointercapture',
+      () => {
+        grip.removeEventListener('pointermove', onMove);
+        grip.classList.remove(DIVIDER_ACTIVE_CLASS);
+        multi.root.classList.remove(RESIZING_CLASS);
+      },
+      { once: true },
+    );
+  }
+
+  function resetSplits(splits) {
+    for (const split of splits) state.multi.splits[split] = null;
+    applyLayout();
+  }
+
+  function buildDivider(className, splits) {
+    return el('div', {
+      class: `skek-multi__divider ${className}`,
+      role: 'separator',
+      title: 'Drag to resize the streams. Double-click to reset.',
+      on: { pointerdown: (event) => beginResize(event, splits), dblclick: () => resetSplits(splits) },
+    });
   }
 
   function renderPicker() {
@@ -370,7 +467,16 @@
         ref('fullToggle', barButton('', () => setFull(!state.multi.full))),
         ref('close', barButton('', () => shared.leaveMulti(null))),
       ),
-      ref('stage', el('div', { class: 'skek-multi__stage' }, ref('picker', el('div', { class: 'skek-multi__picker' })))),
+      ref(
+        'stage',
+        el(
+          'div',
+          { class: 'skek-multi__stage' },
+          ref('picker', el('div', { class: 'skek-multi__picker' })),
+          ...SPLITS.map((split) => ref(`${split}Divider`, buildDivider('', [split]))),
+          ref('cornerDivider', buildDivider('skek-multi__divider--corner', SPLITS)),
+        ),
+      ),
     );
     setButton(refs.close, 'Close multi-stream', 'close');
     return { root, refs };
@@ -399,7 +505,7 @@
 
   function openMulti() {
     const { root, refs } = buildRoot();
-    state.multi = { root, refs, entries: [], hash: '', audioId: null, chatId: null, chatHidden: false, full: false, sharedChat: false, started: false };
+    state.multi = { root, refs, entries: [], dividers: [], splits: {}, hash: '', audioId: null, chatId: null, chatHidden: false, full: false, sharedChat: false, started: false };
     savedTitle = document.title;
     setChatHidden(false);
     setFull(false);
@@ -454,6 +560,8 @@
       multi.refs.stage.append(built.cell, built.chatBox);
       return built;
     });
+    // Another number of streams is laid out another way, so what was dragged no longer means the same.
+    if (previous.length !== multi.entries.length) multi.splits = {};
     for (const entry of previous) {
       if (!multi.entries.includes(entry)) {
         entry.cell.remove();
@@ -468,7 +576,7 @@
     multi.started = true;
     if (!multi.entries.some((e) => e.id === multi.chatId)) multi.chatId = multi.entries[0].id;
 
-    multi.refs.hint.textContent = multi.entries.length < MAX_MULTI_STREAMS ? `${HINT_ADD} ${HINT_MOVE}` : HINT_MOVE;
+    multi.refs.hint.textContent = `${multi.entries.length < MAX_MULTI_STREAMS ? `${HINT_ADD} ` : ''}${HINT_MOVE} ${HINT_RESIZE}`;
     updateMulti();
     for (const entry of multi.entries) sendAudio(entry);
     placeMulti();

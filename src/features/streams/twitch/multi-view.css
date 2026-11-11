@@ -68,6 +68,26 @@
 .skek-multi__player { flex: 1 1 auto; min-height: 0; background: #000; }
 .skek-multi__frame { display: block; width: 100%; height: 100%; border: 0; }
 
+/* Between streams, to drag them bigger and smaller. Wider than the line it shows, so it's easy to
+   catch, and over the frames' edges, which would otherwise take the mouse. Under the swap overlay. */
+.skek-multi__divider { position: absolute; z-index: 1; touch-action: none; user-select: none; }
+.skek-multi__divider[data-skek-axis='x'] { cursor: col-resize; }
+.skek-multi__divider[data-skek-axis='y'] { cursor: row-resize; }
+/* Where two dividers meet, which drags both. */
+.skek-multi__divider--corner { cursor: move; }
+.skek-multi__divider--corner::after { border-radius: 50%; }
+.skek-multi__divider::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  background: #bf94ff;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+.skek-multi__divider:hover::after,
+.skek-multi__divider--active::after { opacity: 1; }
+.skek-multi--resizing iframe { pointer-events: none; }
+
 .skek-multi__chat { position: absolute; box-sizing: border-box; background: var(--color-background-base); outline: 1px solid var(--color-border-base); }
 
 .skek-multi__picker {

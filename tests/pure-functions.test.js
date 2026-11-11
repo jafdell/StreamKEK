@@ -409,6 +409,66 @@ test('multiLayout makes the first of three streams the biggest', () => {
   assert.equal(players[1].w, players[2].w);
 });
 
+test('multiLayout gives a divider between the streams, two where they split both ways', () => {
+  const dividers = (count, chat, width = 1600) => plain(multiLayout({ count, width, height: 900, chat }).dividers).map((d) => `${d.split} ${d.axis}`);
+  assert.deepEqual(dividers(2, true), ['main x']);
+  assert.deepEqual(dividers(2, false), ['main x']);
+  assert.deepEqual(dividers(2, false, 700), ['main y']);
+  assert.deepEqual(dividers(3, false), ['main x', 'cross y']);
+  assert.deepEqual(dividers(3, false, 700), ['main y', 'cross x']);
+  assert.deepEqual(dividers(4, true), ['main x', 'cross y']);
+});
+
+test('multiLayout makes the first stream bigger when its dividers are dragged away from it', () => {
+  for (const count of [2, 3, 4]) {
+    for (const chat of [true, false]) {
+      const sizes = (splits) => plain(multiLayout({ count, width: 1600, height: 900, chat, splits }).players).map((p) => p.w);
+      const before = sizes({});
+      const after = sizes({ main: 0.7, cross: 0.7 });
+      assert.ok(after[0] > before[0], `${count} streams, chat ${chat}: ${after[0]} > ${before[0]}`);
+      assert.ok(after[1] < before[1], `${count} streams, chat ${chat}: ${after[1]} < ${before[1]}`);
+    }
+  }
+});
+
+test('multiLayout puts a dragged divider where the pointer is', () => {
+  const { dividers, players } = plain(multiLayout({ count: 4, width: 1600, height: 900, chat: false, splits: { main: 0.25, cross: 0.6 } }));
+  const [main, cross] = dividers;
+  assert.equal((main.x - main.start) / main.length, 0.25);
+  assert.equal((cross.y - cross.start) / cross.length, 0.6);
+  // Each stream sits against both dividers.
+  assert.equal(players[0].x + players[0].w, main.x);
+  assert.equal(players[0].y + players[0].h, cross.y);
+  assert.deepEqual([players[3].x, players[3].y], [main.x, cross.y]);
+});
+
+test('multiLayout stops a divider before a stream or a chat gets too small', () => {
+  const widths = (width, main) => plain(multiLayout({ count: 2, width, height: 900, chat: true, splits: { main } }).players).map((p) => p.w);
+  assert.deepEqual(widths(1600, 0), [320, 1280]);
+  assert.deepEqual(widths(1600, 3), [1280, 320]);
+  // Two chats side by side each stay wide enough to read.
+  assert.deepEqual(widths(700, 0), [280, 420]);
+});
+
+test('multiLayout keeps dragged streams from overlapping or leaving the view', () => {
+  for (const [width, height] of [[1600, 900], [2560, 1300], [900, 400], [700, 1200]]) {
+    for (const count of [2, 3, 4]) {
+      for (const chat of [true, false]) {
+        for (const splits of [{ main: 0 }, { main: 0.37, cross: 0.3 }, { main: 0.8, cross: 0.9 }, { cross: 1.4 }]) {
+          const { players } = plain(multiLayout({ count, width, height, chat, splits }));
+          players.forEach((a, i) => {
+            assertInside(a, width, height);
+            players.slice(i + 1).forEach((b) => {
+              const apart = a.x + a.w <= b.x + 1 || b.x + b.w <= a.x + 1 || a.y + a.h <= b.y + 1 || b.y + b.h <= a.y + 1;
+              assert.ok(apart, `${JSON.stringify(a)} overlaps ${JSON.stringify(b)} at ${width}x${height}, ${count} streams, ${JSON.stringify(splits)}`);
+            });
+          });
+        }
+      }
+    }
+  }
+});
+
 test('parseMultiHash reads streams from every site, and writes them back the same', () => {
   const hash = '#skek-multi=twitch/kaicenat,kick/some-name,youtube/UCabc_-/abcdefghijk';
   const entries = plain(parseMultiHash(hash));
