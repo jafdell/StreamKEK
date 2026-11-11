@@ -194,7 +194,9 @@ a.setting:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px;
 .dropdown__select:focus-visible { box-shadow: inset 0 0 0 2px var(--focus); }
 .dropdown__select option { background: var(--bg); color: var(--text); font-weight: 400; }
 
-.manager-frame { display: block; width: 100%; height: 340px; margin-top: 10px; border: 0; }
+/* Its height is set to fit the page inside it, once that has loaded. Until then it's the box to add
+   a channel with, which is always there. */
+.manager-frame { display: block; width: 100%; height: 32px; margin-top: 10px; border: 0; }
 
 /* Save a backup and Restore a backup. */
 .backup-controls { display: flex; gap: 8px; margin-top: 10px; }

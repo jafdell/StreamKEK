@@ -121,5 +121,11 @@ html[data-embedded] h1,
 html[data-embedded] #hint,
 html[data-embedded] .subs { display: none; }
 html[data-embedded] body { width: auto; min-height: 0; padding: 0; background: transparent; }
+/* The settings window makes its frame as tall as this page, so the page is only as tall as what's in
+   it. A long list scrolls here, after about six channels, rather than making the settings longer. */
+html[data-embedded],
+html[data-embedded] body { height: auto; }
+html[data-embedded] #list { max-height: 270px; }
+html[data-embedded] #hidden { margin-top: 0; }
 html[data-embedded] ul { margin: 10px 0 0; }
 html[data-embedded] li { padding: 5px 6px; border-radius: 6px; }

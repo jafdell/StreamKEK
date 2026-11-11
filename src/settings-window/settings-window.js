@@ -317,8 +317,16 @@
     frame.className = 'manager-frame';
     frame.title = title;
     frame.src = chrome.runtime.getURL(`src/features/streams/manager/manager.html?embedded&site=${site}`);
-    // Keys pressed inside a frame never reach this page's listener.
-    frame.addEventListener('load', () => frame.contentWindow.addEventListener('keydown', closeOnEscape));
+    frame.addEventListener('load', () => {
+      // Keys pressed inside a frame never reach this page's listener.
+      frame.contentWindow.addEventListener('keydown', closeOnEscape);
+      // As tall as the page inside it, which grows and shrinks with its channels. See manager.css.
+      // The frame's own observer, because this page's only hears about the first size.
+      const { body } = frame.contentDocument;
+      new frame.contentWindow.ResizeObserver(() => {
+        frame.style.height = `${body.offsetHeight}px`;
+      }).observe(body);
+    });
     return frame;
   }
 
