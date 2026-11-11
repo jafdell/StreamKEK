@@ -4,5 +4,6 @@ _metadata/
 *.zip
 AGENTS.md
 .claude/
+.DS_Store
 Thumbs.db
 desktop.ini
