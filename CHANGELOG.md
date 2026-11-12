@@ -5,6 +5,13 @@ What's new in each version of StreamKEK, newest first.
 <!-- The settings window shows this file under What's new, so keep its shape: a "## version - date"
      heading, then one "- " line per change, with ** around the part to show in bold. -->
 
+## 1.6.0 - 2026-11-13
+
+- **Audio only (Alt+A):** a headphones button in Twitch's player plays a live stream or a Twitch video with sound and no picture, so the picture isn't downloaded.
+- **Reload player on errors:** when Twitch's player stops with an error like #2000, it reloads by itself, also in a background tab. It's on by default, under Player.
+- **Keep quality in background tabs:** stops Twitch from lowering a live stream to 360p about a minute after you switch to another tab. It's off by default, under Player.
+- **See deleted messages:** keep reading a message in Twitch chat after a moderator deletes it, shown faded and crossed out. It's off by default, under Chat.
+
 ## 1.5.0 - 2026-11-11
 
 - **Go-live notifications:** get a notification when a channel in your Favorites starts a stream on Twitch, YouTube or Kick, also with no Twitch tab open. It's off by default, under Notifications.
