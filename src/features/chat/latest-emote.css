@@ -1,0 +1,30 @@
+/* The Show the latest emote in the chat box setting; see latest-emote.js. Its text takes the place of
+   Twitch's "Send a message" and looks like it, in Twitch's color for its current theme. Twitch removes
+   its text while something is typed, and this only shows right before that text, so it goes too.
+   Only in a box you can type in, since one that's turned off says why there. With no emote yet,
+   Twitch's text stays.
+   Twitch keeps its text 10px from the top, which is level with the cursor only at its default chat
+   font size. This is centered in the box instead, so it's level with the cursor at every size. */
+
+.skek-latest-emote {
+  display: none;
+}
+
+html[data-skek-on~='chatLatestEmote'] .skek-latest-emote:not(:empty):has(+ .chat-wysiwyg-input__placeholder):has(~ [data-a-target='chat-input'][contenteditable='true']) {
+  display: block;
+  position: absolute;
+  inset: 0;
+  align-content: center;
+  margin-inline-start: 2px;
+  overflow: hidden;
+  color: var(--color-text-input-placeholder, rgba(255, 255, 255, 0.7));
+  font-size: 14px;
+  line-height: 19.6px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+html[data-skek-on~='chatLatestEmote'] .skek-latest-emote:not(:empty):has(~ [data-a-target='chat-input'][contenteditable='true']) + .chat-wysiwyg-input__placeholder {
+  visibility: hidden;
+}
