@@ -2,6 +2,8 @@
 
 Bugs and feature requests go in issues. To send a change: fork the repo, make a branch, make your change, run `node --test` (you'll need Node), walk the relevant part of [TESTING.md](TESTING.md), and open a pull request saying what you tried. Start its title with a verb that says what changed, and fill in the template.
 
+By opening a pull request, you agree that your contribution is licensed under the project's [LICENSE](LICENSE), and that the owner may also use and license it under other terms, including in paid features.
+
 ## How it fits together
 
 - **Service worker** (`src/background/service-worker.js`, feature code in `background/` folders): works out what's live on YouTube and Kick, for all tabs at once, and notifies you when a favorite goes live. It also allows both sites' cookies on Twitch, `rules/youtube-watch-frame.json` lets YouTube's watch page load in a frame, and `sendRequestsAsSite` in `streams/background/site-background.js` lets it read what's live.

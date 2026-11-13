@@ -80,4 +80,4 @@ Pull requests are welcome too. For a bigger change, open an issue first so we ca
 
 ## License
 
-MIT, see [LICENSE](LICENSE). Inter, in `fonts/`, stays under the SIL Open Font License, see `fonts/Inter-LICENSE.txt`.
+MIT with the Commons Clause, see [LICENSE](LICENSE): free to use, change and share, but not to sell. Inter, in `fonts/`, stays under the SIL Open Font License, see `fonts/Inter-LICENSE.txt`.
