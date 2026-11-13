@@ -1,5 +1,5 @@
 // The Show the latest emote in the chat box setting. While Twitch's chat box is empty, the name of the
-// emote chat used last shows where it says "Send a message".
+// emote chat used last shows where it says "Send a message", and Tab puts it in the box.
 // The name comes from the emote images in chat: Twitch's own, and the ones emotes.js draws. It goes in
 // an element of its own beside Twitch's text, and latest-emote.css swaps the two, so Twitch still
 // takes its text away when you type. Nothing is saved, and if Twitch's markup changes, the box just
@@ -62,6 +62,21 @@
     show(name);
   }
 
+  // Tab in the empty box puts the name showing there in it. It has to be a paste, as in emotes.js: text
+  // typed in by script shows in the box, but the box doesn't count it as part of the message. The space
+  // after it finishes the word, so the box shows its image straight away. Captured, to come before the
+  // page's own handling, which would move on to the next control.
+  function onKeyDown(event) {
+    if (event.key !== 'Tab' || event.shiftKey || event.altKey || event.ctrlKey || event.metaKey || event.isComposing) return;
+    const box = event.target.closest?.(CHAT_BOX);
+    if (!box || !latest || label?.parentElement !== box.parentElement || !label.checkVisibility()) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const clipboardData = new DataTransfer();
+    clipboardData.setData('text/plain', `${latest} `);
+    box.dispatchEvent(new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }));
+  }
+
   const watcher = new MutationObserver(onChange);
 
   // Only watches chat while the setting is on. src/twitch/page-sync.js sets the attribute.
@@ -72,9 +87,11 @@
     if (on) {
       path = location.pathname;
       watcher.observe(root, { childList: true, subtree: true });
+      document.addEventListener('keydown', onKeyDown, true);
       show(lastNamed(document.querySelectorAll(EMOTE), ''));
     } else {
       watcher.disconnect();
+      document.removeEventListener('keydown', onKeyDown, true);
       latest = '';
       label?.remove();
       label = null;

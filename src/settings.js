@@ -140,7 +140,7 @@
       key: 'chatLatestEmote',
       category: 'Chat',
       label: 'Show the latest emote in the chat box',
-      hint: "While Twitch's chat box is empty, shows the name of the emote chat used last where it says Send a message. Twitch's own emotes, and 7TV, BTTV and FFZ ones with that setting on. Typing takes it away.",
+      hint: "While Twitch's chat box is empty, shows the name of the emote chat used last where it says Send a message. Press Tab to put it in your message. Twitch's own emotes, and 7TV, BTTV and FFZ ones with that setting on. Typing takes it away.",
       default: true,
     },
     {
