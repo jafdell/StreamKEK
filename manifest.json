@@ -67,6 +67,7 @@
         "src/features/chat/chat-words.js",
         "src/features/chat/deleted-messages.js",
         "src/features/chat/emotes.js",
+        "src/features/chat/recent-emotes.js",
         "src/features/chat/emote-picker.js",
         "src/features/chat/latest-emote.js",
         "src/features/player/control-buttons.js",
@@ -164,6 +165,7 @@
         "src/features/chat/chat-words.js",
         "src/features/chat/deleted-messages.js",
         "src/features/chat/emotes.js",
+        "src/features/chat/recent-emotes.js",
         "src/features/chat/emote-picker.js",
         "src/features/chat/latest-emote.js"
       ],

@@ -25,7 +25,7 @@ It works in Chrome, Brave and other Chromium browsers, with no API key and no ex
 
 ### Chat
 
-- **7TV, BTTV and FFZ emotes:** see them in Twitch chat, animated ones included, with no other extension. Pick one from the button in the chat box, click one in chat to add it to your message, or type its name.
+- **7TV, BTTV and FFZ emotes:** see them in Twitch chat, animated ones included, with no other extension. Pick one from the button in the chat box, which lists your recently used emotes at the top, click one in chat to add it to your message, or type its name.
 - **Autocomplete emotes with Tab:** type the start of an emote's name in Twitch chat and press Tab. Off by default.
 - **Blocked and highlighted words:** remove messages containing the words you choose, or make them stand out, in Twitch, YouTube and Kick chat.
 - **Chat font size:** one text size for Twitch, YouTube and Kick chat.

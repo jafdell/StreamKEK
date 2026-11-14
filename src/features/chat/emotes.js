@@ -163,7 +163,7 @@
     return sections;
   }
 
-  skek.chatEmotes = { channelFromPath, videoFromPath, chatBoxAddition, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts, loadLists, allLoaded, emoteSections };
+  skek.chatEmotes = { channelFromPath, videoFromPath, chatBoxAddition, emoteEntry, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts, loadLists, allLoaded, emoteSections };
 
   // Twitch's pages and its chat in the multi-stream view, but not that chat on other websites.
   if (window !== window.top && !location.ancestorOrigins[0]?.endsWith('.twitch.tv')) return;
@@ -331,6 +331,7 @@
   Object.assign(skek.chatEmotes, {
     emoteImage,
     emotesReady: () => !!table,
+    emote: (name) => table?.get(name) ?? null,
     pickerSections: () => (table ? emoteSections(channelLists, loadedGlobalLists, table) : []),
   });
 

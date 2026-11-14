@@ -38,6 +38,36 @@ vm.runInNewContext(readFileSync(new URL('../src/features/chat/emotes.js', import
 const { channelFromPath, videoFromPath, chatBoxAddition, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts, loadLists, allLoaded, emoteSections } = chatEmotesContext.skek.chatEmotes;
 const names = (emotes) => plain(emotes.map((emote) => emote.name));
 
+// Loads after emotes.js, as in the manifest.
+vm.runInNewContext(readFileSync(new URL('../src/features/chat/recent-emotes.js', import.meta.url), 'utf8'), chatEmotesContext);
+const { addRecent, shownEmotes, twitchId } = chatEmotesContext.skek.recentEmotes;
+
+test('addRecent puts the emotes just sent first, the last one before the others, each name once', () => {
+  const recent = [{ name: 'KEKW' }, { name: 'Kappa', twitch: '25' }, { name: 'EZ' }];
+  const sent = [{ name: 'EZ', twitch: null }, { name: 'Pog', twitch: null }, { name: 'EZ', twitch: null }, { name: 'LUL', twitch: '425618' }];
+  assert.deepEqual(plain(addRecent(recent, sent)), [{ name: 'LUL', twitch: '425618' }, { name: 'EZ' }, { name: 'Pog' }, { name: 'KEKW' }, { name: 'Kappa', twitch: '25' }]);
+  assert.deepEqual(plain(addRecent(recent, [{ name: 'KEKW', twitch: null }])), recent, 'sending the first one again changes nothing');
+  assert.deepEqual(plain(addRecent(recent, [])), recent);
+  const many = Array.from({ length: 60 }, (_, index) => ({ name: `emote${index}`, twitch: null }));
+  const kept = addRecent(recent, many);
+  assert.equal(kept.length, 48);
+  assert.equal(kept[0].name, 'emote59');
+});
+
+test('shownEmotes leaves out the emotes this chat has no image for', () => {
+  const recent = [{ name: 'a' }, { name: 'b', twitch: '1' }, { name: 'c' }, { name: 'd' }];
+  const emoteFor = (name, twitch) => (name === 'c' ? null : { name, twitch });
+  assert.deepEqual(plain(shownEmotes(recent, emoteFor, 2)), [{ name: 'a' }, { name: 'b', twitch: '1' }]);
+  assert.deepEqual(plain(shownEmotes(recent, emoteFor, 10)).map((emote) => emote.name), ['a', 'b', 'd']);
+});
+
+test("twitchId reads an emote's id from Twitch's image address, and nothing from another", () => {
+  assert.equal(twitchId('https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_38b199e5/default/dark/1.0'), 'emotesv2_38b199e5');
+  assert.equal(twitchId('https://static-cdn.jtvnw.net/emoticons/v2/25/default/light/2.0'), '25');
+  assert.equal(twitchId('https://cdn.7tv.app/emote/abc/1x.webp'), null);
+  assert.equal(twitchId('https://example.com/?https://static-cdn.jtvnw.net/emoticons/v2/25/'), null);
+});
+
 test('channelFromPath finds the channel in each address with chat, and nothing elsewhere', () => {
   assert.equal(channelFromPath('/SodaPoppin'), 'sodapoppin');
   assert.equal(channelFromPath('/sodapoppin/about'), 'sodapoppin');
@@ -142,6 +172,7 @@ test('a backup saves everything, and restoring it gives back the same', () => {
     kickVolume: 0.5,
     chatHidden: true,
     floatingChat: { x: 10, y: 20, opacity: 0.5 },
+    recentEmotes: [{ name: 'KEKW' }, { name: ':)', twitch: '1' }, { name: 'esfandPls', twitch: 'emotesv2_38b199e5' }],
   };
   const backup = createBackup(saved, '1.4.0', new Date('2026-11-07T00:00:00Z'));
   assert.equal(backup.extensionVersion, '1.4.0');
@@ -171,6 +202,7 @@ test('parseBackup keeps only what is valid, and leaves out the rest', () => {
     chatHidden: 1,
     chatBlockedWords: ['ok', '', 3, 'x'.repeat(301)],
     floatingChat: { x: 1, y: 'no', extra: 2, width: null },
+    recentEmotes: [{ name: 'KEKW', twitch: '../x', count: 3 }, { name: 'two words' }, { name: '' }, { twitch: '25' }, 'Kappa', null, { name: 'Kappa', twitch: '25' }],
     channels: [
       { id: 'UCgood', name: 'Good', avatar: 'http://example.com/a.png', extra: 'dropped', handle: '@a/../b', slug: '../x', login: 'a b', platform: 'a/b' },
       { id: '../../evil', name: 'Bad' },
@@ -186,6 +218,7 @@ test('parseBackup keeps only what is valid, and leaves out the rest', () => {
     chatFontSize: '14',
     chatBlockedWords: ['ok'],
     floatingChat: { x: 1 },
+    recentEmotes: [{ name: 'KEKW' }, { name: 'Kappa', twitch: '25' }],
     channels: [{ id: 'UCgood', name: 'Good' }],
     hiddenChannels: { UCright: { id: 'UCright', name: 'Right', avatar: 'https://example.com/a.png' } },
   });
