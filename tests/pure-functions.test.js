@@ -112,6 +112,33 @@ test('answerText says when you followed and how long ago, or why it cannot', () 
   assert.equal(cardText(at, 'en-US'), 'Followed since August 22, 2015');
 });
 
+const goLiveContext = { skek: {} };
+vm.runInNewContext(readFileSync(new URL('../src/features/player/go-live.js', import.meta.url), 'utf8'), goLiveContext);
+const { channelPage, reloadNow } = goLiveContext.skek.goLive;
+
+test("channelPage is a channel's own page, not its other tabs", () => {
+  assert.equal(channelPage('/sodapoppin', channelFromPath), 'sodapoppin');
+  assert.equal(channelPage('/SodaPoppin/', channelFromPath), 'sodapoppin');
+  for (const path of ['/sodapoppin/about', '/sodapoppin/videos', '/sodapoppin/clips', '/sodapoppin/schedule', '/popout/sodapoppin/chat', '/directory', '/videos/123', '/']) {
+    assert.equal(channelPage(path, channelFromPath), null, path);
+  }
+});
+
+test('reloadNow reloads when a channel goes live, then twice more at most if the page stays offline', () => {
+  const at = 1_000_000;
+  assert.equal(reloadNow('soda', true, null, at), true, 'Twitch said offline before, so it just went live');
+  assert.equal(reloadNow('soda', false, null, at), false, 'live already when the page opened');
+  const once = { login: 'soda', at, tries: 1 };
+  assert.equal(reloadNow('soda', false, once, at + 19_000), false);
+  assert.equal(reloadNow('soda', false, once, at + 20_000), true);
+  const twice = { login: 'soda', at, tries: 2 };
+  assert.equal(reloadNow('soda', false, twice, at + 59_000), false);
+  assert.equal(reloadNow('soda', false, twice, at + 60_000), true);
+  assert.equal(reloadNow('soda', false, { login: 'soda', at, tries: 3 }, at + 240_000), false, 'left alone after three');
+  assert.equal(reloadNow('other', false, once, at + 30_000), false, 'a reload for another channel');
+  assert.equal(reloadNow('soda', false, once, at + 301_000), false, 'a reload for an earlier stream');
+});
+
 const sortOrderContext = { skek: {} };
 vm.runInNewContext(readFileSync(new URL('../src/features/browse/sort-order.js', import.meta.url), 'utf8'), sortOrderContext);
 const { sortFrom, picksFrom, settle } = sortOrderContext.skek.sortOrder;

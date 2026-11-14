@@ -20,6 +20,7 @@ It works in Chrome, Brave and other Chromium browsers, with no API key and no ex
 - **Audio only (Alt+A):** listen to a Twitch stream or video without the picture, which saves data and battery.
 - **Keep quality in background tabs:** stop Twitch lowering a live stream to 360p when its tab is in the background. Off by default.
 - **Reload player on errors:** Twitch's player reloads itself when a stream stops with an error, instead of you doing it by hand.
+- **Start when a channel goes live:** wait on an offline Twitch channel and the stream starts by itself when it goes live, with no refresh. Off by default.
 - **Stream quality:** choose what streams start at on Twitch, YouTube and Kick, up to 1440p.
 - **Stream previews:** hover a live channel in the sidebar to see an image of its stream.
 

@@ -165,6 +165,13 @@
       default: true,
     },
     {
+      key: 'autoStartLive',
+      category: 'Player',
+      label: 'Start the stream when a channel goes live',
+      hint: "While you wait on an offline Twitch channel, on its Home tab or with its chat open, checks every 15 seconds whether it went live, then reloads the page so the stream starts. Waits while there's text in the chat box. Not on a channel's About, Videos, Clips or Schedule.",
+      default: false,
+    },
+    {
       key: 'keepBackgroundQuality',
       category: 'Player',
       label: 'Keep quality in background tabs',

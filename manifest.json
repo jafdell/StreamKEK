@@ -75,7 +75,8 @@
         "src/features/player/control-buttons.js",
         "src/features/player/floating-window.js",
         "src/features/player/modes.js",
-        "src/features/player/audio-only.js"
+        "src/features/player/audio-only.js",
+        "src/features/player/go-live.js"
       ],
       "css": [
         "src/twitch/base.css",
