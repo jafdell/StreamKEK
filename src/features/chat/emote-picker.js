@@ -1,7 +1,8 @@
 // A button in Twitch's chat box that opens a searchable list of the 7TV, BTTV and FFZ emotes for this
 // chat, part of the same setting as emotes.js, which has the lists and calls sync() and tableChanged().
 // Clicking an emote is handled by emotes.js, like clicking one in chat. The list is only built while it's
-// open, its images load as they scroll into view, and all of it goes away when it closes.
+// open, its images load as they scroll into view, and all of it goes away when it closes. The emotes you
+// sent last come first, from recent-emotes.js, Twitch's own included.
 (() => {
   'use strict';
 
@@ -73,6 +74,19 @@
     list.querySelector('.skek-picker__empty').hidden = anyShown;
   }
 
+  function section(title, images) {
+    const created = document.createElement('section');
+    created.className = 'skek-picker__section';
+    const heading = document.createElement('h3');
+    heading.className = 'skek-picker__heading';
+    heading.textContent = title;
+    const grid = document.createElement('div');
+    grid.className = 'skek-picker__grid';
+    grid.append(...images);
+    created.append(heading, grid);
+    return created;
+  }
+
   function buildPanel() {
     const created = document.createElement('div');
     created.className = 'skek-picker';
@@ -85,17 +99,10 @@
 
     const list = document.createElement('div');
     list.className = 'skek-picker__list';
-    for (const { title, emotes } of skek.chatEmotes.pickerSections()) {
-      const section = document.createElement('section');
-      section.className = 'skek-picker__section';
-      const heading = document.createElement('h3');
-      heading.className = 'skek-picker__heading';
-      heading.textContent = title;
-      const grid = document.createElement('div');
-      grid.className = 'skek-picker__grid';
-      grid.append(...emotes.map((emote) => skek.chatEmotes.emoteImage(emote, true)));
-      section.append(heading, grid);
-      list.append(section);
+    const recent = skek.recentEmotes.shown();
+    const sections = [...(recent.length ? [{ title: 'Recently used', emotes: recent }] : []), ...skek.chatEmotes.pickerSections()];
+    for (const { title, emotes } of sections) {
+      list.append(section(title, emotes.map((emote) => skek.chatEmotes.emoteImage(emote, true))));
     }
     const empty = document.createElement('p');
     empty.className = 'skek-picker__empty';

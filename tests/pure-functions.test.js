@@ -38,6 +38,143 @@ vm.runInNewContext(readFileSync(new URL('../src/features/chat/emotes.js', import
 const { channelFromPath, videoFromPath, chatBoxAddition, sevenTvEmotes, bttvEmotes, ffzEmotes, ffzGlobalSets, mergeEmotes, messageParts, loadLists, allLoaded, emoteSections } = chatEmotesContext.skek.chatEmotes;
 const names = (emotes) => plain(emotes.map((emote) => emote.name));
 
+// Loads after emotes.js, as in the manifest.
+vm.runInNewContext(readFileSync(new URL('../src/features/chat/recent-emotes.js', import.meta.url), 'utf8'), chatEmotesContext);
+const { addRecent, shownEmotes, twitchId } = chatEmotesContext.skek.recentEmotes;
+
+test('addRecent puts the emotes just sent first, the last one before the others, each name once', () => {
+  const recent = [{ name: 'KEKW' }, { name: 'Kappa', twitch: '25' }, { name: 'EZ' }];
+  const sent = [{ name: 'EZ', twitch: null }, { name: 'Pog', twitch: null }, { name: 'EZ', twitch: null }, { name: 'LUL', twitch: '425618' }];
+  assert.deepEqual(plain(addRecent(recent, sent)), [{ name: 'LUL', twitch: '425618' }, { name: 'EZ' }, { name: 'Pog' }, { name: 'KEKW' }, { name: 'Kappa', twitch: '25' }]);
+  assert.deepEqual(plain(addRecent(recent, [{ name: 'KEKW', twitch: null }])), recent, 'sending the first one again changes nothing');
+  assert.deepEqual(plain(addRecent(recent, [])), recent);
+  const many = Array.from({ length: 60 }, (_, index) => ({ name: `emote${index}`, twitch: null }));
+  const kept = addRecent(recent, many);
+  assert.equal(kept.length, 48);
+  assert.equal(kept[0].name, 'emote59');
+});
+
+test('shownEmotes leaves out the emotes this chat has no image for', () => {
+  const recent = [{ name: 'a' }, { name: 'b', twitch: '1' }, { name: 'c' }, { name: 'd' }];
+  const emoteFor = (name, twitch) => (name === 'c' ? null : { name, twitch });
+  assert.deepEqual(plain(shownEmotes(recent, emoteFor, 2)), [{ name: 'a' }, { name: 'b', twitch: '1' }]);
+  assert.deepEqual(plain(shownEmotes(recent, emoteFor, 10)).map((emote) => emote.name), ['a', 'b', 'd']);
+});
+
+test("twitchId reads an emote's id from Twitch's image address, and nothing from another", () => {
+  assert.equal(twitchId('https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_38b199e5/default/dark/1.0'), 'emotesv2_38b199e5');
+  assert.equal(twitchId('https://static-cdn.jtvnw.net/emoticons/v2/25/default/light/2.0'), '25');
+  assert.equal(twitchId('https://cdn.7tv.app/emote/abc/1x.webp'), null);
+  assert.equal(twitchId('https://example.com/?https://static-cdn.jtvnw.net/emoticons/v2/25/'), null);
+});
+
+// Loads after emotes.js, as in the manifest.
+vm.runInNewContext(readFileSync(new URL('../src/features/chat/followed.js', import.meta.url), 'utf8'), chatEmotesContext);
+const { isCommand, timeSince, followedFrom, answerText, cardText } = chatEmotesContext.skek.followed;
+// Midday where the tests run, so the day is the same in every time zone.
+const midday = (year, month, day) => new Date(year, month - 1, day, 12);
+
+test('isCommand takes /followed alone, in any case, and nothing else', () => {
+  for (const text of ['/followed', '﻿/followed', ' /Followed ', '/FOLLOWED']) assert.equal(isCommand(text), true, text);
+  for (const text of ['', '/follow', '/followers', '/followed me', 'hi /followed']) assert.equal(isCommand(text), false, text);
+});
+
+test('timeSince counts whole years and months, and days under a month', () => {
+  assert.equal(timeSince(midday(2015, 8, 22), midday(2026, 11, 14)), '11 years and 2 months');
+  assert.equal(timeSince(midday(2015, 8, 22), midday(2026, 8, 21)), '10 years and 11 months');
+  assert.equal(timeSince(midday(2025, 11, 14), midday(2026, 11, 14)), '1 year');
+  assert.equal(timeSince(midday(2026, 10, 14), midday(2026, 11, 14)), '1 month');
+  assert.equal(timeSince(midday(2026, 10, 20), midday(2026, 11, 14)), '25 days');
+  assert.equal(timeSince(new Date(2026, 10, 13, 23), new Date(2026, 10, 14, 1)), '1 day');
+  assert.equal(timeSince(midday(2026, 11, 14), midday(2026, 11, 14)), '');
+  assert.equal(timeSince(midday(2026, 11, 15), midday(2026, 11, 14)), '', 'a clock that is behind');
+});
+
+test('followedFrom reads the date from Twitch, or says why there is none', () => {
+  const following = followedFrom({ user: { displayName: 'summit1g', self: { follower: { followedAt: '2015-08-22T22:50:01Z' } } } }, 'summit1g');
+  assert.equal(following.state, 'following');
+  assert.equal(following.name, 'summit1g');
+  assert.equal(following.at.toISOString(), '2015-08-22T22:50:01.000Z');
+  assert.deepEqual(plain(followedFrom({ user: { displayName: 'Summit', self: { follower: null } } }, 'summit1g')), { state: 'notFollowing', name: 'Summit' });
+  assert.deepEqual(plain(followedFrom({ user: { displayName: null, self: null } }, 'summit1g')), { state: 'notFollowing', name: 'summit1g' });
+  assert.deepEqual(plain(followedFrom({ user: { self: { follower: { followedAt: 'soon' } } } }, 'x')), { state: 'notFollowing', name: 'x' });
+  for (const data of [null, undefined, {}, { user: null }]) assert.deepEqual(plain(followedFrom(data, 'x')), { state: 'failed' });
+});
+
+test('answerText says when you followed and how long ago, or why it cannot', () => {
+  const at = midday(2015, 8, 22);
+  const now = midday(2026, 11, 14);
+  assert.equal(answerText({ state: 'following', name: 'summit1g', at }, now, 'en-US'), 'You followed summit1g on August 22, 2015, 11 years and 2 months ago.');
+  assert.equal(answerText({ state: 'following', name: 'summit1g', at: now }, now, 'en-US'), 'You followed summit1g on November 14, 2026.');
+  assert.equal(answerText({ state: 'notFollowing', name: 'summit1g' }, now, 'en-US'), "You don't follow summit1g.");
+  assert.match(answerText({ state: 'failed' }, now, 'en-US'), /\/followed/);
+  assert.match(answerText({ state: 'signedOut' }, now, 'en-US'), /Sign in/);
+  assert.equal(cardText(at, 'en-US'), 'Followed since August 22, 2015');
+});
+
+const goLiveContext = { skek: {} };
+vm.runInNewContext(readFileSync(new URL('../src/features/player/go-live.js', import.meta.url), 'utf8'), goLiveContext);
+const { channelPage, reloadNow } = goLiveContext.skek.goLive;
+
+test("channelPage is a channel's own page, not its other tabs", () => {
+  assert.equal(channelPage('/sodapoppin', channelFromPath), 'sodapoppin');
+  assert.equal(channelPage('/SodaPoppin/', channelFromPath), 'sodapoppin');
+  for (const path of ['/sodapoppin/about', '/sodapoppin/videos', '/sodapoppin/clips', '/sodapoppin/schedule', '/popout/sodapoppin/chat', '/directory', '/videos/123', '/']) {
+    assert.equal(channelPage(path, channelFromPath), null, path);
+  }
+});
+
+test('reloadNow reloads when a channel goes live, then twice more at most if the page stays offline', () => {
+  const at = 1_000_000;
+  assert.equal(reloadNow('soda', true, null, at), true, 'Twitch said offline before, so it just went live');
+  assert.equal(reloadNow('soda', false, null, at), false, 'live already when the page opened');
+  const once = { login: 'soda', at, tries: 1 };
+  assert.equal(reloadNow('soda', false, once, at + 19_000), false);
+  assert.equal(reloadNow('soda', false, once, at + 20_000), true);
+  const twice = { login: 'soda', at, tries: 2 };
+  assert.equal(reloadNow('soda', false, twice, at + 59_000), false);
+  assert.equal(reloadNow('soda', false, twice, at + 60_000), true);
+  assert.equal(reloadNow('soda', false, { login: 'soda', at, tries: 3 }, at + 240_000), false, 'left alone after three');
+  assert.equal(reloadNow('other', false, once, at + 30_000), false, 'a reload for another channel');
+  assert.equal(reloadNow('soda', false, once, at + 301_000), false, 'a reload for an earlier stream');
+});
+
+const sortOrderContext = { skek: {} };
+vm.runInNewContext(readFileSync(new URL('../src/features/browse/sort-order.js', import.meta.url), 'utf8'), sortOrderContext);
+const { sortFrom, picksFrom, settle } = sortOrderContext.skek.sortOrder;
+const BROWSE_SORT = 'browseAllCategoriedPageSort';
+const CHANNELS_SORT = 'directoryAllChannelPageSort';
+const CATEGORY_SORT = 'directoryGameChannelPageSort';
+
+test("sortFrom reads a sort as Twitch keeps it, and nothing from anything else", () => {
+  assert.equal(sortFrom('"VIEWER_COUNT"'), 'VIEWER_COUNT');
+  assert.equal(sortFrom('"RECENT"'), 'RECENT');
+  for (const text of [null, '', 'VIEWER_COUNT', '"NEWEST"', 'true', '{"a":1}']) assert.equal(sortFrom(text), null, String(text));
+});
+
+test('picksFrom keeps only the places and sorts Twitch has', () => {
+  const kept = { [CATEGORY_SORT]: 'VIEWER_COUNT', [BROWSE_SORT]: 'NEWEST', other: 'RECENT', [CHANNELS_SORT]: 5 };
+  assert.deepEqual(plain(picksFrom(JSON.stringify(kept))), { [CATEGORY_SORT]: 'VIEWER_COUNT' });
+  for (const text of [null, '', 'not json', '"RECENT"', '[]', 'null']) assert.deepEqual(plain(picksFrom(text)), {}, String(text));
+});
+
+test('settle remembers a pick from the sort menu, and puts picks back when Twitch changes them', () => {
+  const picks = { [CATEGORY_SORT]: 'RECENT' };
+  const newTab = { [BROWSE_SORT]: null, [CHANNELS_SORT]: null, [CATEGORY_SORT]: null };
+  assert.deepEqual(plain(settle(picks, newTab, false)), { remember: picks, putBack: { [CATEGORY_SORT]: 'RECENT' } });
+  assert.deepEqual(plain(settle({}, newTab, false)), { remember: {}, putBack: {} }, 'with nothing picked yet, Twitch is left alone');
+
+  const twitchReset = { [BROWSE_SORT]: 'RELEVANCE', [CHANNELS_SORT]: 'RELEVANCE', [CATEGORY_SORT]: 'RELEVANCE' };
+  assert.deepEqual(plain(settle(picks, twitchReset, false)), { remember: picks, putBack: { [CATEGORY_SORT]: 'RECENT' } });
+
+  const picked = { ...twitchReset, [CHANNELS_SORT]: 'VIEWER_COUNT', [CATEGORY_SORT]: 'RECENT' };
+  assert.deepEqual(plain(settle(picks, picked, true)), {
+    remember: { [CATEGORY_SORT]: 'RECENT', [BROWSE_SORT]: 'RELEVANCE', [CHANNELS_SORT]: 'VIEWER_COUNT' },
+    putBack: {},
+  });
+  assert.deepEqual(plain(settle(picks, { ...newTab, [CATEGORY_SORT]: 'RECENT' }, false)), { remember: picks, putBack: {} });
+});
+
 test('channelFromPath finds the channel in each address with chat, and nothing elsewhere', () => {
   assert.equal(channelFromPath('/SodaPoppin'), 'sodapoppin');
   assert.equal(channelFromPath('/sodapoppin/about'), 'sodapoppin');
@@ -142,6 +279,7 @@ test('a backup saves everything, and restoring it gives back the same', () => {
     kickVolume: 0.5,
     chatHidden: true,
     floatingChat: { x: 10, y: 20, opacity: 0.5 },
+    recentEmotes: [{ name: 'KEKW' }, { name: ':)', twitch: '1' }, { name: 'esfandPls', twitch: 'emotesv2_38b199e5' }],
   };
   const backup = createBackup(saved, '1.4.0', new Date('2026-11-07T00:00:00Z'));
   assert.equal(backup.extensionVersion, '1.4.0');
@@ -171,6 +309,7 @@ test('parseBackup keeps only what is valid, and leaves out the rest', () => {
     chatHidden: 1,
     chatBlockedWords: ['ok', '', 3, 'x'.repeat(301)],
     floatingChat: { x: 1, y: 'no', extra: 2, width: null },
+    recentEmotes: [{ name: 'KEKW', twitch: '../x', count: 3 }, { name: 'two words' }, { name: '' }, { twitch: '25' }, 'Kappa', null, { name: 'Kappa', twitch: '25' }],
     channels: [
       { id: 'UCgood', name: 'Good', avatar: 'http://example.com/a.png', extra: 'dropped', handle: '@a/../b', slug: '../x', login: 'a b', platform: 'a/b' },
       { id: '../../evil', name: 'Bad' },
@@ -186,6 +325,7 @@ test('parseBackup keeps only what is valid, and leaves out the rest', () => {
     chatFontSize: '14',
     chatBlockedWords: ['ok'],
     floatingChat: { x: 1 },
+    recentEmotes: [{ name: 'KEKW' }, { name: 'Kappa', twitch: '25' }],
     channels: [{ id: 'UCgood', name: 'Good' }],
     hiddenChannels: { UCright: { id: 'UCright', name: 'Right', avatar: 'https://example.com/a.png' } },
   });

@@ -126,7 +126,7 @@
       key: 'chatEmotes',
       category: 'Chat',
       label: '7TV, BTTV and FFZ emotes',
-      hint: 'Shows these emotes in Twitch chat, including animated ones, with a button in the chat box to search and pick them. Does nothing if you have one of their extensions, which shows them itself.',
+      hint: 'Shows these emotes in Twitch chat, including animated ones, with a button in the chat box to search and pick them. Your recently used emotes are listed at the top there, Twitch emotes too. Does nothing if you have one of their extensions, which shows them itself.',
       default: true,
     },
     {
@@ -135,6 +135,20 @@
       label: 'Autocomplete emotes with Tab',
       hint: "In Twitch's chat box, type the start of an emote's name and press Tab to see it, then Tab again for the next match, or Shift+Tab to go back. Includes the Twitch emotes you can use there. Needs the 7TV, BTTV and FFZ emotes setting on. Names starting with @ still complete as usual.",
       default: false,
+    },
+    {
+      key: 'chatLatestEmote',
+      category: 'Chat',
+      label: 'Show the latest emote in the chat box',
+      hint: "While Twitch's chat box is empty, shows the name of the emote chat used last where it says Send a message. Press Tab to put it in your message. Twitch's own emotes, and 7TV, BTTV and FFZ ones with that setting on. Typing takes it away.",
+      default: true,
+    },
+    {
+      key: 'chatFollowedDate',
+      category: 'Chat',
+      label: 'Show when you followed a channel',
+      hint: "Type /followed in Twitch's chat box to see the date you followed that channel. Only you see the answer, and nothing is sent to chat. Your own card, which opens when you click your name in chat, shows the date too. Twitch only tells it to you, so this asks Twitch with your Twitch sign-in.",
+      default: true,
     },
     {
       key: 'hidePlayerExtensions',
@@ -149,6 +163,13 @@
       label: 'Reload player on errors',
       hint: "Reloads Twitch's player when a stream or video stops with an error like #2000, so you don't have to. Gives up after a few tries if the error keeps coming back.",
       default: true,
+    },
+    {
+      key: 'autoStartLive',
+      category: 'Player',
+      label: 'Start the stream when a channel goes live',
+      hint: "While you wait on an offline Twitch channel, on its Home tab or with its chat open, checks every 15 seconds whether it went live, then reloads the page so the stream starts. Waits while there's text in the chat box. Not on a channel's About, Videos, Clips or Schedule.",
+      default: false,
     },
     {
       key: 'keepBackgroundQuality',

@@ -180,6 +180,7 @@ function loadTwitchScripts() {
     location: { pathname: '/', search: '', hash: '', hostname: 'www.twitch.tv', ancestorOrigins: [] },
     history: inert(),
     localStorage: inert(),
+    sessionStorage: inert(),
     addEventListener() {},
     setInterval() {},
     setTimeout() {},

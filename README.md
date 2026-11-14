@@ -20,20 +20,24 @@ It works in Chrome, Brave and other Chromium browsers, with no API key and no ex
 - **Audio only (Alt+A):** listen to a Twitch stream or video without the picture, which saves data and battery.
 - **Keep quality in background tabs:** stop Twitch lowering a live stream to 360p when its tab is in the background. Off by default.
 - **Reload player on errors:** Twitch's player reloads itself when a stream stops with an error, instead of you doing it by hand.
+- **Start when a channel goes live:** wait on an offline Twitch channel and the stream starts by itself when it goes live, with no refresh. Off by default.
 - **Stream quality:** choose what streams start at on Twitch, YouTube and Kick, up to 1440p.
 - **Stream previews:** hover a live channel in the sidebar to see an image of its stream.
 
 ### Chat
 
-- **7TV, BTTV and FFZ emotes:** see them in Twitch chat, animated ones included, with no other extension. Pick one from the button in the chat box, click one in chat to add it to your message, or type its name.
+- **7TV, BTTV and FFZ emotes:** see them in Twitch chat, animated ones included, with no other extension. Pick one from the button in the chat box, which lists your recently used emotes at the top, click one in chat to add it to your message, or type its name.
 - **Autocomplete emotes with Tab:** type the start of an emote's name in Twitch chat and press Tab. Off by default.
 - **Blocked and highlighted words:** remove messages containing the words you choose, or make them stand out, in Twitch, YouTube and Kick chat.
 - **Chat font size:** one text size for Twitch, YouTube and Kick chat.
+- **Latest emote in the chat box:** the empty Twitch chat box shows the name of the emote chat used last, and Tab puts it in your message.
+- **When you followed a channel:** type `/followed` in Twitch chat to see the date, shown only to you. Your own card in chat shows it too.
 - **See deleted messages:** keep reading a message in Twitch chat after a moderator deletes it. Off by default.
 - **Cleaner chat:** hide Twitch chat's timestamps, top strip, drops, pinned messages and Hype Train.
 
 ### A tidier Twitch
 
+- **Sort order that sticks:** the sort you pick on Browse, live channels and category pages stays in new tabs and after a restart, instead of going back to Recommended For You.
 - **Cleaner sidebar:** hide For You, Live Channels, Recommended Categories and Viewers Also Watch, and turn off the YouTube Live and Kick Live sections.
 - **Cleaner player:** hide what streamers' Twitch extensions show over the video.
 - **Auto-claim channel points:** only in a tab where the stream is playing. Off by default.
@@ -61,6 +65,7 @@ To update, replace the files in the same folder (or `git pull`), then press **Re
 
 - **Who's live:** the extension asks YouTube and Kick every minute while a Twitch tab is open, using your sign-in on each, which only goes to that site. With go-live notifications on and a favorite on that site, it keeps asking with no Twitch tab.
 - **Cookies on Twitch:** to play streams and let you chat inside Twitch, it allows YouTube's and Kick's cookies on twitch.tv, which is why the browser warns about cookie settings. For YouTube, it also removes the anti-framing and content security headers from `/watch` frames opened from twitch.tv. For Kick, it keeps a copy of your Kick sign-in and your answer to its cookie prompt, which browsers only send to Kick under Twitch. Your real Kick cookies aren't changed, and the copy lasts a day at most once the extension is removed or turned off.
+- **Your Twitch sign-in:** Twitch only tells the date you followed a channel to you, so `/followed` and your own card ask Twitch with the sign-in its own page uses. It goes only to Twitch, only then, and isn't saved. Turn off **Show when you followed a channel** to stop it.
 - **What Twitch can see:** your live YouTube subscriptions and Kick follows, the channels you added, your favorites, the stream you're watching and your StreamKEK settings are all in Twitch's page, so Twitch and scripts running on its page could read them. The stream you're watching is also in the address, which reaches Twitch's servers if you reload. Your sign-ins can't be read this way.
 
 ### If something's off
@@ -79,4 +84,4 @@ Pull requests are welcome too. For a bigger change, open an issue first so we ca
 
 ## License
 
-MIT, see [LICENSE](LICENSE). Inter, in `fonts/`, stays under the SIL Open Font License, see `fonts/Inter-LICENSE.txt`.
+MIT with the Commons Clause, see [LICENSE](LICENSE): free to use, change and share, but not to sell. Inter, in `fonts/`, stays under the SIL Open Font License, see `fonts/Inter-LICENSE.txt`.

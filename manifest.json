@@ -63,15 +63,20 @@
         "src/features/streams/twitch/main.js",
         "src/features/sidebar/preview.js",
         "src/features/sidebar/current-channel.js",
+        "src/features/browse/sort-order.js",
         "src/features/chat/claim-points.js",
         "src/features/chat/chat-words.js",
         "src/features/chat/deleted-messages.js",
         "src/features/chat/emotes.js",
+        "src/features/chat/recent-emotes.js",
         "src/features/chat/emote-picker.js",
+        "src/features/chat/latest-emote.js",
+        "src/features/chat/followed.js",
         "src/features/player/control-buttons.js",
         "src/features/player/floating-window.js",
         "src/features/player/modes.js",
-        "src/features/player/audio-only.js"
+        "src/features/player/audio-only.js",
+        "src/features/player/go-live.js"
       ],
       "css": [
         "src/twitch/base.css",
@@ -86,6 +91,8 @@
         "src/features/chat/deleted-messages.css",
         "src/features/chat/emotes.css",
         "src/features/chat/emote-picker.css",
+        "src/features/chat/latest-emote.css",
+        "src/features/chat/followed.css",
         "src/features/player/extensions.css",
         "src/features/player/modes.css",
         "src/features/player/audio-only.css",
@@ -162,7 +169,10 @@
         "src/features/chat/chat-words.js",
         "src/features/chat/deleted-messages.js",
         "src/features/chat/emotes.js",
-        "src/features/chat/emote-picker.js"
+        "src/features/chat/recent-emotes.js",
+        "src/features/chat/emote-picker.js",
+        "src/features/chat/latest-emote.js",
+        "src/features/chat/followed.js"
       ],
       "css": [
         "src/features/chat/font-size.css",
@@ -171,7 +181,9 @@
         "src/features/chat/chat-words.css",
         "src/features/chat/deleted-messages.css",
         "src/features/chat/emotes.css",
-        "src/features/chat/emote-picker.css"
+        "src/features/chat/emote-picker.css",
+        "src/features/chat/latest-emote.css",
+        "src/features/chat/followed.css"
       ],
       "all_frames": true,
       "run_at": "document_start"

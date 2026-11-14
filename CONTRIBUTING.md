@@ -2,6 +2,8 @@
 
 Bugs and feature requests go in issues. To send a change: fork the repo, make a branch, make your change, run `node --test` (you'll need Node), walk the relevant part of [TESTING.md](TESTING.md), and open a pull request saying what you tried. Start its title with a verb that says what changed, and fill in the template.
 
+By opening a pull request, you agree that your contribution is licensed under the project's [LICENSE](LICENSE), and that the owner may also use and license it under other terms, including in paid features.
+
 ## How it fits together
 
 - **Service worker** (`src/background/service-worker.js`, feature code in `background/` folders): works out what's live on YouTube and Kick, for all tabs at once, and notifies you when a favorite goes live. It also allows both sites' cookies on Twitch, `rules/youtube-watch-frame.json` lets YouTube's watch page load in a frame, and `sendRequestsAsSite` in `streams/background/site-background.js` lets it read what's live.
@@ -15,12 +17,12 @@ They talk through `chrome.storage.local` (settings and what's live), messages to
 
 ## Where do I...?
 
-Features are in `src/features/`. `chat/`, `player/` and `sidebar/` match the settings window's tabs, `streams/` holds what every other site shares, and `youtube/` and `kick/` hold what's particular to each. This table lists only what those names wouldn't lead you to.
+Features are in `src/features/`. `chat/`, `player/` and `sidebar/` match the settings window's tabs, `browse/` is for Twitch's Browse and category pages, `streams/` holds what every other site shares, and `youtube/` and `kick/` hold what's particular to each. This table lists only what those names wouldn't lead you to.
 
 | To change... | Look in |
 | --- | --- |
 | Settings | `src/settings.js` (the registry). A CSS-only setting's rule lives with its feature, like `src/features/sidebar/sections.css` |
-| Code shared by every feature on Twitch pages | `src/twitch/`: `helpers.js`, `page-sync.js`, `gql.js` (Twitch's own API), `base.css` |
+| Code shared by every feature on Twitch pages | `src/twitch/`: `helpers.js`, `page-sync.js`, `gql.js` (Twitch's own API, and the name and sign-in of whoever is signed in to Twitch), `base.css` |
 | The extension's button in Twitch's top bar and the window around the settings page | `src/twitch/settings-button.js` and `.css` |
 | What's new in each version | `CHANGELOG.md` in the root, newest version first. `src/settings-window/changelog.js` reads that same file for the settings window's **What's new** category, so keep its shape: a `## 1.5.0 - 2026-11-11` heading, then one `- ` line per change, with `**` around the part to show in bold. Write what people can do now, not how the code changed. `node --test` checks that it starts with the manifest's version |
 | The settings page: categories, search, rows, backups. Also the toolbar popup | `src/settings-window/`. `src/extension-pages/` holds what it shares with the channel manager: `page.css` and `page-theme.js` |
@@ -28,14 +30,16 @@ Features are in `src/features/`. `chat/`, `player/` and `sidebar/` match the set
 | Streams from other sites | `src/features/streams/`: `sites.js` (everything that differs per site), `twitch/` (sidebar sections, stream view, address, Following page), `manager/` (channel manager), `frames/` and `background/` (what every site's frames and service worker code share) |
 | One site in particular | `src/features/youtube/` and `src/features/kick/`: `background/` (polling, reading the site) and `frames/` (its chat and player) |
 | Stream view | `streams/twitch/`: `stream-view.js` (the info bar, opening and closing), `view-frames.js` (the two frames), `view-layouts.js` (theatre, stacked and floating) |
-| Chat: font size, timestamps, what sits over chat, deleted messages, 7TV, BTTV and FFZ emotes (`emotes.js`, `chat-box-emotes.js` for the chat box and `emote-picker.js` for its button) | `src/features/chat/`. A site's chat is styled in its `frames/chat.css` |
+| Chat: font size, timestamps, what sits over chat, deleted messages, 7TV, BTTV and FFZ emotes (`emotes.js`, `chat-box-emotes.js` for the chat box, `emote-picker.js` for its button and `recent-emotes.js` for the emotes you sent last), the latest emote in the chat box (`latest-emote.js`), when you followed a channel (`followed.js`) | `src/features/chat/`. A site's chat is styled in its `frames/chat.css` |
 | Blocked and highlighted words | `chat/chat-words.js` and `.css`, for every site's chat, with each site's selectors in `MESSAGES`. Their lists are in `settings-window.js` |
 | Stream quality | `player/quality.js` (Twitch, and Twitch's embedded player in multi-stream, which gets the setting from `player/embed-settings.js`), and `frames/watch-start.js` in `youtube/` and `kick/` |
 | Theatre, stacked and floating chat modes | `src/features/player/` (Twitch, plus `floating-window.js` and `.css`, which both use) and `streams/twitch/view-layouts.js` and `stream-view.css` (other sites). `streams/frames/layout-keys.js` forwards the shortcuts from inside their frames, and `chat-settings.js` there and each site's `chat.css` make floating chat see-through. Theatre on Twitch is Twitch's own. Stacked and floating exist twice, so change both |
 | Audio only | `player/audio-only.js` and `.css` (the button, Alt+A and the label over the player) and `player/audio-only-player.js` (switching Twitch's player, in the page itself). Twitch's player only, not multi-stream, YouTube or Kick |
 | Reload player on errors | `player/auto-reload.js`, in the page itself, for Twitch's player and its embedded player in multi-stream, which gets the setting from `player/embed-settings.js`. Twitch's player only, not YouTube or Kick |
 | Keep quality in background tabs | `player/background-quality.js`, in the page itself, for Twitch's player and its embedded player in multi-stream, which gets the setting from `player/embed-settings.js`. Twitch's player only: YouTube and Kick weren't looked at |
+| Starting the stream when a channel goes live | `player/go-live.js`, which asks Twitch whether the channel is live and reloads the page. It keeps its last reload in the tab's `sessionStorage` as `skek-go-live`, to stop after three. Twitch's own pages only, not YouTube or Kick |
 | A button in Twitch's player controls | `player/control-buttons.js`, which `modes.js` and `audio-only.js` both add theirs with |
+| Remembering the sort order on Browse, live channels and category pages | `browse/sort-order.js`. It has no setting, and keeps your picks in Twitch's own `localStorage` as `skek-sort-orders`, the one thing not in `chrome.storage.local`, because it has to be read before Twitch's page starts |
 | Sidebar previews | `sidebar/preview.js` (Twitch channels) and `streams/twitch/stream-tip.js` (other sites) |
 | Favorites | `streams/twitch/favorites.js` and `.css`. Twitch's channels there are read from Twitch's own API in the page, not from `sites.js` |
 | Go-live notifications | `notifications/background/`: `index.js` (the checks and the notification), `live-changes.js` (what counts as going live) and `twitch-live.js` (asking Twitch, which the page does itself in `favorites.js`). `pollIfWanted` in `streams/background/site-background.js` keeps YouTube's and Kick's checks running with no Twitch tab while a favorite there needs them |
@@ -157,3 +161,4 @@ All in `chrome.storage.local`. A key in `SETTINGS` is written by the settings wi
 | `chatHidden` | boolean | Twitch page |
 | `chatBlockedWords`, `chatHighlightedWords` | `[string]`, default empty | settings window |
 | `floatingChat` | `{x,y,width,height,opacity}`, each optional | Twitch page |
+| `recentEmotes` | `[{name,twitch}]`, the last emotes you sent in Twitch's chat, newest first. `twitch` is the emote's id, only on Twitch's own | Twitch page |

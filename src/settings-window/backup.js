@@ -31,6 +31,7 @@
     chatBlockedWords: [],
     chatHighlightedWords: [],
     floatingChat: {},
+    recentEmotes: [],
   };
   // Worked out again by the next check.
   const NOT_BACKED_UP = ['live', 'status', 'kickLive', 'kickStatus', 'liveNotificationsSeen'];
@@ -38,6 +39,7 @@
   const CHANNEL_ID = /^[\w:@-][\w:.@-]*$/;
   const CHANNEL_NAME = /^[\w-]+$/;
   const HANDLE = /^@?[^\s/\\?#<>"']+$/;
+  const EMOTE_ID = /^[\w-]+$/;
 
   const isObject = (value) => typeof value === 'object' && value !== null && !Array.isArray(value);
   const isText = (value) => typeof value === 'string' && value.length > 0 && value.length <= MAX_TEXT;
@@ -84,6 +86,17 @@
     return Object.fromEntries(kept.map((key) => [key, value[key]]));
   }
 
+  // Each is a name to type, with the id its image is built from when it's one of Twitch's own emotes.
+  function cleanRecentEmotes(value) {
+    if (!Array.isArray(value)) return undefined;
+    const emotes = [];
+    for (const emote of value.slice(0, MAX_ITEMS)) {
+      if (!isObject(emote) || !isText(emote.name) || /\s/.test(emote.name)) continue;
+      emotes.push(isText(emote.twitch) && EMOTE_ID.test(emote.twitch) ? { name: emote.name, twitch: emote.twitch } : { name: emote.name });
+    }
+    return emotes;
+  }
+
   const cleanBoolean = (value) => (typeof value === 'boolean' ? value : undefined);
 
   const CLEANERS = {
@@ -104,6 +117,7 @@
     chatHighlightedWords: cleanWords,
     chatHidden: cleanBoolean,
     floatingChat: cleanFloatingChat,
+    recentEmotes: cleanRecentEmotes,
     kickVolume: (value) => (Number.isFinite(value) && value > 0 && value <= 1 ? value : undefined),
   };
 

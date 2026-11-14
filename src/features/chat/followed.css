@@ -1,0 +1,59 @@
+/* The Show when you followed a channel setting; see followed.js. Its answer above the chat box and its
+   line on your own card. The answer is in Twitch's colors for its current theme. */
+
+.skek-followed {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 8px 8px 8px 12px;
+  border: 1px solid var(--color-border-base, rgba(83, 83, 95, 0.48));
+  border-radius: 6px;
+  background: var(--color-background-alt, #1f1f23);
+  color: var(--color-text-base, #efeff1);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.skek-followed__text {
+  flex: 1;
+  margin: 0;
+  align-self: center;
+  overflow-wrap: anywhere;
+}
+
+.skek-followed__close {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.skek-followed__close:hover {
+  background: var(--color-background-button-text-hover, rgba(83, 83, 95, 0.48));
+}
+
+/* Like the line Twitch puts there for a sub: a 20px icon, then the text, in the white of the card's top. */
+.skek-followed-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  color: inherit;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.skek-followed-card svg {
+  flex: none;
+}
+
+.skek-followed-card p {
+  margin: 0;
+}
