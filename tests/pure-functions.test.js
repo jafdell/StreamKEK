@@ -68,6 +68,50 @@ test("twitchId reads an emote's id from Twitch's image address, and nothing from
   assert.equal(twitchId('https://example.com/?https://static-cdn.jtvnw.net/emoticons/v2/25/'), null);
 });
 
+// Loads after emotes.js, as in the manifest.
+vm.runInNewContext(readFileSync(new URL('../src/features/chat/followed.js', import.meta.url), 'utf8'), chatEmotesContext);
+const { isCommand, timeSince, followedFrom, answerText, cardText } = chatEmotesContext.skek.followed;
+// Midday where the tests run, so the day is the same in every time zone.
+const midday = (year, month, day) => new Date(year, month - 1, day, 12);
+
+test('isCommand takes /followed alone, in any case, and nothing else', () => {
+  for (const text of ['/followed', '﻿/followed', ' /Followed ', '/FOLLOWED']) assert.equal(isCommand(text), true, text);
+  for (const text of ['', '/follow', '/followers', '/followed me', 'hi /followed']) assert.equal(isCommand(text), false, text);
+});
+
+test('timeSince counts whole years and months, and days under a month', () => {
+  assert.equal(timeSince(midday(2015, 8, 22), midday(2026, 11, 14)), '11 years and 2 months');
+  assert.equal(timeSince(midday(2015, 8, 22), midday(2026, 8, 21)), '10 years and 11 months');
+  assert.equal(timeSince(midday(2025, 11, 14), midday(2026, 11, 14)), '1 year');
+  assert.equal(timeSince(midday(2026, 10, 14), midday(2026, 11, 14)), '1 month');
+  assert.equal(timeSince(midday(2026, 10, 20), midday(2026, 11, 14)), '25 days');
+  assert.equal(timeSince(new Date(2026, 10, 13, 23), new Date(2026, 10, 14, 1)), '1 day');
+  assert.equal(timeSince(midday(2026, 11, 14), midday(2026, 11, 14)), '');
+  assert.equal(timeSince(midday(2026, 11, 15), midday(2026, 11, 14)), '', 'a clock that is behind');
+});
+
+test('followedFrom reads the date from Twitch, or says why there is none', () => {
+  const following = followedFrom({ user: { displayName: 'summit1g', self: { follower: { followedAt: '2015-08-22T22:50:01Z' } } } }, 'summit1g');
+  assert.equal(following.state, 'following');
+  assert.equal(following.name, 'summit1g');
+  assert.equal(following.at.toISOString(), '2015-08-22T22:50:01.000Z');
+  assert.deepEqual(plain(followedFrom({ user: { displayName: 'Summit', self: { follower: null } } }, 'summit1g')), { state: 'notFollowing', name: 'Summit' });
+  assert.deepEqual(plain(followedFrom({ user: { displayName: null, self: null } }, 'summit1g')), { state: 'notFollowing', name: 'summit1g' });
+  assert.deepEqual(plain(followedFrom({ user: { self: { follower: { followedAt: 'soon' } } } }, 'x')), { state: 'notFollowing', name: 'x' });
+  for (const data of [null, undefined, {}, { user: null }]) assert.deepEqual(plain(followedFrom(data, 'x')), { state: 'failed' });
+});
+
+test('answerText says when you followed and how long ago, or why it cannot', () => {
+  const at = midday(2015, 8, 22);
+  const now = midday(2026, 11, 14);
+  assert.equal(answerText({ state: 'following', name: 'summit1g', at }, now, 'en-US'), 'You followed summit1g on August 22, 2015, 11 years and 2 months ago.');
+  assert.equal(answerText({ state: 'following', name: 'summit1g', at: now }, now, 'en-US'), 'You followed summit1g on November 14, 2026.');
+  assert.equal(answerText({ state: 'notFollowing', name: 'summit1g' }, now, 'en-US'), "You don't follow summit1g.");
+  assert.match(answerText({ state: 'failed' }, now, 'en-US'), /\/followed/);
+  assert.match(answerText({ state: 'signedOut' }, now, 'en-US'), /Sign in/);
+  assert.equal(cardText(at, 'en-US'), 'Followed since August 22, 2015');
+});
+
 test('channelFromPath finds the channel in each address with chat, and nothing elsewhere', () => {
   assert.equal(channelFromPath('/SodaPoppin'), 'sodapoppin');
   assert.equal(channelFromPath('/sodapoppin/about'), 'sodapoppin');

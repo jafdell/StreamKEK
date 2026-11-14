@@ -70,6 +70,7 @@
         "src/features/chat/recent-emotes.js",
         "src/features/chat/emote-picker.js",
         "src/features/chat/latest-emote.js",
+        "src/features/chat/followed.js",
         "src/features/player/control-buttons.js",
         "src/features/player/floating-window.js",
         "src/features/player/modes.js",
@@ -89,6 +90,7 @@
         "src/features/chat/emotes.css",
         "src/features/chat/emote-picker.css",
         "src/features/chat/latest-emote.css",
+        "src/features/chat/followed.css",
         "src/features/player/extensions.css",
         "src/features/player/modes.css",
         "src/features/player/audio-only.css",
@@ -167,7 +169,8 @@
         "src/features/chat/emotes.js",
         "src/features/chat/recent-emotes.js",
         "src/features/chat/emote-picker.js",
-        "src/features/chat/latest-emote.js"
+        "src/features/chat/latest-emote.js",
+        "src/features/chat/followed.js"
       ],
       "css": [
         "src/features/chat/font-size.css",
@@ -177,7 +180,8 @@
         "src/features/chat/deleted-messages.css",
         "src/features/chat/emotes.css",
         "src/features/chat/emote-picker.css",
-        "src/features/chat/latest-emote.css"
+        "src/features/chat/latest-emote.css",
+        "src/features/chat/followed.css"
       ],
       "all_frames": true,
       "run_at": "document_start"

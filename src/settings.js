@@ -144,6 +144,13 @@
       default: true,
     },
     {
+      key: 'chatFollowedDate',
+      category: 'Chat',
+      label: 'Show when you followed a channel',
+      hint: "Type /followed in Twitch's chat box to see the date you followed that channel. Only you see the answer, and nothing is sent to chat. Your own card, which opens when you click your name in chat, shows the date too. Twitch only tells it to you, so this asks Twitch with your Twitch sign-in.",
+      default: true,
+    },
+    {
       key: 'hidePlayerExtensions',
       category: 'Player',
       label: 'Hide extensions over the video',

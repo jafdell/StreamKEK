@@ -105,10 +105,10 @@
     }
   });
 
-  // Twitch keeps the name you're signed in with in a cookie, and puts each chatter's on their messages.
+  // Twitch puts each chatter's name on their messages, and src/twitch/gql.js knows yours.
   function waitForMessage() {
     if (!skek.chatEmotes.emotesReady()) return;
-    login = document.cookie.match(/(?:^|; )login=(\w+)(?:;|$)/)?.[1]?.toLowerCase() ?? null;
+    login = skek.twitchLogin();
     if (!login) return;
     clearTimeout(giveUp);
     watcher.observe(document.documentElement, { childList: true, subtree: true });
