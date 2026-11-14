@@ -5,6 +5,15 @@ What's new in each version of StreamKEK, newest first.
 <!-- The settings window shows this file under What's new, so keep its shape: a "## version - date"
      heading, then one "- " line per change, with ** around the part to show in bold. -->
 
+## 1.7.0 - 2026-11-14
+
+- **Latest emote in the chat box:** Twitch's empty chat box shows the name of the emote chat used last, and Tab puts it in your message. It's on by default, under Chat.
+- **Recently used emotes:** the emote picker starts with the emotes you sent last, Twitch's own included.
+- **When you followed a channel:** type /followed in Twitch chat to see the date you followed the channel, shown only to you. Your own card in chat shows it too. It's on by default, under Chat.
+- **Sort order that sticks:** the sort you pick on Browse, live channels and category pages stays in new tabs and through a reload, instead of going back to Recommended For You.
+- **Start the stream when a channel goes live:** wait on an offline Twitch channel and the stream starts by itself when it goes live, with no refresh. It's off by default, under Player.
+- **License:** StreamKEK is now under MIT with the Commons Clause: free to use, change and share, but not to sell.
+
 ## 1.6.0 - 2026-11-13
 
 - **Audio only (Alt+A):** a headphones button in Twitch's player plays a live stream or a Twitch video with sound and no picture, so the picture isn't downloaded.
