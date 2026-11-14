@@ -36,6 +36,7 @@ It works in Chrome, Brave and other Chromium browsers, with no API key and no ex
 
 ### A tidier Twitch
 
+- **Sort order that sticks:** the sort you pick on Browse, live channels and category pages stays in new tabs and after a restart, instead of going back to Recommended For You.
 - **Cleaner sidebar:** hide For You, Live Channels, Recommended Categories and Viewers Also Watch, and turn off the YouTube Live and Kick Live sections.
 - **Cleaner player:** hide what streamers' Twitch extensions show over the video.
 - **Auto-claim channel points:** only in a tab where the stream is playing. Off by default.

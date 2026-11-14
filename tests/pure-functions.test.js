@@ -112,6 +112,42 @@ test('answerText says when you followed and how long ago, or why it cannot', () 
   assert.equal(cardText(at, 'en-US'), 'Followed since August 22, 2015');
 });
 
+const sortOrderContext = { skek: {} };
+vm.runInNewContext(readFileSync(new URL('../src/features/browse/sort-order.js', import.meta.url), 'utf8'), sortOrderContext);
+const { sortFrom, picksFrom, settle } = sortOrderContext.skek.sortOrder;
+const BROWSE_SORT = 'browseAllCategoriedPageSort';
+const CHANNELS_SORT = 'directoryAllChannelPageSort';
+const CATEGORY_SORT = 'directoryGameChannelPageSort';
+
+test("sortFrom reads a sort as Twitch keeps it, and nothing from anything else", () => {
+  assert.equal(sortFrom('"VIEWER_COUNT"'), 'VIEWER_COUNT');
+  assert.equal(sortFrom('"RECENT"'), 'RECENT');
+  for (const text of [null, '', 'VIEWER_COUNT', '"NEWEST"', 'true', '{"a":1}']) assert.equal(sortFrom(text), null, String(text));
+});
+
+test('picksFrom keeps only the places and sorts Twitch has', () => {
+  const kept = { [CATEGORY_SORT]: 'VIEWER_COUNT', [BROWSE_SORT]: 'NEWEST', other: 'RECENT', [CHANNELS_SORT]: 5 };
+  assert.deepEqual(plain(picksFrom(JSON.stringify(kept))), { [CATEGORY_SORT]: 'VIEWER_COUNT' });
+  for (const text of [null, '', 'not json', '"RECENT"', '[]', 'null']) assert.deepEqual(plain(picksFrom(text)), {}, String(text));
+});
+
+test('settle remembers a pick from the sort menu, and puts picks back when Twitch changes them', () => {
+  const picks = { [CATEGORY_SORT]: 'RECENT' };
+  const newTab = { [BROWSE_SORT]: null, [CHANNELS_SORT]: null, [CATEGORY_SORT]: null };
+  assert.deepEqual(plain(settle(picks, newTab, false)), { remember: picks, putBack: { [CATEGORY_SORT]: 'RECENT' } });
+  assert.deepEqual(plain(settle({}, newTab, false)), { remember: {}, putBack: {} }, 'with nothing picked yet, Twitch is left alone');
+
+  const twitchReset = { [BROWSE_SORT]: 'RELEVANCE', [CHANNELS_SORT]: 'RELEVANCE', [CATEGORY_SORT]: 'RELEVANCE' };
+  assert.deepEqual(plain(settle(picks, twitchReset, false)), { remember: picks, putBack: { [CATEGORY_SORT]: 'RECENT' } });
+
+  const picked = { ...twitchReset, [CHANNELS_SORT]: 'VIEWER_COUNT', [CATEGORY_SORT]: 'RECENT' };
+  assert.deepEqual(plain(settle(picks, picked, true)), {
+    remember: { [CATEGORY_SORT]: 'RECENT', [BROWSE_SORT]: 'RELEVANCE', [CHANNELS_SORT]: 'VIEWER_COUNT' },
+    putBack: {},
+  });
+  assert.deepEqual(plain(settle(picks, { ...newTab, [CATEGORY_SORT]: 'RECENT' }, false)), { remember: picks, putBack: {} });
+});
+
 test('channelFromPath finds the channel in each address with chat, and nothing elsewhere', () => {
   assert.equal(channelFromPath('/SodaPoppin'), 'sodapoppin');
   assert.equal(channelFromPath('/sodapoppin/about'), 'sodapoppin');

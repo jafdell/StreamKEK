@@ -63,6 +63,7 @@
         "src/features/streams/twitch/main.js",
         "src/features/sidebar/preview.js",
         "src/features/sidebar/current-channel.js",
+        "src/features/browse/sort-order.js",
         "src/features/chat/claim-points.js",
         "src/features/chat/chat-words.js",
         "src/features/chat/deleted-messages.js",

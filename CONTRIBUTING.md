@@ -17,7 +17,7 @@ They talk through `chrome.storage.local` (settings and what's live), messages to
 
 ## Where do I...?
 
-Features are in `src/features/`. `chat/`, `player/` and `sidebar/` match the settings window's tabs, `streams/` holds what every other site shares, and `youtube/` and `kick/` hold what's particular to each. This table lists only what those names wouldn't lead you to.
+Features are in `src/features/`. `chat/`, `player/` and `sidebar/` match the settings window's tabs, `browse/` is for Twitch's Browse and category pages, `streams/` holds what every other site shares, and `youtube/` and `kick/` hold what's particular to each. This table lists only what those names wouldn't lead you to.
 
 | To change... | Look in |
 | --- | --- |
@@ -38,6 +38,7 @@ Features are in `src/features/`. `chat/`, `player/` and `sidebar/` match the set
 | Reload player on errors | `player/auto-reload.js`, in the page itself, for Twitch's player and its embedded player in multi-stream, which gets the setting from `player/embed-settings.js`. Twitch's player only, not YouTube or Kick |
 | Keep quality in background tabs | `player/background-quality.js`, in the page itself, for Twitch's player and its embedded player in multi-stream, which gets the setting from `player/embed-settings.js`. Twitch's player only: YouTube and Kick weren't looked at |
 | A button in Twitch's player controls | `player/control-buttons.js`, which `modes.js` and `audio-only.js` both add theirs with |
+| Remembering the sort order on Browse, live channels and category pages | `browse/sort-order.js`. It has no setting, and keeps your picks in Twitch's own `localStorage` as `skek-sort-orders`, the one thing not in `chrome.storage.local`, because it has to be read before Twitch's page starts |
 | Sidebar previews | `sidebar/preview.js` (Twitch channels) and `streams/twitch/stream-tip.js` (other sites) |
 | Favorites | `streams/twitch/favorites.js` and `.css`. Twitch's channels there are read from Twitch's own API in the page, not from `sites.js` |
 | Go-live notifications | `notifications/background/`: `index.js` (the checks and the notification), `live-changes.js` (what counts as going live) and `twitch-live.js` (asking Twitch, which the page does itself in `favorites.js`). `pollIfWanted` in `streams/background/site-background.js` keeps YouTube's and Kick's checks running with no Twitch tab while a favorite there needs them |
