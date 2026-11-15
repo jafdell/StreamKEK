@@ -5,6 +5,10 @@ What's new in each version of StreamKEK, newest first.
 <!-- The settings window shows this file under What's new, so keep its shape: a "## version - date"
      heading, then one "- " line per change, with ** around the part to show in bold. -->
 
+## 1.7.1 - 2026-11-16
+
+- **Fixed:** with Start the stream when a channel goes live on, a stream that Twitch started in the picture at the top of the channel's Home now opens in the normal view, with chat beside it.
+
 ## 1.7.0 - 2026-11-14
 
 - **Latest emote in the chat box:** Twitch's empty chat box shows the name of the emote chat used last, and Tab puts it in your message. It's on by default, under Chat.
