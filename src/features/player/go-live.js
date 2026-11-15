@@ -6,7 +6,11 @@
 // Only on the channel's own page, /name, on Home or with chat open, not on About, Videos, Clips or
 // Schedule. Not while there's text in the chat box, which a reload would lose. A reload that came
 // too early, with the page still offline after it, is followed by two more, and then the page is
-// left alone. If Twitch's markup changes, nothing happens.
+// left alone.
+// Sometimes Twitch notices by itself on Home, and plays the stream in the picture at the top of the
+// page instead of in its normal view. So a page that showed the channel as offline and now shows
+// that picture gets its "Watch now" link clicked, which opens the normal view with no reload.
+// If Twitch's markup changes, nothing happens.
 // This loads after emotes.js, for the channel in the address.
 (() => {
   'use strict';
@@ -42,15 +46,24 @@
   // with chat open. LIVE is on the page while it shows a stream.
   const OFFLINE = '.channel-root__player--offline';
   const LIVE = '.channel-root--live';
+  // WATCH is on the page while it shows a stream in its normal view, with chat beside it. On Home a
+  // live stream plays in the picture at the top instead, over which WATCH_NOW opens the normal view.
+  const WATCH = '.channel-root--watch';
+  const WATCH_NOW = "a[data-a-target='home-live-overlay-button']";
   const CHAT_BOX = "[data-a-target='chat-input']";
   const QUERY = 'query($login:String!){user(login:$login){stream{id}}}';
   // In the tab's sessionStorage, so it's still there after the reload.
   const KEY = 'skek-go-live';
   const CHECK_MS = 15_000;
+  const LOOK_MS = 2_000;
   const TIMEOUT_MS = 10_000;
 
   // The channel Twitch has said is offline since this page opened.
   let offlineSeen = null;
+  // The channel whose page has shown it as offline, and hasn't shown its stream in the normal view
+  // since. A stream at the top of its Home is then one that just started, not one you went to Home
+  // from.
+  let offlineShown = null;
   let checking = false;
 
   const channelHere = () => channelPage(location.pathname, skek.chatEmotes.channelFromPath);
@@ -100,5 +113,27 @@
     }
   }
 
+  // Opens the normal view when Twitch started the stream at the top of Home by itself.
+  function look() {
+    if (!document.documentElement.matches(ON) || document.getElementById('skek-view')) return;
+    const login = channelHere();
+    if (offlineShown !== login) offlineShown = null;
+    if (!login) return;
+    if (showsOffline()) {
+      offlineShown = login;
+      return;
+    }
+    if (!offlineShown || !document.querySelector(LIVE)) return;
+    if (document.querySelector(WATCH)) {
+      offlineShown = null;
+      return;
+    }
+    const link = document.querySelector(WATCH_NOW);
+    if (!link) return;
+    offlineShown = null;
+    link.click();
+  }
+
   setInterval(check, CHECK_MS);
+  setInterval(look, LOOK_MS);
 })();
