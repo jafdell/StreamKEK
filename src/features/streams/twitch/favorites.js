@@ -19,10 +19,19 @@
   const GQL_QUERY = 'query($logins:[String!]){users(logins:$logins){login displayName profileImageURL(width:70) stream{viewersCount title game{displayName}}}}';
   const GQL_MAX_LOGINS = 100;
   const REFRESH_MS = 60_000;
+  const TIMEOUT_MS = 10_000;
+  // When Twitch doesn't answer it's asked again this long after, twice, so a tab you come back to
+  // isn't left with what it knew before until the next minute.
+  const RETRY_WAITS_MS = [3_000, 10_000];
+  // The window getting focus asks too, unless something else just did.
+  const JUST_ASKED_MS = 10_000;
 
   // What Twitch last said about each Twitch favorite, and each Twitch stream in the multi-stream view,
   // by id. Only a favorite it says is live gets a card.
   let twitchStatus = {};
+  let retryTimer = null;
+  let lastAsk = 0;
+  let askedAt = 0;
   let lastRender = null;
   // The star on the Twitch card under the mouse. Only one, since it goes into Twitch's own markup.
   let twitchStar = null;
@@ -222,20 +231,33 @@
     else list.replaceChildren(el('p', { class: 'skek-section__empty' }, 'Drop a channel here'));
   }
 
-  async function refreshTwitchStatus() {
+  async function askTwitch(attempt) {
+    clearTimeout(retryTimer);
     const favorites = state.favorites.filter((c) => platformOf(c) === 'twitch').map((c) => c.login);
     const logins = [...new Set([...shared.multiTwitchLogins(), ...favorites])];
     if (!logins.length || document.hidden) return;
+    const ask = ++lastAsk;
+    askedAt = Date.now();
+    let users = null;
     try {
-      const data = await skek.twitchGql(GQL_QUERY, { logins: logins.slice(0, GQL_MAX_LOGINS) });
-      if (!data?.users) return;
-      twitchStatus = twitchStatusFrom(data.users);
-      shared.renderSidebar();
-      shared.updateMulti();
+      users = (await skek.twitchGql(GQL_QUERY, { logins: logins.slice(0, GQL_MAX_LOGINS) }, AbortSignal.timeout(TIMEOUT_MS)))?.users;
     } catch {
-      // Keeps what it last knew until the next try.
+      // The same as an answer that doesn't say.
     }
+    // A later ask has the newer answer, or is waiting for it.
+    if (ask !== lastAsk) return;
+    if (!users) {
+      // Keeps what it last knew until Twitch answers.
+      const wait = RETRY_WAITS_MS[attempt];
+      if (wait !== undefined) retryTimer = setTimeout(() => askTwitch(attempt + 1), wait);
+      return;
+    }
+    twitchStatus = twitchStatusFrom(users);
+    shared.renderSidebar();
+    shared.updateMulti();
   }
+
+  const refreshTwitchStatus = () => askTwitch(0);
 
   function showStar(event) {
     const link = event.target.closest?.(TWITCH_CARD);
@@ -298,6 +320,10 @@
     setInterval(refreshTwitchStatus, REFRESH_MS);
     // A tab opened in the background hasn't asked yet, and live favorites wait on the answer.
     document.addEventListener('visibilitychange', refreshTwitchStatus);
+    // Clicking into a window that was showing all along isn't a visibilitychange.
+    addEventListener('focus', () => {
+      if (Date.now() - askedAt > JUST_ASKED_MS) refreshTwitchStatus();
+    });
   });
 
   Object.assign(shared, {
