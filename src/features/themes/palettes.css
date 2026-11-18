@@ -1,0 +1,174 @@
+/* Each theme's colors, for Twitch's pages, the extension's own pages and YouTube's chat. Whatever
+   has data-skek-theme gets them, so a tile in the settings window's theme picker can show a theme
+   that isn't on. Each place turns them into its own colors: twitch-colors.css on Twitch,
+   extension-pages/page.css and youtube/frames/chat.css.
+
+   bg is the page behind everything, base the panels on it, raised a card on a panel and float a
+   popup. accent is a button's color, with on-accent for the text on it, so pick one that text can
+   be read on. accent-2 is a second color for the themes that have one. A new theme also needs a
+   choice in src/settings.js. */
+
+[data-skek-theme='dark'] {
+  --skek-t-bg: #0e0e10;
+  --skek-t-base: #18181b;
+  --skek-t-raised: #26262c;
+  --skek-t-float: #323239;
+  --skek-t-text: #efeff1;
+  --skek-t-accent: #9147ff;
+  --skek-t-accent-2: #9147ff;
+  --skek-t-on-accent: #fff;
+}
+[data-skek-theme='light'] {
+  --skek-t-bg: #f7f7f8;
+  --skek-t-base: #ffffff;
+  --skek-t-raised: #efeff1;
+  --skek-t-float: #ffffff;
+  --skek-t-text: #0e0e10;
+  --skek-t-accent: #9147ff;
+  --skek-t-accent-2: #9147ff;
+  --skek-t-on-accent: #fff;
+}
+
+/* True black, with greys and a soft white for buttons. */
+[data-skek-theme='midnight'] {
+  --skek-t-bg: #000000;
+  --skek-t-base: #0a0a0c;
+  --skek-t-raised: #17171a;
+  --skek-t-float: #1f1f23;
+  --skek-t-text: #ededf0;
+  --skek-t-accent: #dcdce6;
+  --skek-t-accent-2: #8a8a99;
+  --skek-t-on-accent: #0a0a0c;
+}
+[data-skek-theme='synthwave'] {
+  --skek-t-bg: #130b2b;
+  --skek-t-base: #1c113d;
+  --skek-t-raised: #2a1958;
+  --skek-t-float: #34206b;
+  --skek-t-text: #f4eaff;
+  --skek-t-accent: #e0389a;
+  --skek-t-accent-2: #22d3ee;
+  --skek-t-on-accent: #fff;
+}
+[data-skek-theme='abyss'] {
+  --skek-t-bg: #05111d;
+  --skek-t-base: #0a1a2b;
+  --skek-t-raised: #11273d;
+  --skek-t-float: #17324c;
+  --skek-t-text: #e1f0f7;
+  --skek-t-accent: #0b8f9c;
+  --skek-t-accent-2: #38bdf8;
+  --skek-t-on-accent: #fff;
+}
+[data-skek-theme='ember'] {
+  --skek-t-bg: #0e0c0b;
+  --skek-t-base: #171312;
+  --skek-t-raised: #241c1a;
+  --skek-t-float: #2e2320;
+  --skek-t-text: #f5ece8;
+  --skek-t-accent: #dc3d22;
+  --skek-t-accent-2: #ff9a3d;
+  --skek-t-on-accent: #fff;
+}
+[data-skek-theme='mocha'] {
+  --skek-t-bg: #16100d;
+  --skek-t-base: #1f1713;
+  --skek-t-raised: #2c211a;
+  --skek-t-float: #382a21;
+  --skek-t-text: #f2e5d4;
+  --skek-t-accent: #a8662f;
+  --skek-t-accent-2: #e0b48a;
+  --skek-t-on-accent: #fff;
+}
+[data-skek-theme='cotton-candy'] {
+  --skek-t-bg: #fdeaf4;
+  --skek-t-base: #fff8fc;
+  --skek-t-raised: #f9dcec;
+  --skek-t-float: #ffffff;
+  --skek-t-text: #3a2742;
+  --skek-t-accent: #d6408f;
+  --skek-t-accent-2: #7cc4f5;
+  --skek-t-on-accent: #fff;
+}
+[data-skek-theme='aurora'] {
+  --skek-t-bg: #081017;
+  --skek-t-base: #0e1a23;
+  --skek-t-raised: #152733;
+  --skek-t-float: #1b3240;
+  --skek-t-text: #e3f4ee;
+  --skek-t-accent: #0f8a66;
+  --skek-t-accent-2: #8b5cf6;
+  --skek-t-on-accent: #fff;
+}
+[data-skek-theme='terminal'] {
+  --skek-t-bg: #000000;
+  --skek-t-base: #040a06;
+  --skek-t-raised: #0b170e;
+  --skek-t-float: #102014;
+  --skek-t-text: #b8f5c8;
+  --skek-t-accent: #25c45a;
+  --skek-t-accent-2: #7dffa6;
+  --skek-t-on-accent: #021006;
+}
+
+[data-skek-theme='winter'] {
+  --skek-t-bg: #0b111e;
+  --skek-t-base: #121a2b;
+  --skek-t-raised: #1b263c;
+  --skek-t-float: #23304a;
+  --skek-t-text: #e9f1fb;
+  --skek-t-accent: #4279cc;
+  --skek-t-accent-2: #bfe3ff;
+  --skek-t-on-accent: #fff;
+}
+[data-skek-theme='spring'] {
+  --skek-t-bg: #eef7e8;
+  --skek-t-base: #fbfef8;
+  --skek-t-raised: #e0efd6;
+  --skek-t-float: #ffffff;
+  --skek-t-text: #1f2f1b;
+  --skek-t-accent: #d24a84;
+  --skek-t-accent-2: #6bbf59;
+  --skek-t-on-accent: #fff;
+}
+[data-skek-theme='summer'] {
+  --skek-t-bg: #fcf3dc;
+  --skek-t-base: #fffdf5;
+  --skek-t-raised: #f6e9c6;
+  --skek-t-float: #ffffff;
+  --skek-t-text: #12313a;
+  --skek-t-accent: #0889a0;
+  --skek-t-accent-2: #f6b21b;
+  --skek-t-on-accent: #fff;
+}
+[data-skek-theme='autumn'] {
+  --skek-t-bg: #130c08;
+  --skek-t-base: #1d130d;
+  --skek-t-raised: #2b1c13;
+  --skek-t-float: #372419;
+  --skek-t-text: #f6e7d4;
+  --skek-t-accent: #c9540f;
+  --skek-t-accent-2: #e2a63a;
+  --skek-t-on-accent: #fff;
+}
+
+[data-skek-theme='christmas'] {
+  --skek-t-bg: #06130d;
+  --skek-t-base: #0b1e14;
+  --skek-t-raised: #122c1e;
+  --skek-t-float: #183826;
+  --skek-t-text: #f7f4ea;
+  --skek-t-accent: #c8102e;
+  --skek-t-accent-2: #d9b44a;
+  --skek-t-on-accent: #fff;
+}
+[data-skek-theme='halloween'] {
+  --skek-t-bg: #0c0711;
+  --skek-t-base: #150c1d;
+  --skek-t-raised: #21132d;
+  --skek-t-float: #2b1939;
+  --skek-t-text: #f2e7f8;
+  --skek-t-accent: #f07a12;
+  --skek-t-accent-2: #9be022;
+  --skek-t-on-accent: #1c0d00;
+}

@@ -86,7 +86,7 @@
     previewUrl: (stream) => stream.thumbnail ?? '',
     frameUrls(channel, stream, settings) {
       const parent = `parent=${location.hostname}`;
-      const theme = settings.includes('skek-theme=dark') ? '&darkpopout' : '';
+      const theme = settings.includes('skek-theme-base=dark') ? '&darkpopout' : '';
       return {
         player: `https://player.twitch.tv/?channel=${channel.login}&${parent}`,
         chat: `https://www.twitch.tv/embed/${channel.login}/chat?${parent}${theme}${settings}`,

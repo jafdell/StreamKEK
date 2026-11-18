@@ -84,6 +84,20 @@ test('every setting the CSS uses exists', () => {
   }
 });
 
+test('every theme has its colors', () => {
+  const palettes = read('src/features/themes/palettes.css');
+  const themes = context.skek.SETTINGS.find((setting) => setting.key === 'theme').choices;
+  for (const { value, base, group } of themes) {
+    assert.ok(group, `the theme ${value} needs a group`);
+    // The one without a base follows Twitch's own theme.
+    if (base) assert.ok(palettes.includes(`[data-skek-theme='${value}'] {`), `the theme ${value} has no colors in palettes.css`);
+    else assert.equal(value, 'twitch');
+  }
+  for (const [, value] of palettes.matchAll(/\[data-skek-theme='([\w-]+)'\] \{/g)) {
+    assert.ok(themes.some((theme) => theme.value === value), `palettes.css has colors for ${value}, which isn't a theme`);
+  }
+});
+
 test('every setting with a message has a handler', () => {
   const handlers = { ...youtubeHandlers, ...kickHandlers };
   for (const { key, message } of context.skek.SETTINGS) {

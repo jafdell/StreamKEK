@@ -13,7 +13,7 @@ By opening a pull request, you agree that your contribution is licensed under th
 - **Page-world scripts** (`"world": "MAIN"` in the manifest): run in the site's own page, to reach things like its player.
 - **Extension pages:** the settings window and the channel manager. The manager also opens beside the sidebar's **+** button, called the **+** frame.
 
-They talk through `chrome.storage.local` (settings and what's live), messages to the service worker (asking it to do work), `data-skek-*` attributes on `<html>` (for CSS and page-world scripts), and `postMessage` between the Twitch page and the frames in it. The chat frame also gets its theme and Twitch's font size in its address, because storage would answer too late for its first paint.
+They talk through `chrome.storage.local` (settings and what's live), messages to the service worker (asking it to do work), `data-skek-*` attributes on `<html>` (for CSS and page-world scripts), and `postMessage` between the Twitch page and the frames in it. The chat frame also gets its theme and Twitch's font size in its address, because storage would answer too late for its first paint. For the same reason the Twitch page keeps the Theme setting in Twitch's own `localStorage` as `skek-theme`.
 
 ## Where do I...?
 
@@ -26,7 +26,7 @@ Features are in `src/features/`. `chat/`, `player/` and `sidebar/` match the set
 | The extension's button in Twitch's top bar and the window around the settings page | `src/twitch/settings-button.js` and `.css` |
 | What's new in each version | `CHANGELOG.md` in the root, newest version first. `src/settings-window/changelog.js` reads that same file for the settings window's **What's new** category, so keep its shape: a `## 1.5.0 - 2026-11-11` heading, then one `- ` line per change, with `**` around the part to show in bold. Write what people can do now, not how the code changed. `node --test` checks that it starts with the manifest's version |
 | The settings page: categories, search, rows, backups. Also the toolbar popup | `src/settings-window/`. `src/extension-pages/` holds what it shares with the channel manager: `page.css` and `page-theme.js` |
-| The Theme setting's colors | Twitch's values for each theme, wherever `src/` matches `data-theme` or `data-skek-theme`, plus `READABLE` in `youtube/frames/chat.js` (chatters' name colors). Kick has no light theme, so `kick/frames/chat.css` stays dark |
+| Themes | `src/features/themes/`: `palettes.css` (each theme's colors), `twitch-colors.css` (Twitch recolored with them) and `twitch-base.js` (switching Twitch to its dark or light theme, in the page itself). A theme is a choice of the `theme` setting in `src/settings.js`, with the one of Twitch's two themes it's built on as its `base`, and `resolveTheme` there says which to show. `src/twitch/page-sync.js` puts it on Twitch's `<html>`, `extension-pages/page-theme.js` on the extension's own pages and `streams/frames/chat-settings.js` on YouTube's and Kick's chat: `data-skek-theme` is the theme and `data-skek-theme-base` is `dark` or `light`. Twitch's own two themes keep Twitch's values, wherever `src/` matches those attributes, plus `READABLE` in `youtube/frames/chat.js` (chatters' name colors). Kick has no light theme, so `kick/frames/chat.css` stays dark in a light one |
 | Streams from other sites | `src/features/streams/`: `sites.js` (everything that differs per site), `twitch/` (sidebar sections, stream view, address, Following page), `manager/` (channel manager), `frames/` and `background/` (what every site's frames and service worker code share) |
 | One site in particular | `src/features/youtube/` and `src/features/kick/`: `background/` (polling, reading the site) and `frames/` (its chat and player) |
 | Stream view | `streams/twitch/`: `stream-view.js` (the info bar, opening and closing), `view-frames.js` (the two frames), `view-layouts.js` (theatre, stacked and floating) |
@@ -73,6 +73,12 @@ chrome.storage.onChanged.addListener((changes, area) => {
 Code that only asks whether it's on right now can use `document.documentElement.matches("[data-skek-on~='yourKey']")`, as `chat/claim-points.js` does.
 
 If the background has work to do when it changes, add `message: '<name>:doThing'` to the entry and handle that message in the feature's `messageHandlers` (see `showSubscriptions`). The settings window then sends `{ type, enabled }` instead of writing storage, and your handler writes the key. This only works on on/off switches: dropdowns and `choices` always write storage. A dropdown or `choices` setting with background work picks up the change with `chrome.storage.onChanged` in `startBackground`.
+
+## Add a theme
+
+1. Add a choice to the `theme` setting in `src/settings.js`: its `value`, `label`, `group` (its heading in the picker) and `base`, `dark` or `light`, for which of Twitch's own two themes it's built on.
+2. Give it its colors in `src/features/themes/palettes.css`, under `[data-skek-theme='<value>']`. The top of that file says what each one is for. `node --test` checks that every theme has them.
+3. Try it on Twitch's pages, in the settings window, in a stream view and in YouTube's chat. Buttons need text you can read on the accent color: set `--skek-t-on-accent` to a dark color if the accent is a light one.
 
 To pick one value from a few rather than switch something on or off, give the entry `choices: [{ value, label }, ...]` and a `default` that is one of the values, as `theme` does. Values are strings, even for numbers (`String(px)`). Add `dropdown: true` if there are too many for buttons, as `chatFontSize` does. Its value isn't added to `data-skek-on`, so read it from storage or put it on `<html>` in `src/twitch/page-sync.js`.
 
@@ -161,4 +167,5 @@ All in `chrome.storage.local`. A key in `SETTINGS` is written by the settings wi
 | `chatHidden` | boolean | Twitch page |
 | `chatBlockedWords`, `chatHighlightedWords` | `[string]`, default empty | settings window |
 | `floatingChat` | `{x,y,width,height,opacity}`, each optional | Twitch page |
+| `twitchTheme` | `'dark'` or `'light'`: Twitch's own theme, for the Theme setting's Twitch choice on the extension's own pages and in YouTube's chat, which can't see it | Twitch page |
 | `recentEmotes` | `[{name,twitch}]`, the last emotes you sent in Twitch's chat, newest first. `twitch` is the emote's id, only on Twitch's own | Twitch page |

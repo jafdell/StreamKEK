@@ -80,7 +80,7 @@
   content: '';
   position: absolute;
   inset: 3px;
-  background: #bf94ff;
+  background: var(--color-twitch-purple-11, #bf94ff);
   opacity: 0;
   transition: opacity 0.1s;
 }
@@ -137,7 +137,7 @@
   text-align: center;
 }
 .skek-multi__swap-tile--self { border-style: solid; border-color: rgba(255, 255, 255, 0.2); background: rgba(0, 0, 0, 0.5); }
-.skek-multi__swap-tile--over { border-color: #bf94ff; background: rgba(145, 71, 255, 0.35); }
+.skek-multi__swap-tile--over { border-color: var(--color-twitch-purple-11, #bf94ff); background: rgb(from var(--color-twitch-purple-9, #9147ff) r g b / 0.35); }
 .skek-multi__ghost {
   position: fixed;
   top: 0;
@@ -173,7 +173,7 @@
   font-weight: 600;
   text-align: center;
 }
-.skek-drop--over { border-color: #bf94ff; background: rgba(145, 71, 255, 0.35); }
+.skek-drop--over { border-color: var(--color-twitch-purple-11, #bf94ff); background: rgb(from var(--color-twitch-purple-9, #9147ff) r g b / 0.35); }
 .skek-drop--refused { border-color: rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.7); }
 .skek-drop__message { position: relative; z-index: 1; margin: 0; padding: 16px; pointer-events: none; }
 .skek-drop__tile {
@@ -184,4 +184,4 @@
   box-sizing: border-box;
   border: 2px dashed rgba(255, 255, 255, 0.45);
 }
-.skek-drop__tile.skek-drop--over { border-color: #bf94ff; background: rgba(145, 71, 255, 0.35); }
+.skek-drop__tile.skek-drop--over { border-color: var(--color-twitch-purple-11, #bf94ff); background: rgb(from var(--color-twitch-purple-9, #9147ff) r g b / 0.35); }

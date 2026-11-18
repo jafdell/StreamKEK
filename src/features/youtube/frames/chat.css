@@ -8,7 +8,7 @@
   font-display: swap;
 }
 
-html.skek[data-skek-theme='dark'] {
+html.skek[data-skek-theme-base='dark'] {
   --skek-bg: #18181b;
   --skek-alt: #26262c;
   --skek-hover: rgba(83, 83, 95, 0.48);
@@ -19,8 +19,10 @@ html.skek[data-skek-theme='dark'] {
   --skek-link: #bf94ff;
   --skek-border: rgba(83, 83, 95, 0.48);
   --skek-shadow: rgba(0, 0, 0, 0.5);
+  --skek-button: #9147ff;
+  --skek-on-button: #fff;
 }
-html.skek[data-skek-theme='light'] {
+html.skek[data-skek-theme-base='light'] {
   --skek-bg: #ffffff;
   --skek-alt: #efeff1;
   --skek-hover: rgba(173, 173, 184, 0.35);
@@ -31,6 +33,25 @@ html.skek[data-skek-theme='light'] {
   --skek-link: #5c16c5;
   --skek-border: rgba(173, 173, 184, 0.35);
   --skek-shadow: rgba(0, 0, 0, 0.2);
+  --skek-button: #9147ff;
+  --skek-on-button: #fff;
+}
+/* Every other theme, from its colors in features/themes/palettes.css. */
+html.skek[data-skek-theme-base]:not([data-skek-theme='dark'], [data-skek-theme='light']) {
+  --skek-bg: var(--skek-t-base);
+  --skek-alt: var(--skek-t-raised);
+  --skek-hover: rgb(from var(--skek-t-text) r g b / 0.12);
+  --skek-text: var(--skek-t-text);
+  --skek-muted: color-mix(in oklab, var(--skek-t-base) 15%, var(--skek-t-text));
+  --skek-input: rgb(from var(--skek-t-text) r g b / 0.09);
+  --skek-focus: var(--skek-t-accent);
+  --skek-link: oklch(from var(--skek-t-accent) calc(l + 0.15) calc(c * 0.85) h);
+  --skek-border: rgb(from var(--skek-t-text) r g b / 0.14);
+  --skek-button: var(--skek-t-accent);
+  --skek-on-button: var(--skek-t-on-accent);
+}
+html.skek[data-skek-theme-base='light']:not([data-skek-theme='light']) {
+  --skek-link: oklch(from var(--skek-t-accent) calc(l - 0.15) calc(c * 0.9) h);
 }
 
 /* streams/frames/chat-settings.js sets the real size. */
@@ -188,11 +209,11 @@ html.skek yt-live-chat-text-input-field-renderer #label {
 html.skek yt-live-chat-text-input-field-renderer #label { color: var(--skek-muted) !important; }
 html.skek yt-live-chat-message-input-renderer #send-button yt-button-renderer,
 html.skek yt-live-chat-message-input-renderer #send-button button {
-  background: #9147ff !important;
-  color: #fff !important;
+  background: var(--skek-button) !important;
+  color: var(--skek-on-button) !important;
   border-radius: 9000px !important;
 }
-html.skek yt-live-chat-message-input-renderer #send-button yt-icon { color: #fff !important; fill: #fff !important; }
+html.skek yt-live-chat-message-input-renderer #send-button yt-icon { color: var(--skek-on-button) !important; fill: var(--skek-on-button) !important; }
 
 /* --- emoji picker: YouTube's own grays, and white search text in either theme -- */
 
@@ -342,8 +363,8 @@ html.skek[data-skek-transparent] #item-scroller {
   animation-timeline: scroll(self);
   animation-range: 0 calc(100% - 30px);
 }
-html.skek[data-skek-theme='dark'] { --skek-halo: #000; }
-html.skek[data-skek-theme='light'] { --skek-halo: #fff; }
+html.skek[data-skek-theme-base='dark'] { --skek-halo: #000; }
+html.skek[data-skek-theme-base='light'] { --skek-halo: #fff; }
 
 /* Twitch-style thin scrollbar */
 html.skek #item-scroller { scrollbar-width: thin; scrollbar-color: var(--skek-border) transparent; }

@@ -658,13 +658,24 @@ test('siteOf treats a channel saved without a platform as YouTube', () => {
   assert.equal(siteOf({ id: 'kick:a', platform: 'kick' }).name, 'Kick');
 });
 
+test('resolveTheme shows a theme by name, and the theme Twitch has for the Twitch choice', () => {
+  const { resolveTheme } = backupContext.skek;
+  assert.deepEqual(plain(resolveTheme('cotton-candy', 'dark')), { name: 'cotton-candy', base: 'light', followsTwitch: false });
+  assert.deepEqual(plain(resolveTheme('dark', 'light')), { name: 'dark', base: 'dark', followsTwitch: false });
+  assert.deepEqual(plain(resolveTheme('twitch', 'light')), { name: 'light', base: 'light', followsTwitch: true });
+  assert.deepEqual(plain(resolveTheme('twitch', null)), { name: 'dark', base: 'dark', followsTwitch: true });
+  // A theme from a newer version's backup, or one that was removed.
+  assert.deepEqual(plain(resolveTheme('gone', 'light')), { name: 'light', base: 'light', followsTwitch: true });
+  assert.deepEqual(plain(resolveTheme(undefined)), { name: 'dark', base: 'dark', followsTwitch: true });
+});
+
 test('Twitch frames name this page as their parent, in the theme chosen', () => {
   sitesContext.location = { hostname: 'www.twitch.tv' };
-  const urls = siteOf({ platform: 'twitch' }).frameUrls({ login: 'a' }, null, '#skek-theme=dark');
+  const urls = siteOf({ platform: 'twitch' }).frameUrls({ login: 'a' }, null, '#skek-theme=ember&skek-theme-base=dark');
   assert.equal(urls.player, 'https://player.twitch.tv/?channel=a&parent=www.twitch.tv');
-  assert.equal(urls.chat, 'https://www.twitch.tv/embed/a/chat?parent=www.twitch.tv&darkpopout#skek-theme=dark');
-  const light = siteOf({ platform: 'twitch' }).frameUrls({ login: 'a' }, null, '#skek-theme=light');
-  assert.equal(light.chat, 'https://www.twitch.tv/embed/a/chat?parent=www.twitch.tv#skek-theme=light');
+  assert.equal(urls.chat, 'https://www.twitch.tv/embed/a/chat?parent=www.twitch.tv&darkpopout#skek-theme=ember&skek-theme-base=dark');
+  const light = siteOf({ platform: 'twitch' }).frameUrls({ login: 'a' }, null, '#skek-theme=spring&skek-theme-base=light');
+  assert.equal(light.chat, 'https://www.twitch.tv/embed/a/chat?parent=www.twitch.tv#skek-theme=spring&skek-theme-base=light');
 });
 
 test('Kick links are told apart from anything else', () => {

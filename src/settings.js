@@ -3,11 +3,13 @@
 // `key` is also the chrome.storage.local key, so never rename one after release.
 // Also loaded in YouTube's and Kick's frames and Twitch's embedded player, for the defaults.
 // It only adds `skek` to the extension's own world there, which the page can't see.
+// `resolveTheme` is here too, because every place that shows a theme loads this file.
 // `category` is where it's listed. Categories, and the items in each, show in alphabetical order.
 // `message` is optional: the window sends { type: message, enabled } to the background instead
 // of writing storage itself, for a setting that has background work to do when it changes.
 // `choices` is optional: buttons to pick one value from, instead of an on/off switch. Add
-// `dropdown: true` when there are too many for buttons to fit.
+// `dropdown: true` when there are too many for buttons to fit, or `swatches: true` to show each as
+// a picture of a theme, under its `group`.
 (() => {
   'use strict';
 
@@ -67,6 +69,7 @@
       label: 'Chat font size',
       hint: "Text size in Twitch, YouTube and Kick chat. Twitch's setting uses the size from Twitch's own chat settings.",
       default: 'twitch',
+      swatches: true,
       dropdown: true,
       choices: [
         { value: 'twitch', label: "Twitch's setting" },
@@ -218,17 +221,48 @@
       key: 'theme',
       category: 'Appearance',
       label: 'Theme',
-      hint: "Used by this window, popups, the stream view and YouTube's chat. Kick's chat stays dark, and the rest of Twitch keeps its own theme.",
-      default: 'dark',
+      hint: "Colors Twitch, this window, popups, the stream view and YouTube's chat. Twitch keeps whichever of Twitch's own two themes you have there. Kick's chat stays dark in a light theme.",
+      default: 'twitch',
+      swatches: true,
+      // `base` is which of Twitch's own two themes a theme is built on, and `group` its heading in
+      // the picker. A new theme also needs its colors in features/themes/palettes.css.
       choices: [
-        { value: 'dark', label: 'Dark' },
-        { value: 'light', label: 'Light' },
+        { value: 'twitch', label: 'Twitch', group: 'Twitch' },
+        { value: 'dark', label: 'Dark', group: 'Twitch', base: 'dark' },
+        { value: 'light', label: 'Light', group: 'Twitch', base: 'light' },
+        { value: 'midnight', label: 'Midnight', group: 'Themes', base: 'dark' },
+        { value: 'synthwave', label: 'Synthwave', group: 'Themes', base: 'dark' },
+        { value: 'abyss', label: 'Abyss', group: 'Themes', base: 'dark' },
+        { value: 'ember', label: 'Ember', group: 'Themes', base: 'dark' },
+        { value: 'mocha', label: 'Mocha', group: 'Themes', base: 'dark' },
+        { value: 'cotton-candy', label: 'Cotton Candy', group: 'Themes', base: 'light' },
+        { value: 'aurora', label: 'Aurora', group: 'Themes', base: 'dark' },
+        { value: 'terminal', label: 'Terminal', group: 'Themes', base: 'dark' },
+        { value: 'winter', label: 'Winter', group: 'Seasons', base: 'dark' },
+        { value: 'spring', label: 'Spring', group: 'Seasons', base: 'light' },
+        { value: 'summer', label: 'Summer', group: 'Seasons', base: 'light' },
+        { value: 'autumn', label: 'Autumn', group: 'Seasons', base: 'dark' },
+        { value: 'christmas', label: 'Christmas', group: 'Specials', base: 'dark' },
+        { value: 'halloween', label: 'Halloween', group: 'Specials', base: 'dark' },
       ],
     },
   ];
 
+  const THEMES = SETTINGS.find((s) => s.key === 'theme').choices;
+
+  // Which theme to show for the Theme setting: its name, and `base`, the one of Twitch's own two
+  // themes it's built on. The Twitch choice, and a theme that no longer exists, follow Twitch's
+  // own theme, which is `twitchTheme`: 'dark' or 'light'.
+  function resolveTheme(setting, twitchTheme) {
+    const base = THEMES.find((theme) => theme.value === setting)?.base;
+    if (base) return { name: setting, base, followsTwitch: false };
+    const own = twitchTheme === 'light' ? 'light' : 'dark';
+    return { name: own, base: own, followsTwitch: true };
+  }
+
   globalThis.skek = {
     SETTINGS,
     settingDefaults: Object.fromEntries(SETTINGS.map((s) => [s.key, s.default])),
+    resolveTheme,
   };
 })();

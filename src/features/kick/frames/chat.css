@@ -1,10 +1,12 @@
-/* Kick's chat on Twitch's dark background. Its buttons keep Kick's own colours. Kick has no light
-   theme to switch to, so this stays dark whatever the Theme setting says. Only applies while framed
-   on Twitch: see chat.js. */
+/* Kick's chat on Twitch's dark background, or on a dark theme's, from its colors in
+   features/themes/palettes.css. Its buttons keep Kick's own colours. Kick has no light theme to
+   switch to, so this stays dark in a light theme. Only applies while framed on Twitch: see chat.js. */
+html[data-skek-kick-chat] { --skek-kick-bg: #18181b; }
+html[data-skek-kick-chat][data-skek-theme-base='dark']:not([data-skek-theme='dark']) { --skek-kick-bg: var(--skek-t-base); }
 html[data-skek-kick-chat] body,
 html[data-skek-kick-chat] #channel-chatroom,
 html[data-skek-kick-chat] .bg-surface-bg-lowest {
-  background: #18181b !important;
+  background: var(--skek-kick-bg) !important;
 }
 html[data-skek-kick-chat] #channel-chatroom { --chatroom-font-size: var(--skek-chat-size) !important; }
 

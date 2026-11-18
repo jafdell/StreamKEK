@@ -6,7 +6,7 @@
 #skek-settings-button img { display: block; width: 22px; height: 22px; }
 #skek-settings-button:hover { background: var(--color-background-button-text-hover); }
 
-/* Twitch's tooltip shape, in the Theme setting's colors. */
+/* Twitch's tooltip shape, in the theme's colors. */
 #skek-settings-button:hover::after {
   content: attr(aria-label);
   position: absolute;

@@ -1,0 +1,105 @@
+/* Recolors Twitch for the themes in palettes.css. Twitch builds its colors from a ramp of greys,
+   a ramp of purples and a few see-through greys, so replacing those recolors every page. Twitch's
+   own Dark and Light are left as they are.
+
+   A dark theme needs Twitch in its dark theme and a light one in its light theme, because the two
+   use the ramps differently: twitch-base.js switches Twitch over. Twitch repeats every color on
+   the parts it gives a theme of their own, like its footer, so those are recolored too. */
+
+/* The purples, around the theme's button color. */
+html[data-skek-theme-base]:not([data-skek-theme='dark'], [data-skek-theme='light']),
+html[data-skek-theme-base='dark']:not([data-skek-theme='dark']) .tw-root--theme-dark,
+html[data-skek-theme-base='light']:not([data-skek-theme='light']) .tw-root--theme-light {
+  --color-twitch-purple-1: oklch(from var(--skek-t-accent) calc(l - 0.5) calc(c * 0.3) h);
+  --color-twitch-purple-2: oklch(from var(--skek-t-accent) calc(l - 0.46) calc(c * 0.4) h);
+  --color-twitch-purple-3: oklch(from var(--skek-t-accent) calc(l - 0.42) calc(c * 0.5) h);
+  --color-twitch-purple-4: oklch(from var(--skek-t-accent) calc(l - 0.36) calc(c * 0.6) h);
+  --color-twitch-purple-5: oklch(from var(--skek-t-accent) calc(l - 0.3) calc(c * 0.7) h);
+  --color-twitch-purple-6: oklch(from var(--skek-t-accent) calc(l - 0.23) calc(c * 0.8) h);
+  --color-twitch-purple-7: oklch(from var(--skek-t-accent) calc(l - 0.15) calc(c * 0.9) h);
+  --color-twitch-purple-8: oklch(from var(--skek-t-accent) calc(l - 0.07) c h);
+  --color-twitch-purple-9: var(--skek-t-accent);
+  --color-twitch-purple-10: oklch(from var(--skek-t-accent) calc(l + 0.07) c h);
+  --color-twitch-purple-11: oklch(from var(--skek-t-accent) calc(l + 0.15) calc(c * 0.85) h);
+  --color-twitch-purple-12: oklch(from var(--skek-t-accent) calc(l + 0.22) calc(c * 0.65) h);
+  --color-twitch-purple-13: oklch(from var(--skek-t-accent) calc(l + 0.29) calc(c * 0.4) h);
+  --color-twitch-purple-14: oklch(from var(--skek-t-accent) calc(l + 0.33) calc(c * 0.28) h);
+  --color-twitch-purple-15: oklch(from var(--skek-t-accent) calc(l + 0.36) calc(c * 0.18) h);
+
+  /* Text on a button, which Twitch has as white. */
+  --color-text-button: var(--skek-t-on-accent);
+  --color-text-button-hover: var(--skek-t-on-accent);
+  --color-text-button-focus: var(--skek-t-on-accent);
+  --color-text-button-active: var(--skek-t-on-accent);
+  --color-text-button-primary: var(--skek-t-on-accent);
+  --color-text-button-brand: var(--skek-t-on-accent);
+  --color-text-interactable-selected: var(--skek-t-on-accent);
+}
+
+/* A dark theme: greys 1 to 7 are its backgrounds, darkest first, and 8 to 15 its text. */
+html[data-skek-theme-base='dark']:not([data-skek-theme='dark']),
+html[data-skek-theme-base='dark']:not([data-skek-theme='dark']) .tw-root--theme-dark {
+  --color-hinted-grey-1: var(--skek-t-bg);
+  --color-hinted-grey-2: var(--skek-t-base);
+  --color-hinted-grey-3: color-mix(in oklab, var(--skek-t-base), var(--skek-t-raised));
+  --color-hinted-grey-4: var(--skek-t-raised);
+  --color-hinted-grey-5: var(--skek-t-float);
+  --color-hinted-grey-6: color-mix(in oklab, var(--skek-t-float) 90%, var(--skek-t-text));
+  --color-hinted-grey-7: color-mix(in oklab, var(--skek-t-float) 76%, var(--skek-t-text));
+  --color-hinted-grey-8: color-mix(in oklab, var(--skek-t-base) 46%, var(--skek-t-text));
+  --color-hinted-grey-9: color-mix(in oklab, var(--skek-t-base) 28%, var(--skek-t-text));
+  --color-hinted-grey-10: color-mix(in oklab, var(--skek-t-base) 18%, var(--skek-t-text));
+  --color-hinted-grey-11: color-mix(in oklab, var(--skek-t-base) 13%, var(--skek-t-text));
+  --color-hinted-grey-12: color-mix(in oklab, var(--skek-t-base) 8%, var(--skek-t-text));
+  --color-hinted-grey-13: color-mix(in oklab, var(--skek-t-base) 4%, var(--skek-t-text));
+  --color-hinted-grey-14: var(--skek-t-text);
+  --color-hinted-grey-15: color-mix(in oklab, var(--skek-t-text), #fff);
+
+  /* Twitch's see-through greys, for hovered rows, borders and inputs. */
+  --color-opac-gd-1: rgb(from color-mix(in oklab, var(--skek-t-base) 68%, var(--skek-t-text)) r g b / 0.38);
+  --color-opac-gd-2: rgb(from color-mix(in oklab, var(--skek-t-base) 68%, var(--skek-t-text)) r g b / 0.48);
+  --color-opac-gd-3: rgb(from color-mix(in oklab, var(--skek-t-base) 68%, var(--skek-t-text)) r g b / 0.55);
+  --color-opac-gd-4: rgb(from var(--skek-t-float) r g b / 0.62);
+  --color-opac-gd-5: rgb(from var(--skek-t-float) r g b / 0.95);
+  --color-opac-gl-1: rgb(from color-mix(in oklab, var(--skek-t-base) 28%, var(--skek-t-text)) r g b / 0.22);
+  --color-opac-gl-2: rgb(from color-mix(in oklab, var(--skek-t-base) 28%, var(--skek-t-text)) r g b / 0.35);
+  --color-opac-gl-3: rgb(from color-mix(in oklab, var(--skek-t-base) 28%, var(--skek-t-text)) r g b / 0.43);
+  --color-opac-gl-4: rgb(from color-mix(in oklab, var(--skek-t-base) 8%, var(--skek-t-text)) r g b / 0.55);
+  --color-opac-gl-5: rgb(from color-mix(in oklab, var(--skek-t-base) 8%, var(--skek-t-text)) r g b / 0.95);
+}
+
+/* A light theme: greys 15 down to 9 are its backgrounds, lightest first, and 1 to 8 its text.
+   Twitch's light panels are plain white, which no ramp reaches, so those are set by name. */
+html[data-skek-theme-base='light']:not([data-skek-theme='light']),
+html[data-skek-theme-base='light']:not([data-skek-theme='light']) .tw-root--theme-light {
+  --color-hinted-grey-15: var(--skek-t-bg);
+  --color-hinted-grey-14: var(--skek-t-raised);
+  --color-hinted-grey-13: color-mix(in oklab, var(--skek-t-raised) 95%, var(--skek-t-text));
+  --color-hinted-grey-12: color-mix(in oklab, var(--skek-t-raised) 90%, var(--skek-t-text));
+  --color-hinted-grey-11: color-mix(in oklab, var(--skek-t-raised) 84%, var(--skek-t-text));
+  --color-hinted-grey-10: color-mix(in oklab, var(--skek-t-raised) 78%, var(--skek-t-text));
+  --color-hinted-grey-9: color-mix(in oklab, var(--skek-t-raised) 66%, var(--skek-t-text));
+  --color-hinted-grey-8: color-mix(in oklab, var(--skek-t-base) 48%, var(--skek-t-text));
+  --color-hinted-grey-7: color-mix(in oklab, var(--skek-t-base) 30%, var(--skek-t-text));
+  --color-hinted-grey-6: color-mix(in oklab, var(--skek-t-base) 20%, var(--skek-t-text));
+  --color-hinted-grey-5: color-mix(in oklab, var(--skek-t-base) 15%, var(--skek-t-text));
+  --color-hinted-grey-4: color-mix(in oklab, var(--skek-t-base) 10%, var(--skek-t-text));
+  --color-hinted-grey-3: color-mix(in oklab, var(--skek-t-base) 6%, var(--skek-t-text));
+  --color-hinted-grey-2: color-mix(in oklab, var(--skek-t-base) 3%, var(--skek-t-text));
+  --color-hinted-grey-1: var(--skek-t-text);
+
+  --color-background-base: var(--skek-t-base);
+  --color-background-float: var(--skek-t-float);
+  --color-background-modal: var(--skek-t-float);
+
+  --color-opac-gl-1: rgb(from color-mix(in oklab, var(--skek-t-base) 62%, var(--skek-t-text)) r g b / 0.22);
+  --color-opac-gl-2: rgb(from color-mix(in oklab, var(--skek-t-base) 62%, var(--skek-t-text)) r g b / 0.35);
+  --color-opac-gl-3: rgb(from color-mix(in oklab, var(--skek-t-base) 62%, var(--skek-t-text)) r g b / 0.43);
+  --color-opac-gl-4: rgb(from var(--skek-t-raised) r g b / 0.55);
+  --color-opac-gl-5: rgb(from var(--skek-t-raised) r g b / 0.95);
+  --color-opac-gd-1: rgb(from color-mix(in oklab, var(--skek-t-base) 30%, var(--skek-t-text)) r g b / 0.38);
+  --color-opac-gd-2: rgb(from color-mix(in oklab, var(--skek-t-base) 30%, var(--skek-t-text)) r g b / 0.48);
+  --color-opac-gd-3: rgb(from color-mix(in oklab, var(--skek-t-base) 30%, var(--skek-t-text)) r g b / 0.55);
+  --color-opac-gd-4: rgb(from color-mix(in oklab, var(--skek-t-base) 12%, var(--skek-t-text)) r g b / 0.62);
+  --color-opac-gd-5: rgb(from color-mix(in oklab, var(--skek-t-base) 12%, var(--skek-t-text)) r g b / 0.95);
+}
