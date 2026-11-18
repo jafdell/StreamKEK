@@ -658,15 +658,15 @@ test('siteOf treats a channel saved without a platform as YouTube', () => {
   assert.equal(siteOf({ id: 'kick:a', platform: 'kick' }).name, 'Kick');
 });
 
-test('resolveTheme shows a theme by name, and the theme Twitch has for the Twitch choice', () => {
+test('resolveTheme shows a theme by name, with the one of Twitch\'s themes it is built on', () => {
   const { resolveTheme } = backupContext.skek;
-  assert.deepEqual(plain(resolveTheme('cotton-candy', 'dark')), { name: 'cotton-candy', base: 'light', followsTwitch: false });
-  assert.deepEqual(plain(resolveTheme('dark', 'light')), { name: 'dark', base: 'dark', followsTwitch: false });
-  assert.deepEqual(plain(resolveTheme('twitch', 'light')), { name: 'light', base: 'light', followsTwitch: true });
-  assert.deepEqual(plain(resolveTheme('twitch', null)), { name: 'dark', base: 'dark', followsTwitch: true });
-  // A theme from a newer version's backup, or one that was removed.
-  assert.deepEqual(plain(resolveTheme('gone', 'light')), { name: 'light', base: 'light', followsTwitch: true });
-  assert.deepEqual(plain(resolveTheme(undefined)), { name: 'dark', base: 'dark', followsTwitch: true });
+  assert.deepEqual(plain(resolveTheme('cotton-candy')), { name: 'cotton-candy', base: 'light' });
+  assert.deepEqual(plain(resolveTheme('light')), { name: 'light', base: 'light' });
+  assert.deepEqual(plain(resolveTheme('ember')), { name: 'ember', base: 'dark' });
+  // A theme from a newer version's backup, or one that was removed, and nothing saved yet.
+  assert.deepEqual(plain(resolveTheme('gone')), { name: 'dark', base: 'dark' });
+  assert.deepEqual(plain(resolveTheme(null)), { name: 'dark', base: 'dark' });
+  assert.deepEqual(plain(resolveTheme(undefined)), { name: 'dark', base: 'dark' });
 });
 
 test('Twitch frames name this page as their parent, in the theme chosen', () => {

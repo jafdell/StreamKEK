@@ -15,15 +15,10 @@
     root.dataset.skekTheme = name;
     root.dataset.skekThemeBase = base;
   }
-  // The Twitch page puts the theme it's showing in the address, so the first paint is already
-  // right, and this never has to ask what Twitch's own theme is.
+  // In the address so the first paint is already right; storage would answer too late.
   setTheme(resolveTheme(location.hash.match(/skek-theme=([\w-]+)/)?.[1]));
-  // twitchTheme is Twitch's own theme, which the Twitch page saves for the Twitch choice.
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area !== 'local' || !(changes.theme || changes.twitchTheme)) return;
-    chrome.storage.local
-      .get({ theme: settingDefaults.theme, twitchTheme: null })
-      .then(({ theme, twitchTheme }) => setTheme(resolveTheme(theme, twitchTheme)));
+    if (area === 'local' && changes.theme) setTheme(resolveTheme(changes.theme.newValue));
   });
 
   // In the address so the first paint is already right; storage would answer too late.

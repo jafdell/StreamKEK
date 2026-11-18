@@ -34,7 +34,7 @@
     recentEmotes: [],
   };
   // Worked out again by the next check.
-  const NOT_BACKED_UP = ['live', 'status', 'kickLive', 'kickStatus', 'liveNotificationsSeen', 'twitchTheme'];
+  const NOT_BACKED_UP = ['live', 'status', 'kickLive', 'kickStatus', 'liveNotificationsSeen'];
 
   const CHANNEL_ID = /^[\w:@-][\w:.@-]*$/;
   const CHANNEL_NAME = /^[\w-]+$/;

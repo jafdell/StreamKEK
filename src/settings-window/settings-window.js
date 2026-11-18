@@ -227,8 +227,7 @@
         radio.addEventListener('change', () => chrome.storage.local.set({ [setting.key]: choice.value }));
         const preview = document.createElement('span');
         preview.className = 'swatch__preview';
-        // A choice with no base is Twitch's own theme, which is one of its two.
-        preview.append(...(choice.base ? [choice.value] : ['dark', 'light']).map(themeScene));
+        preview.append(themeScene(choice.value));
         const name = document.createElement('span');
         name.className = 'swatch__name';
         name.textContent = choice.label;

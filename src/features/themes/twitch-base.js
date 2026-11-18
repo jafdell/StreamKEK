@@ -1,5 +1,5 @@
 // Switches Twitch between its own dark and light theme, for a theme that's built on the other one.
-// twitch/page-sync.js says which it should be, as data-skek-twitch-base on <html>. Runs in the page
+// twitch/page-sync.js says which it should be, as data-skek-theme-base on <html>. Runs in the page
 // itself, because Twitch's theme can only be changed from there without reloading. This changes
 // what Twitch shows, not what it has saved as your theme: that's page-sync.js's.
 (() => {
@@ -25,7 +25,7 @@
   }
 
   function switchTheme() {
-    const wanted = TWITCH_THEMES[root.dataset.skekTwitchBase];
+    const wanted = TWITCH_THEMES[root.dataset.skekThemeBase];
     if (wanted === undefined) return;
     try {
       const store = findStore();
@@ -37,6 +37,6 @@
   }
 
   // Twitch puts its theme on <html>'s class once it has started, and again when you change it there.
-  new MutationObserver(switchTheme).observe(root, { attributes: true, attributeFilter: ['class', 'data-skek-twitch-base'] });
+  new MutationObserver(switchTheme).observe(root, { attributes: true, attributeFilter: ['class', 'data-skek-theme-base'] });
   switchTheme();
 })();

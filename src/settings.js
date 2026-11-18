@@ -69,7 +69,6 @@
       label: 'Chat font size',
       hint: "Text size in Twitch, YouTube and Kick chat. Twitch's setting uses the size from Twitch's own chat settings.",
       default: 'twitch',
-      swatches: true,
       dropdown: true,
       choices: [
         { value: 'twitch', label: "Twitch's setting" },
@@ -221,13 +220,12 @@
       key: 'theme',
       category: 'Appearance',
       label: 'Theme',
-      hint: "Colors Twitch, this window, popups, the stream view and YouTube's chat. Twitch keeps whichever of Twitch's own two themes you have there. Kick's chat stays dark in a light theme.",
-      default: 'twitch',
+      hint: "Colors Twitch, this window, popups, the stream view and YouTube's chat. Dark and Light are Twitch's own two themes, and this setting takes over from Twitch's Dark Theme switch. Kick's chat stays dark in a light theme.",
+      default: 'dark',
       swatches: true,
       // `base` is which of Twitch's own two themes a theme is built on, and `group` its heading in
       // the picker. A new theme also needs its colors in features/themes/palettes.css.
       choices: [
-        { value: 'twitch', label: 'Twitch', group: 'Twitch' },
         { value: 'dark', label: 'Dark', group: 'Twitch', base: 'dark' },
         { value: 'light', label: 'Light', group: 'Twitch', base: 'light' },
         { value: 'midnight', label: 'Midnight', group: 'Themes', base: 'dark' },
@@ -248,16 +246,14 @@
     },
   ];
 
-  const THEMES = SETTINGS.find((s) => s.key === 'theme').choices;
+  const THEME = SETTINGS.find((s) => s.key === 'theme');
+  const THEMES = THEME.choices;
 
   // Which theme to show for the Theme setting: its name, and `base`, the one of Twitch's own two
-  // themes it's built on. The Twitch choice, and a theme that no longer exists, follow Twitch's
-  // own theme, which is `twitchTheme`: 'dark' or 'light'.
-  function resolveTheme(setting, twitchTheme) {
-    const base = THEMES.find((theme) => theme.value === setting)?.base;
-    if (base) return { name: setting, base, followsTwitch: false };
-    const own = twitchTheme === 'light' ? 'light' : 'dark';
-    return { name: own, base: own, followsTwitch: true };
+  // themes it's built on. A theme that no longer exists shows as the default one.
+  function resolveTheme(setting) {
+    const theme = THEMES.find((each) => each.value === setting) ?? THEMES.find((each) => each.value === THEME.default);
+    return { name: theme.value, base: theme.base };
   }
 
   globalThis.skek = {

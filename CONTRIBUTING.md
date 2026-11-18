@@ -13,7 +13,7 @@ By opening a pull request, you agree that your contribution is licensed under th
 - **Page-world scripts** (`"world": "MAIN"` in the manifest): run in the site's own page, to reach things like its player.
 - **Extension pages:** the settings window and the channel manager. The manager also opens beside the sidebar's **+** button, called the **+** frame.
 
-They talk through `chrome.storage.local` (settings and what's live), messages to the service worker (asking it to do work), `data-skek-*` attributes on `<html>` (for CSS and page-world scripts), and `postMessage` between the Twitch page and the frames in it. The chat frame also gets its theme and Twitch's font size in its address, because storage would answer too late for its first paint. For the same reason the Twitch page keeps the Theme setting in Twitch's own `localStorage` as `skek-theme`.
+They talk through `chrome.storage.local` (settings and what's live), messages to the service worker (asking it to do work), `data-skek-*` attributes on `<html>` (for CSS and page-world scripts), and `postMessage` between the Twitch page and the frames in it. The chat frame also gets its theme and Twitch's font size in its address, because storage would answer too late for its first paint. For the same reason the Twitch page keeps the theme in Twitch's own `localStorage` as `skek-theme`.
 
 ## Where do I...?
 
@@ -167,5 +167,4 @@ All in `chrome.storage.local`. A key in `SETTINGS` is written by the settings wi
 | `chatHidden` | boolean | Twitch page |
 | `chatBlockedWords`, `chatHighlightedWords` | `[string]`, default empty | settings window |
 | `floatingChat` | `{x,y,width,height,opacity}`, each optional | Twitch page |
-| `twitchTheme` | `'dark'` or `'light'`: Twitch's own theme, for the Theme setting's Twitch choice on the extension's own pages and in YouTube's chat, which can't see it | Twitch page |
 | `recentEmotes` | `[{name,twitch}]`, the last emotes you sent in Twitch's chat, newest first. `twitch` is the emote's id, only on Twitch's own | Twitch page |
