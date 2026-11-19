@@ -246,6 +246,13 @@
         { value: 'halloween', label: 'Halloween', group: 'Specials', base: 'dark' },
       ],
     },
+    {
+      key: 'themeAnimations',
+      category: 'Appearance',
+      label: 'Theme animations',
+      hint: 'Gentle motion in the Seasons and Specials themes, like snow falling in Winter. It shows behind the sidebar and where a page is empty, never over the video or chat.',
+      default: true,
+    },
   ];
 
   const THEME = SETTINGS.find((s) => s.key === 'theme');

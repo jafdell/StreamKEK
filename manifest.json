@@ -82,6 +82,7 @@
         "src/features/themes/palettes.css",
         "src/features/themes/twitch-colors.css",
         "src/features/themes/twitch-fixed-colors.css",
+        "src/features/themes/twitch-effects.css",
         "src/twitch/base.css",
         "src/twitch/settings-button.css",
         "src/features/sidebar/sections.css",
