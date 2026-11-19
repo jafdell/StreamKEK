@@ -14,7 +14,7 @@ body:
     attributes:
       label: StreamKEK version
       description: Shown at the bottom left of the settings window.
-      placeholder: 1.7.2
+      placeholder: 1.8.0
     validations:
       required: true
   - type: input

@@ -5,6 +5,12 @@ What's new in each version of StreamKEK, newest first.
 <!-- The settings window shows this file under What's new, so keep its shape: a "## version - date"
      heading, then one "- " line per change, with ** around the part to show in bold. -->
 
+## 1.8.0 - 2026-11-19
+
+- **Themes:** 16 themes recolor Twitch, the settings window, the stream view and YouTube's chat, like Midnight, Slate, Synthwave and one for each season. Pick one under Appearance. Dark and Light are Twitch's own two, and the setting takes over from Twitch's Dark Theme switch.
+- **Theme animations:** the Seasons and Specials themes move a little, like snow falling in Winter, behind the sidebar and where a page is empty. It's on by default, under Appearance.
+- **Fixed:** on the Following page, the YouTube live and Kick live cards no longer shrink to nothing when another extension hides Twitch's first card.
+
 ## 1.7.2 - 2026-11-18
 
 - **Fixed:** in a tab you come back to, a favorite that went live could stay under Followed Channels for up to a minute when Twitch didn't answer the first time. It's now asked again within seconds.
