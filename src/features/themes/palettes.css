@@ -206,20 +206,22 @@
     radial-gradient(55% 45% at 85% 0%, rgb(255 170 205 / 0.45), transparent 70%),
     radial-gradient(60% 50% at 0% 100%, rgb(150 215 130 / 0.35), transparent 70%);
 }
-/* Sand, with the sun in one corner and the sea along the bottom. */
+/* A bright day by the sea: sky blue all over, with buttons in the sun's orange, sea blue links,
+   the sun in the top left corner, where the sidebar shows it, and the sea along the bottom. */
 [data-skek-theme='summer'] {
-  --skek-t-bg: #fcf3dc;
-  --skek-t-base: #fffdf5;
-  --skek-t-raised: #f6e9c6;
+  --skek-t-bg: #d8f0fa;
+  --skek-t-base: #e7f6fd;
+  --skek-t-raised: #c4e6f4;
   --skek-t-float: #ffffff;
-  --skek-t-text: #12313a;
-  --skek-t-accent: #008298;
-  --skek-t-on-accent: #fff;
-  --skek-t-accent-2: #f6b21b;
-  --skek-t-link: #005d6f;
+  --skek-t-text: #112937;
+  --skek-t-accent: #ff9c47;
+  --skek-t-on-accent: #3b1d00;
+  --skek-t-accent-2: #36b8c5;
+  --skek-t-link: #00598f;
   --skek-t-backdrop:
-    radial-gradient(50% 45% at 90% 0%, rgb(255 196 50 / 0.55), transparent 70%),
-    linear-gradient(0deg, rgb(8 137 160 / 0.16), transparent 40%);
+    radial-gradient(14% 24% at 0% 0%, rgb(255 214 90 / 0.8), rgb(255 190 70 / 0.32) 45%, transparent),
+    radial-gradient(60% 55% at 0% 0%, rgb(255 205 90 / 0.28), transparent 70%),
+    linear-gradient(0deg, rgb(30 165 200 / 0.22), transparent 38%);
 }
 /* Gold buttons, which sets it apart from Ember's orange. */
 [data-skek-theme='autumn'] {

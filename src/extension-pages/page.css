@@ -58,10 +58,12 @@
   --button-hover: oklch(from var(--skek-t-accent) calc(l - 0.05) c h);
   --on-button: var(--skek-t-on-accent);
 }
+/* On a light background they're made darker instead, as Twitch's purples 7 and 9 are. min() does
+   the same for a button that's a light color, like Summer's, which wouldn't show otherwise. */
 :root[data-skek-theme-base='light']:not([data-skek-theme='light']) {
-  --accent: oklch(from var(--skek-t-accent) calc(l - 0.15) calc(c * 0.9) h);
+  --accent: oklch(from var(--skek-t-accent) calc(min(l, 0.6) - 0.15) calc(c * 0.9) h);
   --input-border: rgb(from var(--skek-t-text) r g b / 0.55);
-  --focus: var(--skek-t-accent);
+  --focus: oklch(from var(--skek-t-accent) min(l, 0.6) c h);
 }
 :root:not([data-skek-theme]) body { visibility: hidden; }
 

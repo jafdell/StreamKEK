@@ -50,6 +50,10 @@ html.skek[data-skek-theme-base]:not([data-skek-theme='dark'], [data-skek-theme='
   --skek-button: var(--skek-t-accent);
   --skek-on-button: var(--skek-t-on-accent);
 }
+/* A button that's a light color, like Summer's, wouldn't show as a line on a light background. */
+html.skek[data-skek-theme-base='light']:not([data-skek-theme='light']) {
+  --skek-focus: oklch(from var(--skek-t-accent) min(l, 0.6) c h);
+}
 
 /* streams/frames/chat-settings.js sets the real size. */
 html.skek { --skek-chat-size: 14px; }
