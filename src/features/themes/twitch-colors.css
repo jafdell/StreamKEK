@@ -6,34 +6,64 @@
    use the ramps differently: twitch-base.js switches Twitch over. Twitch repeats every color on
    the parts it gives a theme of their own, like its footer, so those are recolored too. */
 
-/* The purples, around the theme's button color. */
+/* The purples, around the theme's button color. Twitch puts white text on 5 to 9, so those stay
+   dark even when the button is a light color with dark text on it: min() keeps 9 from going
+   lighter than Twitch's own. 10 to 15 are text and borders on a dark background, and max() keeps
+   them from going darker than the button. */
 html[data-skek-theme-base]:not([data-skek-theme='dark'], [data-skek-theme='light']),
 html[data-skek-theme-base='dark']:not([data-skek-theme='dark']) .tw-root--theme-dark,
 html[data-skek-theme-base='light']:not([data-skek-theme='light']) .tw-root--theme-light {
-  --color-twitch-purple-1: oklch(from var(--skek-t-accent) calc(l - 0.5) calc(c * 0.3) h);
-  --color-twitch-purple-2: oklch(from var(--skek-t-accent) calc(l - 0.46) calc(c * 0.4) h);
-  --color-twitch-purple-3: oklch(from var(--skek-t-accent) calc(l - 0.42) calc(c * 0.5) h);
-  --color-twitch-purple-4: oklch(from var(--skek-t-accent) calc(l - 0.36) calc(c * 0.6) h);
-  --color-twitch-purple-5: oklch(from var(--skek-t-accent) calc(l - 0.3) calc(c * 0.7) h);
-  --color-twitch-purple-6: oklch(from var(--skek-t-accent) calc(l - 0.23) calc(c * 0.8) h);
-  --color-twitch-purple-7: oklch(from var(--skek-t-accent) calc(l - 0.15) calc(c * 0.9) h);
-  --color-twitch-purple-8: oklch(from var(--skek-t-accent) calc(l - 0.07) c h);
-  --color-twitch-purple-9: var(--skek-t-accent);
-  --color-twitch-purple-10: oklch(from var(--skek-t-accent) calc(l + 0.07) c h);
-  --color-twitch-purple-11: oklch(from var(--skek-t-accent) calc(l + 0.15) calc(c * 0.85) h);
-  --color-twitch-purple-12: oklch(from var(--skek-t-accent) calc(l + 0.22) calc(c * 0.65) h);
-  --color-twitch-purple-13: oklch(from var(--skek-t-accent) calc(l + 0.29) calc(c * 0.4) h);
-  --color-twitch-purple-14: oklch(from var(--skek-t-accent) calc(l + 0.33) calc(c * 0.28) h);
-  --color-twitch-purple-15: oklch(from var(--skek-t-accent) calc(l + 0.36) calc(c * 0.18) h);
+  --color-twitch-purple-1: oklch(from var(--skek-t-accent) calc(min(l, 0.6) - 0.5) calc(c * 0.3) h);
+  --color-twitch-purple-2: oklch(from var(--skek-t-accent) calc(min(l, 0.6) - 0.46) calc(c * 0.4) h);
+  --color-twitch-purple-3: oklch(from var(--skek-t-accent) calc(min(l, 0.6) - 0.42) calc(c * 0.5) h);
+  --color-twitch-purple-4: oklch(from var(--skek-t-accent) calc(min(l, 0.6) - 0.36) calc(c * 0.6) h);
+  --color-twitch-purple-5: oklch(from var(--skek-t-accent) calc(min(l, 0.6) - 0.3) calc(c * 0.7) h);
+  --color-twitch-purple-6: oklch(from var(--skek-t-accent) calc(min(l, 0.6) - 0.23) calc(c * 0.8) h);
+  --color-twitch-purple-7: oklch(from var(--skek-t-accent) calc(min(l, 0.6) - 0.15) calc(c * 0.9) h);
+  --color-twitch-purple-8: oklch(from var(--skek-t-accent) calc(min(l, 0.6) - 0.07) c h);
+  --color-twitch-purple-9: oklch(from var(--skek-t-accent) min(l, 0.6) c h);
+  --color-twitch-purple-10: oklch(from var(--skek-t-accent) max(l, calc(min(l, 0.6) + 0.07)) c h);
+  --color-twitch-purple-11: oklch(from var(--skek-t-accent) max(l, calc(min(l, 0.6) + 0.15)) calc(c * 0.85) h);
+  --color-twitch-purple-12: oklch(from var(--skek-t-accent) max(l, calc(min(l, 0.6) + 0.22)) calc(c * 0.65) h);
+  --color-twitch-purple-13: oklch(from var(--skek-t-accent) max(l, calc(min(l, 0.6) + 0.29)) calc(c * 0.4) h);
+  --color-twitch-purple-14: oklch(from var(--skek-t-accent) max(l, calc(min(l, 0.6) + 0.33)) calc(c * 0.28) h);
+  --color-twitch-purple-15: oklch(from var(--skek-t-accent) max(l, calc(min(l, 0.6) + 0.36)) calc(c * 0.18) h);
 
-  /* Text on a button, which Twitch has as white. */
-  --color-text-button: var(--skek-t-on-accent);
-  --color-text-button-hover: var(--skek-t-on-accent);
-  --color-text-button-focus: var(--skek-t-on-accent);
-  --color-text-button-active: var(--skek-t-on-accent);
+  /* Twitch's see-through purple. */
+  --color-opac-p-1: rgb(from var(--color-twitch-purple-7) r g b / 0.05);
+  --color-opac-p-2: rgb(from var(--color-twitch-purple-7) r g b / 0.1);
+  --color-opac-p-3: rgb(from var(--color-twitch-purple-7) r g b / 0.15);
+  --color-opac-p-4: rgb(from var(--color-twitch-purple-7) r g b / 0.2);
+  --color-opac-p-5: rgb(from var(--color-twitch-purple-7) r g b / 0.25);
+  --color-opac-p-6: rgb(from var(--color-twitch-purple-7) r g b / 0.3);
+  --color-opac-p-7: rgb(from var(--color-twitch-purple-7) r g b / 0.4);
+  --color-opac-p-8: rgb(from var(--color-twitch-purple-7) r g b / 0.5);
+  --color-opac-p-9: rgb(from var(--color-twitch-purple-7) r g b / 0.6);
+  --color-opac-p-10: rgb(from var(--color-twitch-purple-7) r g b / 0.7);
+  --color-opac-p-11: rgb(from var(--color-twitch-purple-7) r g b / 0.75);
+  --color-opac-p-12: rgb(from var(--color-twitch-purple-7) r g b / 0.8);
+  --color-opac-p-13: rgb(from var(--color-twitch-purple-7) r g b / 0.85);
+  --color-opac-p-14: rgb(from var(--color-twitch-purple-7) r g b / 0.9);
+  --color-opac-p-15: rgb(from var(--color-twitch-purple-7) r g b / 0.95);
+
+  /* A button, which Twitch has as purple 9 with white text, a little darker when hovered and
+     pressed. */
+  --color-background-button-brand: var(--skek-t-accent);
+  --color-background-button-brand-hover: oklch(from var(--skek-t-accent) calc(l - 0.05) c h);
+  --color-background-button-brand-active: oklch(from var(--skek-t-accent) calc(l - 0.1) c h);
   --color-text-button-primary: var(--skek-t-on-accent);
   --color-text-button-brand: var(--skek-t-on-accent);
   --color-text-interactable-selected: var(--skek-t-on-accent);
+
+  /* Colored text, which Twitch has as a light or dark purple: a link, and the tab you're on with
+     the line under it. Some of Twitch's tabs are links, so the two have to match. */
+  --color-text-link: var(--skek-t-link);
+  --color-text-link-active: var(--skek-t-link);
+  --color-text-link-visited: var(--skek-t-link);
+  --color-text-tab-active: var(--skek-t-link);
+  --color-border-tab-active: var(--skek-t-link);
+  --color-border-tab-hover: var(--skek-t-link);
+  --color-border-tab-focus: var(--skek-t-link);
 }
 
 /* A dark theme: greys 1 to 7 are its backgrounds, darkest first, and 8 to 15 its text. */
@@ -66,6 +96,10 @@ html[data-skek-theme-base='dark']:not([data-skek-theme='dark']) .tw-root--theme-
   --color-opac-gl-3: rgb(from color-mix(in oklab, var(--skek-t-base) 28%, var(--skek-t-text)) r g b / 0.43);
   --color-opac-gl-4: rgb(from color-mix(in oklab, var(--skek-t-base) 8%, var(--skek-t-text)) r g b / 0.55);
   --color-opac-gl-5: rgb(from color-mix(in oklab, var(--skek-t-base) 8%, var(--skek-t-text)) r g b / 0.95);
+
+  /* A link under the mouse goes a little darker, as Twitch's does. */
+  --color-text-link-hover: oklch(from var(--skek-t-link) calc(l - 0.07) c h);
+  --color-text-link-focus: oklch(from var(--skek-t-link) calc(l - 0.07) c h);
 }
 
 /* A light theme: greys 15 down to 9 are its backgrounds, lightest first, and 1 to 8 its text.
@@ -102,4 +136,20 @@ html[data-skek-theme-base='light']:not([data-skek-theme='light']) .tw-root--them
   --color-opac-gd-3: rgb(from color-mix(in oklab, var(--skek-t-base) 30%, var(--skek-t-text)) r g b / 0.55);
   --color-opac-gd-4: rgb(from color-mix(in oklab, var(--skek-t-base) 12%, var(--skek-t-text)) r g b / 0.62);
   --color-opac-gd-5: rgb(from color-mix(in oklab, var(--skek-t-base) 12%, var(--skek-t-text)) r g b / 0.95);
+
+  /* A link under the mouse goes a little lighter, as Twitch's does. */
+  --color-text-link-hover: oklch(from var(--skek-t-link) calc(l + 0.07) c h);
+  --color-text-link-focus: oklch(from var(--skek-t-link) calc(l + 0.07) c h);
+}
+
+/* A theme's backdrop shows wherever Twitch's page has nothing over its background, like Browse,
+   and a line in the theme's two colors runs under the top bar. */
+html[data-skek-theme-base]:not([data-skek-theme='dark'], [data-skek-theme='light']) body {
+  background-image: var(--skek-t-backdrop);
+}
+html[data-skek-theme-base]:not([data-skek-theme='dark'], [data-skek-theme='light']) .top-nav__menu {
+  background-image: linear-gradient(90deg, var(--skek-t-accent), var(--skek-t-accent-2));
+  background-position: 0 100%;
+  background-size: 100% 2px;
+  background-repeat: no-repeat;
 }

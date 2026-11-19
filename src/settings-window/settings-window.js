@@ -185,15 +185,16 @@
     return row;
   }
 
-  // A small picture of a theme: the page, a panel on it, two lines of text and a button. It has
-  // data-skek-theme, so features/themes/palettes.css gives it that theme's colors.
+  // A small picture of a theme: the page with its backdrop, a panel on it, a line of text, a link
+  // and a button. It has data-skek-theme, so features/themes/palettes.css gives it that theme's
+  // colors.
   function themeScene(theme) {
     const scene = document.createElement('span');
     scene.className = 'swatch__scene';
     scene.dataset.skekTheme = theme;
     const main = document.createElement('span');
     main.className = 'swatch__main';
-    for (const part of ['swatch__text', 'swatch__text swatch__text--short', 'swatch__button']) {
+    for (const part of ['swatch__text', 'swatch__text swatch__text--link', 'swatch__button']) {
       main.append(Object.assign(document.createElement('span'), { className: part }));
     }
     scene.append(Object.assign(document.createElement('span'), { className: 'swatch__panel' }), main);

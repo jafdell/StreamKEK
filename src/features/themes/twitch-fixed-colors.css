@@ -5,7 +5,9 @@
    Made from Twitch's own rules: the ones in document.styleSheets whose selector names a theme
    (.tw-root--theme-dark or .tw-root--theme-light) and that set a color from Twitch's ramp of
    greys or purples, gathered on its channel, chat, browse, video, clip and settings pages. A part
-   of Twitch that keeps its own colors in a theme is one this has no rule for yet.
+   of Twitch that keeps its own colors in a theme is one this has no rule for yet. The last block
+   is for the purples Twitch writes out in a rule that names no theme, gathered on its channel,
+   browse, following and front pages. Its gradients there are left alone.
 
    Each rule is only just stronger than the one of Twitch's it replaces, which is what :where() is
    for: anything that already won over Twitch's rule still wins over this one, like the sidebar's
@@ -47,11 +49,11 @@ html.tw-root--theme-dark:where([data-skek-theme-base='dark']:not([data-skek-them
   .flagged-fragment,
   .token.tag,
   .search-item__history,
-  .navigation-link.active,
-  .navigation-link:hover,
   .top-nav__home-link-logo,
   .video-chat__message-author,
   .minimal-top-nav__home-link-logo { color: var(--color-twitch-purple-11); }
+  .navigation-link.active,
+  .navigation-link:hover { color: var(--color-text-link); }
   .flagged-fragment:hover,
   .flagged-fragment--active,
   .creator-chat-event--twitch--new .creator-chat-activity-detail,
@@ -181,11 +183,11 @@ html.tw-root--theme-light:where([data-skek-theme-base='light']:not([data-skek-th
   .flagged-fragment,
   .token.tag,
   .search-item__history,
-  .navigation-link.active,
-  .navigation-link:hover,
   .top-nav__home-link-logo,
   .video-chat__message-author,
   .minimal-top-nav__home-link-logo { color: var(--color-twitch-purple-7); }
+  .navigation-link.active,
+  .navigation-link:hover { color: var(--color-text-link); }
   .flagged-fragment:hover,
   .flagged-fragment--active,
   .creator-chat-event--twitch--new .creator-chat-activity-detail,
@@ -284,4 +286,26 @@ html.tw-root--theme-light:where([data-skek-theme-base='light']:not([data-skek-th
   .search-result-offline_channel--avatar,
   .subscription-card__channel-avatar { border-color: var(--color-opac-gl-2); }
   .settings-row:not(:first-child, .settings-row--focused, .settings-row--no-border) { border-top-color: var(--color-opac-gl-2); }
+}
+
+/* What Twitch colors the same in both of its themes, like a message someone paid to highlight,
+   which has white text on it. */
+html:where([data-skek-theme-base]:not([data-skek-theme='dark'], [data-skek-theme='light'])) {
+  .chat-line__message-body--highlighted { background-color: var(--color-twitch-purple-7); border-color: var(--color-twitch-purple-7); }
+  .chat-line__message--special,
+  .chat-line__bits-charity { border-inline-start-color: var(--color-twitch-purple-7); }
+  .base-chat-replies-list__reply-line--flash-animation { background-color: var(--color-twitch-purple-13); }
+  .base-chat-replies-list__reply-line--flash-animation-dark { background-color: var(--color-twitch-purple-6); }
+  .creator-chat-base-list-item__icon { color: var(--color-twitch-purple-9); }
+  .persistent-notification__card-image-unread { border-inline-start-color: var(--color-twitch-purple-9); }
+  .solid-purple { background-color: var(--color-twitch-purple-9); }
+  .community-goals-list-item__fill { background-color: var(--color-twitch-purple-10); }
+  [class*='featuredSlot--'],
+  .extensions-dock-card__image__visible { border-color: var(--color-twitch-purple-8); }
+  .extensions-dock-card__menu-status__visible { background-color: var(--color-twitch-purple-8); }
+  .offline-embeds--stylized-link { color: var(--color-twitch-purple-8); }
+  .first-paid-gift-offer__container { background-color: var(--color-twitch-purple-7); }
+  .top-nav__logo { background-color: var(--color-twitch-purple-6); }
+  .audio-ax-overlay-link { color: var(--color-twitch-purple-15); }
+  .audio-ax-overlay-link:hover { color: var(--color-twitch-purple-12); }
 }

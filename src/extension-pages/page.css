@@ -40,20 +40,22 @@
   --muted: #3b3b44;
   --error: #971311;
 }
-/* Every other theme, from its colors in features/themes/palettes.css. */
+/* Every other theme, from its colors in features/themes/palettes.css. accent and focus are the
+   button's color made lighter, as features/themes/twitch-colors.css does for Twitch's purples 11
+   and 10: max() leaves a button that's already a light color as it is. */
 :root[data-skek-theme-base]:not([data-skek-theme='dark'], [data-skek-theme='light']) {
   --bg: var(--skek-t-base);
   --bg-alt: var(--skek-t-bg);
   --card: rgb(from var(--skek-t-text) r g b / 0.08);
   --selected: rgb(from var(--skek-t-accent) r g b / 0.22);
-  --accent: oklch(from var(--skek-t-accent) calc(l + 0.15) calc(c * 0.85) h);
+  --accent: oklch(from var(--skek-t-accent) max(l, calc(min(l, 0.6) + 0.15)) calc(c * 0.85) h);
   --input-border: rgb(from var(--skek-t-text) r g b / 0.8);
-  --focus: oklch(from var(--skek-t-accent) calc(l + 0.07) c h);
+  --focus: oklch(from var(--skek-t-accent) max(l, calc(min(l, 0.6) + 0.07)) c h);
   --hover: rgb(from var(--skek-t-text) r g b / 0.15);
   --text: var(--skek-t-text);
   --muted: color-mix(in oklab, var(--skek-t-base) 15%, var(--skek-t-text));
   --button: var(--skek-t-accent);
-  --button-hover: oklch(from var(--skek-t-accent) calc(l - 0.07) c h);
+  --button-hover: oklch(from var(--skek-t-accent) calc(l - 0.05) c h);
   --on-button: var(--skek-t-on-accent);
 }
 :root[data-skek-theme-base='light']:not([data-skek-theme='light']) {

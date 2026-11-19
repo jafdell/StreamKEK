@@ -45,13 +45,10 @@ html.skek[data-skek-theme-base]:not([data-skek-theme='dark'], [data-skek-theme='
   --skek-muted: color-mix(in oklab, var(--skek-t-base) 15%, var(--skek-t-text));
   --skek-input: rgb(from var(--skek-t-text) r g b / 0.09);
   --skek-focus: var(--skek-t-accent);
-  --skek-link: oklch(from var(--skek-t-accent) calc(l + 0.15) calc(c * 0.85) h);
+  --skek-link: var(--skek-t-link);
   --skek-border: rgb(from var(--skek-t-text) r g b / 0.14);
   --skek-button: var(--skek-t-accent);
   --skek-on-button: var(--skek-t-on-accent);
-}
-html.skek[data-skek-theme-base='light']:not([data-skek-theme='light']) {
-  --skek-link: oklch(from var(--skek-t-accent) calc(l - 0.15) calc(c * 0.9) h);
 }
 
 /* streams/frames/chat-settings.js sets the real size. */

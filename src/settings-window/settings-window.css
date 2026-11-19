@@ -20,7 +20,8 @@ html.framed body { width: 100%; height: 100%; }
   flex-direction: column;
   min-height: 0;
   padding: 16px 12px 12px;
-  background: var(--bg-alt);
+  /* With the theme's backdrop, from features/themes/palettes.css, as Twitch's page has it. */
+  background: var(--skek-t-backdrop, none), var(--bg-alt);
 }
 
 .brand { display: flex; align-items: center; gap: 8px; padding: 0 4px 14px; font-weight: 600; }
@@ -172,12 +173,14 @@ a.setting:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px;
 .swatch input:hover + .swatch__preview { transform: translateY(-2px); }
 .swatch input:checked + .swatch__preview { outline: 2px solid var(--focus); outline-offset: 2px; }
 .swatch input:focus-visible + .swatch__preview { outline: 2px solid var(--text); outline-offset: 2px; }
-.swatch__scene { flex: 1 1 0; display: flex; background: var(--skek-t-bg); }
+.swatch__scene { position: relative; flex: 1 1 0; display: flex; background: var(--skek-t-backdrop, none), var(--skek-t-bg); }
+/* The line under Twitch's top bar, which Twitch's own two themes don't have. */
+.swatch__scene:not([data-skek-theme='dark'], [data-skek-theme='light'])::before { content: ''; position: absolute; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, var(--skek-t-accent), var(--skek-t-accent-2)); }
 .swatch__panel { flex: 0 0 26%; background: var(--skek-t-base); }
 .swatch__main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 5px; padding: 10px 8px 8px; }
 .swatch__text { width: 75%; height: 5px; border-radius: 3px; background: var(--skek-t-text); }
-.swatch__text--short { width: 45%; opacity: 0.55; }
-.swatch__button { align-self: flex-end; width: 26px; max-width: 100%; height: 10px; margin-top: auto; border-radius: 9000px; background: linear-gradient(90deg, var(--skek-t-accent), var(--skek-t-accent-2)); }
+.swatch__text--link { width: 45%; background: var(--skek-t-link); }
+.swatch__button { align-self: flex-end; width: 26px; max-width: 100%; height: 10px; margin-top: auto; border-radius: 9000px; background: var(--skek-t-accent); }
 .swatch__name { font-size: 13px; font-weight: 600; text-align: center; }
 .swatch input:checked ~ .swatch__name { color: var(--accent); }
 @media (prefers-reduced-motion: reduce) {

@@ -46,7 +46,7 @@ It works in Chrome, Brave and other Chromium browsers, with no API key and no ex
 
 - **One searchable window:** open it from StreamKEK's icon in Twitch's top bar or the browser toolbar.
 - **Backup and restore:** save your settings, channels, favorites and chat words to a file, and put them back after a reinstall.
-- **Themes:** 14 themes that recolor Twitch, the settings window and the YouTube and Kick stream view, like Midnight, Synthwave and one for each season, besides Twitch's own dark and light. Kick's chat stays dark in a light theme.
+- **Themes:** 16 themes that recolor Twitch, the settings window and the YouTube and Kick stream view, like Midnight, Synthwave and one for each season, besides Twitch's own dark and light. Kick's chat stays dark in a light theme.
 - **What's new:** see what each version added, there or in the [changelog](CHANGELOG.md).
 
 ## Install
