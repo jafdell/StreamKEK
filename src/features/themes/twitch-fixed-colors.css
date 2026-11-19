@@ -1,0 +1,311 @@
+/* Twitch's older styles write a color out instead of using a token, so twitch-colors.css doesn't
+   reach them: chat's background in a popout is one. This gives each of those the token for the
+   color it wrote, in the themes that aren't Twitch's own.
+
+   Made from Twitch's own rules: the ones in document.styleSheets whose selector names a theme
+   (.tw-root--theme-dark or .tw-root--theme-light) and that set a color from Twitch's ramp of
+   greys or purples, gathered on its channel, chat, browse, video, clip and settings pages. A part
+   of Twitch that keeps its own colors in a theme is one this has no rule for yet. The last block
+   is for the purples Twitch writes out in a rule that names no theme, gathered on its channel,
+   browse, following and front pages. Its gradients there are left alone.
+
+   Each rule is only just stronger than the one of Twitch's it replaces, which is what :where() is
+   for: anything that already won over Twitch's rule still wins over this one, like the sidebar's
+   hover color in features/sidebar/current-channel.css. */
+
+/* What Twitch colors for its dark theme. */
+html.tw-root--theme-dark:where([data-skek-theme-base='dark']:not([data-skek-theme='dark'])) {
+  .subscriber-stream-tag,
+  .subscriber-stream-tag:active,
+  .subscriber-stream-tag:hover:active,
+  .chat-line__message--highlighted .chat-line__message-highlight,
+  .chat-line__message--highlighted.chat-line__message--native:focus .chat-line__message-highlight,
+  .chat-line__message--highlighted.chat-line__message--native:focus-within .chat-line__message-highlight { background-color: var(--color-twitch-purple-4); }
+  .subscriber-stream-tag { color: var(--color-hinted-grey-1); }
+  .subscriber-stream-tag:focus,
+  .subscriber-stream-tag:hover { background-color: var(--color-twitch-purple-3); }
+  .game-card__image { background-color: var(--color-opac-gd-1); }
+  .game-card__title,
+  .game-card__link,
+  .modal__content,
+  .navigation-link,
+  .top-nav__external-link,
+  .poll-service-error__service-error__close,
+  .new-poll-configure__service-error__close,
+  .recent-raids-item:hover .recent-raids-item__title,
+  .recent-raids-item:hover .recent-raids-item__metadata,
+  .container--default { color: var(--color-hinted-grey-14); }
+  .follow-game-card__overlay:hover { border-color: var(--color-opac-gd-3); }
+  .follow-game-card__overlay--followed,
+  .offline-recommendations-video-card:focus .offline-recommendations-video-card-border-2,
+  .offline-recommendations-video-card:hover .offline-recommendations-video-card-border-2,
+  .highlighted-section { border-color: var(--color-twitch-purple-9); }
+  .settings-row--focused { border-color: var(--color-twitch-purple-10); }
+  .mention-fragment--recipient { background-color: var(--color-hinted-grey-15); color: var(--color-hinted-grey-2); }
+  .mention-fragment--sender { background-color: var(--color-hinted-grey-5); }
+  .reward-icon,
+  .guest-star-tag__dark-theme,
+  .t-bits-card__footer { background-color: var(--color-twitch-purple-5); }
+  .flagged-fragment,
+  .token.tag,
+  .search-item__history,
+  .top-nav__home-link-logo,
+  .video-chat__message-author,
+  .minimal-top-nav__home-link-logo { color: var(--color-twitch-purple-11); }
+  .navigation-link.active,
+  .navigation-link:hover { color: var(--color-text-link); }
+  .flagged-fragment:hover,
+  .flagged-fragment--active,
+  .creator-chat-event--twitch--new .creator-chat-activity-detail,
+  .creator-chat-event--poll--new .creator-chat-activity-detail,
+  .creator-chat-event--prediction--new .creator-chat-activity-detail { background-color: var(--color-twitch-purple-6); }
+  .whispers-list-item--selected,
+  .whispers-list-item:hover,
+  .whispers-list-item--selected .whispers-list-item__archive-button:hover,
+  .whispers-list-item:hover .whispers-list-item__archive-button:hover,
+  .whispers-list-item--selected .whispers-list-item__archive,
+  .whispers-list-item:hover .whispers-list-item__archive,
+  .side-nav,
+  .side-nav-card__link:hover,
+  .side-nav-card__link:focus-visible,
+  .creator-chat-base-list-item .creator-chat-activity-detail,
+  .recent-raids-item__hover-content,
+  .recent-raids-item:hover { background-color: var(--color-hinted-grey-4); }
+  .whispers-list-item--selected .whispers-list-item__archive-button,
+  .whispers-list-item:hover .whispers-list-item__archive-button,
+  .whispers-list-item__archive,
+  .creator-chat-base-list-item .creator-chat-activity-detail--selected,
+  .chat-room,
+  .charity-paypal-checkout-form .paypal-hosted-field,
+  .gifting-option__overlay,
+  .multi-month__selected { background-color: var(--color-hinted-grey-2); }
+  .emote-button__link:hover,
+  .emote-picker__emote-link:hover { background-color: rgb(from var(--color-opac-gd-1) r g b / 0); }
+  .emote-button__options { border-bottom-color: var(--color-hinted-grey-14); }
+  .directory-header-new__banner-cover { background-image: linear-gradient(rgb(from var(--color-hinted-grey-2) r g b / 0.6), var(--color-hinted-grey-1)), linear-gradient(90deg, var(--color-hinted-grey-1) 0%, var(--color-hinted-grey-1) 40%, rgb(from var(--color-hinted-grey-2) r g b / 0.6) 50%, rgb(from var(--color-hinted-grey-2) r g b / 0.6) 52%); }
+  .offline-recommendations-video-card .offline-recommendations-video-card-border-3 { border-color: var(--color-twitch-purple-6); }
+  .social-button__link--copy::after,
+  .social-button__link--download::after,
+  .collection-top-bar:hover .collection-top-bar-text,
+  .creator-chat-event--twitch,
+  .creator-chat-event--poll,
+  .creator-chat-event--prediction { color: var(--color-twitch-purple-9); }
+  .social-button__link--embed::after,
+  .top-nav__home-link-logo:hover,
+  .top-nav__external-link:hover,
+  .minimal-top-nav__home-link-logo:hover { color: var(--color-twitch-purple-10); }
+  .social-button__icon--embed { background-color: var(--color-twitch-purple-10); }
+  .social-button__icon--copy,
+  .social-button__icon--download { background-color: var(--color-twitch-purple-9); }
+  .bits-balance-notification { border-top-color: var(--color-twitch-purple-10) !important; }
+  .low-latency-notification { border-top-color: var(--color-twitch-purple-10); }
+  .hype-train-icon__train--default,
+  .navigation-link__active-indicator { background-color: var(--color-twitch-purple-11); }
+  .follow-channels-onboarding__primary-heart__svg { fill: var(--color-twitch-purple-10); }
+  .follow-channels-onboarding__secondary-heart__svg { stroke: var(--color-hinted-grey-14); }
+  .tray-item--highlighted,
+  .navigation-link__left-border { background-color: var(--color-opac-gd-2); }
+  .channel-root__right-column,
+  .first-paid-gift-offer-color-promo__container { background-color: var(--color-hinted-grey-1); }
+  .guest-star-tag__light-theme { background-color: var(--color-twitch-purple-12); }
+  .stream-schedule-segment--overlay { background-color: rgb(from var(--color-hinted-grey-2) r g b / 0.5); }
+  .moderated-message-fake-input__container { box-shadow: var(--color-twitch-purple-10) 0px 0px 6px -2px; }
+  .message__timestamp,
+  .vcml-message__timestamp,
+  .automod-message,
+  .blocked-term-message,
+  .blocked-link-message,
+  .secure-stamp,
+  .t-extension-panel__top-controls,
+  .targeted-mod-action { color: var(--color-hinted-grey-11); }
+  .creator-chat-base-list-item--new,
+  .creator-chat-event--twitch--new,
+  .creator-chat-event--poll--new,
+  .creator-chat-event--prediction--new { background-color: var(--color-twitch-purple-7); border-color: var(--color-twitch-purple-9); box-shadow: var(--color-twitch-purple-9) 0px 4px 10px -3px; }
+  .creator-chat-event--twitch--new .creator-chat-activity-detail--selected,
+  .creator-chat-event--poll--new .creator-chat-activity-detail--selected,
+  .creator-chat-event--prediction--new .creator-chat-activity-detail--selected,
+  .goal-highlight-banner { background-color: var(--color-twitch-purple-8); }
+  .gift-pay-forward-line { border-inline-start-color: var(--color-hinted-grey-4); }
+  .acknowledge-unban-request__scrim { background-color: rgb(from var(--color-hinted-grey-2) r g b / 0.6); }
+  .charity-paypal-checkout-form .paypal-hosted-field-focus { background-color: var(--color-hinted-grey-2); border-color: var(--color-twitch-purple-10); }
+  .recurly-credit-card-form .recurly-element:not(.recurly-element-card),
+  .recurly-credit-card-form .recurly-element-card { background-color: var(--color-hinted-grey-2); box-shadow: var(--color-opac-gl-5) 0px 0px 0px 1px inset; }
+  .recurly-credit-card-form .recurly-element-card.recurly-element-focus,
+  .recurly-credit-card-form .recurly-element-focus:not(.recurly-element-card) { background-color: var(--color-hinted-grey-2); box-shadow: var(--color-twitch-purple-10) 0px 0px 0px 2px, var(--color-twitch-purple-10) 0px 0px 0px 2px inset; }
+  .emote-modifier-button--selected { border-color: var(--color-twitch-purple-7) !important; }
+  .message-preview__unexpanded::after { background-image: linear-gradient(rgb(from var(--color-hinted-grey-2) r g b / 0) 0px, var(--color-hinted-grey-2) 90%); }
+  .message-preview__button { background-image: linear-gradient(90deg, rgb(from var(--color-hinted-grey-2) r g b / 0) -37.5%, rgb(from var(--color-hinted-grey-2) r g b / 0.95) 42.71%, var(--color-hinted-grey-2) 54.17%); }
+  .edit-appearance__badge-chooser__global-badge-none { background-color: var(--color-hinted-grey-4); color: var(--color-hinted-grey-11); }
+  .pinned-chat__scrollable-area__gradient { mask-image: linear-gradient(var(--color-hinted-grey-2) calc(100% - 3rem), rgba(0, 0, 0, 0) 100%); }
+  .pinned-chat__replyline { text-decoration-color: var(--color-hinted-grey-9); }
+  .pinned-chat__replyline { border-top-color: var(--color-hinted-grey-4); }
+  .community-highlight-stack__card--scrollable::after { background-image: linear-gradient(rgb(from var(--color-hinted-grey-2) r g b / 0) 0px, var(--color-hinted-grey-2) 100%); }
+  .community-highlight-stack__separator { background-color: var(--color-hinted-grey-11); }
+  .video-chat__message-list-wrapper::-webkit-scrollbar-thumb { border-color: var(--color-hinted-grey-4); }
+  .video-chat__input { box-shadow: var(--color-opac-gd-2) 0px 1px inset; }
+  .video-chat__header { box-shadow: var(--color-opac-gd-2) 0px -1px inset; }
+  .search-result-offline_channel--avatar,
+  .subscription-card__channel-avatar { border-color: var(--color-opac-gd-2); }
+  .settings-row:not(:first-child, .settings-row--focused, .settings-row--no-border) { border-top-color: var(--color-opac-gd-2); }
+}
+
+/* What Twitch colors for its light theme, where plain white is a panel's background. */
+html.tw-root--theme-light:where([data-skek-theme-base='light']:not([data-skek-theme='light'])) {
+  .subscriber-stream-tag,
+  .subscriber-stream-tag:active,
+  .subscriber-stream-tag:hover:active { background-color: var(--color-twitch-purple-13); }
+  .subscriber-stream-tag,
+  .game-card__title,
+  .game-card__link,
+  .modal__content,
+  .navigation-link,
+  .top-nav__external-link,
+  .poll-service-error__service-error__close,
+  .new-poll-configure__service-error__close,
+  .recent-raids-item:hover .recent-raids-item__title,
+  .recent-raids-item:hover .recent-raids-item__metadata,
+  .container--default { color: var(--color-hinted-grey-1); }
+  .subscriber-stream-tag:focus,
+  .subscriber-stream-tag:hover { background-color: var(--color-twitch-purple-14); }
+  .game-card__image { background-color: var(--color-opac-gl-1); }
+  .follow-game-card__overlay:hover { border-color: var(--color-opac-gl-3); }
+  .follow-game-card__overlay--followed,
+  .offline-recommendations-video-card:focus .offline-recommendations-video-card-border-2,
+  .offline-recommendations-video-card:hover .offline-recommendations-video-card-border-2,
+  .highlighted-section { border-color: var(--color-twitch-purple-9); }
+  .settings-row--focused { border-color: var(--color-twitch-purple-8); }
+  .mention-fragment--recipient { background-color: var(--color-hinted-grey-1); }
+  .mention-fragment--sender { background-color: var(--color-hinted-grey-12); color: var(--color-hinted-grey-2); }
+  .reward-icon,
+  .guest-star-tag__dark-theme,
+  .t-bits-card__footer { background-color: var(--color-twitch-purple-5); }
+  .flagged-fragment,
+  .token.tag,
+  .search-item__history,
+  .top-nav__home-link-logo,
+  .video-chat__message-author,
+  .minimal-top-nav__home-link-logo { color: var(--color-twitch-purple-7); }
+  .navigation-link.active,
+  .navigation-link:hover { color: var(--color-text-link); }
+  .flagged-fragment:hover,
+  .flagged-fragment--active,
+  .creator-chat-event--twitch--new .creator-chat-activity-detail,
+  .creator-chat-event--poll--new .creator-chat-activity-detail,
+  .creator-chat-event--prediction--new .creator-chat-activity-detail { background-color: var(--color-twitch-purple-6); }
+  .whispers-list-item--selected,
+  .whispers-list-item:hover,
+  .whispers-list-item--selected .whispers-list-item__archive-button:hover,
+  .whispers-list-item:hover .whispers-list-item__archive-button:hover,
+  .whispers-list-item--selected .whispers-list-item__archive,
+  .whispers-list-item:hover .whispers-list-item__archive,
+  .side-nav,
+  .side-nav-card__link:hover,
+  .side-nav-card__link:focus-visible,
+  .recent-raids-item__hover-content,
+  .recent-raids-item:hover { background-color: var(--color-hinted-grey-14); }
+  .whispers-list-item--selected .whispers-list-item__archive-button,
+  .whispers-list-item:hover .whispers-list-item__archive-button,
+  .whispers-list-item__archive,
+  .chat-room,
+  .chat-private-callout__icon--overlay,
+  .hype-train-rewards__icon,
+  .bits-badge-tier-rewards__icon--background,
+  .pinned-callout__icon,
+  .charity-paypal-checkout-form .paypal-hosted-field,
+  .gifting-option__overlay,
+  .multi-month__selected { background-color: var(--color-background-base); }
+  .emote-button__link:hover,
+  .emote-picker__emote-link:hover { background-color: rgb(from var(--color-opac-gl-1) r g b / 0); }
+  .emote-button__options { border-bottom-color: var(--color-hinted-grey-1); }
+  .directory-header-new__banner-cover { background-image: linear-gradient(rgb(from var(--color-background-base) r g b / 0.6), var(--color-hinted-grey-15)), linear-gradient(90deg, var(--color-hinted-grey-15) 0%, var(--color-hinted-grey-15) 40%, rgb(from var(--color-background-base) r g b / 0.6) 50%, rgb(from var(--color-background-base) r g b / 0.6) 52%); }
+  .offline-recommendations-video-card .offline-recommendations-video-card-border-3 { border-color: var(--color-twitch-purple-6); }
+  .social-button__link--copy::after,
+  .social-button__link--embed::after,
+  .social-button__link--download::after,
+  .collection-top-bar:hover .collection-top-bar-text,
+  .creator-chat-event--twitch,
+  .creator-chat-event--poll,
+  .creator-chat-event--prediction { color: var(--color-twitch-purple-9); }
+  .social-button__icon--embed,
+  .social-button__icon--copy,
+  .social-button__icon--download,
+  .hype-train-icon__train--default { background-color: var(--color-twitch-purple-9); }
+  .bits-balance-notification { border-top-color: var(--color-twitch-purple-8) !important; }
+  .low-latency-notification { border-top-color: var(--color-twitch-purple-8); }
+  .follow-channels-onboarding__primary-heart__svg { fill: var(--color-twitch-purple-9); }
+  .follow-channels-onboarding__secondary-heart__svg { stroke: var(--color-hinted-grey-1); }
+  .tray-item--highlighted,
+  .navigation-link__left-border { background-color: var(--color-opac-gl-2); }
+  .navigation-link__active-indicator { background-color: var(--color-twitch-purple-7); }
+  .top-nav__home-link-logo:hover,
+  .top-nav__external-link:hover,
+  .minimal-top-nav__home-link-logo:hover { color: var(--color-twitch-purple-8); }
+  .channel-root__right-column,
+  .creator-chat-base-list-item .creator-chat-activity-detail--selected,
+  .first-paid-gift-offer-color-promo__container { background-color: var(--color-hinted-grey-15); }
+  .guest-star-tag__light-theme { background-color: var(--color-twitch-purple-12); }
+  .chat-line__message--highlighted .chat-line__message-highlight,
+  .chat-line__message--highlighted.chat-line__message--native:focus .chat-line__message-highlight,
+  .chat-line__message--highlighted.chat-line__message--native:focus-within .chat-line__message-highlight { background-color: var(--color-twitch-purple-15); }
+  .moderated-message-fake-input__container { box-shadow: var(--color-twitch-purple-8) 0px 0px 6px -2px; }
+  .message__timestamp,
+  .vcml-message__timestamp,
+  .automod-message,
+  .blocked-term-message,
+  .blocked-link-message,
+  .secure-stamp,
+  .t-extension-panel__top-controls,
+  .targeted-mod-action { color: var(--color-hinted-grey-6); }
+  .creator-chat-base-list-item--new,
+  .creator-chat-event--twitch--new,
+  .creator-chat-event--poll--new,
+  .creator-chat-event--prediction--new { background-color: var(--color-twitch-purple-7); border-color: var(--color-twitch-purple-9); box-shadow: var(--color-twitch-purple-9) 0px 4px 10px -3px; }
+  .creator-chat-base-list-item .creator-chat-activity-detail { background-color: var(--color-hinted-grey-13); }
+  .creator-chat-event--twitch--new .creator-chat-activity-detail--selected,
+  .creator-chat-event--poll--new .creator-chat-activity-detail--selected,
+  .creator-chat-event--prediction--new .creator-chat-activity-detail--selected { background-color: var(--color-twitch-purple-8); }
+  .gift-pay-forward-line { border-inline-start-color: var(--color-hinted-grey-14); }
+  .charity-paypal-checkout-form .paypal-hosted-field-focus { background-color: var(--color-background-base); border-color: var(--color-twitch-purple-8); }
+  .recurly-credit-card-form .recurly-element:not(.recurly-element-card),
+  .recurly-credit-card-form .recurly-element-card { background-color: var(--color-background-base); box-shadow: var(--color-opac-gd-4) 0px 0px 0px 1px inset; }
+  .recurly-credit-card-form .recurly-element-card.recurly-element-focus,
+  .recurly-credit-card-form .recurly-element-focus:not(.recurly-element-card) { background-color: var(--color-background-base); box-shadow: var(--color-twitch-purple-8) 0px 0px 0px 2px, var(--color-twitch-purple-8) 0px 0px 0px 2px inset; }
+  .emote-modifier-button--selected { border-color: var(--color-twitch-purple-7) !important; }
+  .message-preview__unexpanded::after { background-image: linear-gradient(rgb(from var(--color-background-base) r g b / 0) 0px, var(--color-background-base) 90%); }
+  .message-preview__button { background-image: linear-gradient(90deg, rgb(from var(--color-background-base) r g b / 0) -37.5%, rgb(from var(--color-background-base) r g b / 0.95) 42.71%, var(--color-background-base) 54.17%); }
+  .edit-appearance__badge-chooser__global-badge-none { background-color: var(--color-hinted-grey-14); color: var(--color-hinted-grey-6); }
+  .goal-highlight-banner { background-color: var(--color-twitch-purple-10); }
+  .pinned-chat__replyline { text-decoration-color: var(--color-hinted-grey-7); }
+  .pinned-chat__replyline { border-top-color: var(--color-hinted-grey-13); }
+  .community-highlight-stack__card--scrollable::after { background-image: linear-gradient(rgb(from var(--color-background-base) r g b / 0) 0px, var(--color-background-base) 100%); }
+  .community-highlight-stack__separator { background-color: var(--color-hinted-grey-6); }
+  .video-chat__message-list-wrapper::-webkit-scrollbar-thumb { border-color: var(--color-hinted-grey-14); }
+  .video-chat__input { box-shadow: var(--color-opac-gl-2) 0px 1px inset; }
+  .video-chat__header { box-shadow: var(--color-opac-gl-2) 0px -1px inset; }
+  .search-result-offline_channel--avatar,
+  .subscription-card__channel-avatar { border-color: var(--color-opac-gl-2); }
+  .settings-row:not(:first-child, .settings-row--focused, .settings-row--no-border) { border-top-color: var(--color-opac-gl-2); }
+}
+
+/* What Twitch colors the same in both of its themes, like a message someone paid to highlight,
+   which has white text on it. */
+html:where([data-skek-theme-base]:not([data-skek-theme='dark'], [data-skek-theme='light'])) {
+  .chat-line__message-body--highlighted { background-color: var(--color-twitch-purple-7); border-color: var(--color-twitch-purple-7); }
+  .chat-line__message--special,
+  .chat-line__bits-charity { border-inline-start-color: var(--color-twitch-purple-7); }
+  .base-chat-replies-list__reply-line--flash-animation { background-color: var(--color-twitch-purple-13); }
+  .base-chat-replies-list__reply-line--flash-animation-dark { background-color: var(--color-twitch-purple-6); }
+  .creator-chat-base-list-item__icon { color: var(--color-twitch-purple-9); }
+  .persistent-notification__card-image-unread { border-inline-start-color: var(--color-twitch-purple-9); }
+  .solid-purple { background-color: var(--color-twitch-purple-9); }
+  .community-goals-list-item__fill { background-color: var(--color-twitch-purple-10); }
+  [class*='featuredSlot--'],
+  .extensions-dock-card__image__visible { border-color: var(--color-twitch-purple-8); }
+  .extensions-dock-card__menu-status__visible { background-color: var(--color-twitch-purple-8); }
+  .offline-embeds--stylized-link { color: var(--color-twitch-purple-8); }
+  .first-paid-gift-offer__container { background-color: var(--color-twitch-purple-7); }
+  .top-nav__logo { background-color: var(--color-twitch-purple-6); }
+  .audio-ax-overlay-link { color: var(--color-twitch-purple-15); }
+  .audio-ax-overlay-link:hover { color: var(--color-twitch-purple-12); }
+}

@@ -20,7 +20,8 @@ html.framed body { width: 100%; height: 100%; }
   flex-direction: column;
   min-height: 0;
   padding: 16px 12px 12px;
-  background: var(--bg-alt);
+  /* With the theme's backdrop, from features/themes/palettes.css, as Twitch's page has it. */
+  background: var(--skek-t-backdrop, none), var(--bg-alt);
 }
 
 .brand { display: flex; align-items: center; gap: 8px; padding: 0 4px 14px; font-weight: 600; }
@@ -160,8 +161,31 @@ a.setting:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px;
 .choice input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
 .choice span { display: block; padding: 4px 14px; border-radius: 6px; font-weight: 600; }
 .choice input:hover + span { background: var(--hover); }
-.choice input:checked + span { background: #9147ff; color: #fff; }
+.choice input:checked + span { background: var(--button); color: var(--on-button); }
 .choice input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 1px; }
+
+/* Pick a theme: radio buttons drawn as small pictures of each one; see swatchRow. */
+.swatches__group { margin: 14px 0 6px; color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.swatches__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; }
+.swatch { position: relative; display: flex; flex-direction: column; gap: 5px; }
+.swatch input { position: absolute; inset: 0; z-index: 1; margin: 0; opacity: 0; cursor: pointer; }
+.swatch__preview { display: flex; height: 60px; border-radius: 8px; overflow: hidden; outline: 1px solid var(--hover); outline-offset: -1px; transition: transform 0.1s ease; }
+.swatch input:hover + .swatch__preview { transform: translateY(-2px); }
+.swatch input:checked + .swatch__preview { outline: 2px solid var(--focus); outline-offset: 2px; }
+.swatch input:focus-visible + .swatch__preview { outline: 2px solid var(--text); outline-offset: 2px; }
+.swatch__scene { position: relative; flex: 1 1 0; display: flex; background: var(--skek-t-backdrop, none), var(--skek-t-bg); }
+/* The line under Twitch's top bar, which Twitch's own two themes don't have. */
+.swatch__scene:not([data-skek-theme='dark'], [data-skek-theme='light'])::before { content: ''; position: absolute; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, var(--skek-t-accent), var(--skek-t-accent-2)); }
+.swatch__panel { flex: 0 0 26%; background: var(--skek-t-base); }
+.swatch__main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 5px; padding: 10px 8px 8px; }
+.swatch__text { width: 75%; height: 5px; border-radius: 3px; background: var(--skek-t-text); }
+.swatch__text--link { width: 45%; background: var(--skek-t-link); }
+.swatch__button { align-self: flex-end; width: 26px; max-width: 100%; height: 10px; margin-top: auto; border-radius: 9000px; background: var(--skek-t-accent); }
+.swatch__name { font-size: 13px; font-weight: 600; text-align: center; }
+.swatch input:checked ~ .swatch__name { color: var(--accent); }
+@media (prefers-reduced-motion: reduce) {
+  .swatch__preview { transition: none; }
+}
 
 .dropdown { position: relative; flex: 0 0 auto; }
 .dropdown::after {
@@ -205,13 +229,13 @@ a.setting:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px;
   padding: 0 14px;
   border: 0;
   border-radius: 6px;
-  background: #9147ff;
-  color: #fff;
+  background: var(--button);
+  color: var(--on-button);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
 }
-.backup-button:hover { background: #772ce8; }
+.backup-button:hover { background: var(--button-hover); }
 .backup-button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
 .backup-button[hidden] { display: none; }
 .backup-button--quiet { background: var(--card); color: var(--text); }
@@ -242,13 +266,13 @@ a.setting:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px;
   padding: 0 14px;
   border: 0;
   border-radius: 6px;
-  background: #9147ff;
-  color: #fff;
+  background: var(--button);
+  color: var(--on-button);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
 }
-.word-add:hover:not(:disabled) { background: #772ce8; }
+.word-add:hover:not(:disabled) { background: var(--button-hover); }
 .word-add:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
 .word-add:disabled { background: var(--card); color: var(--muted); cursor: default; }
 .word-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }

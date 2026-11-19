@@ -3,12 +3,18 @@
 (() => {
   'use strict';
 
+  const { settingDefaults, resolveTheme } = skek;
+
+  // `name` picks the theme's colors from features/themes/palettes.css and `base` says whether
+  // it's a dark or a light one.
   function apply(theme) {
-    document.documentElement.dataset.theme = theme;
+    const { name, base } = resolveTheme(theme);
+    document.documentElement.dataset.skekTheme = name;
+    document.documentElement.dataset.skekThemeBase = base;
   }
 
-  chrome.storage.local.get({ theme: skek.settingDefaults.theme }).then(({ theme }) => apply(theme));
+  chrome.storage.local.get({ theme: settingDefaults.theme }).then(({ theme }) => apply(theme));
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && changes.theme) apply(changes.theme.newValue ?? skek.settingDefaults.theme);
+    if (area === 'local' && changes.theme) apply(changes.theme.newValue);
   });
 })();

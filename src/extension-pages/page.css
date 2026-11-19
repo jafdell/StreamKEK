@@ -1,4 +1,6 @@
 /* Shared by the extension's own pages (settings window, channel manager). Not loaded on Twitch. */
+@import url('../features/themes/palettes.css');
+
 @font-face {
   font-family: Inter;
   src: url('../../fonts/inter-latin.woff2') format('woff2');
@@ -6,7 +8,7 @@
   font-display: swap;
 }
 
-/* Twitch's own values for each theme. Set by page-theme.js from the Theme setting. */
+/* Twitch's own values for its dark and light theme. page-theme.js puts the theme on <html>. */
 :root {
   color-scheme: dark;
   --bg: #18181b;
@@ -20,8 +22,11 @@
   --text: #efeff1;
   --muted: #d3d3d9;
   --error: #ff8280;
+  --button: #9147ff;
+  --button-hover: #772ce8;
+  --on-button: #fff;
 }
-:root[data-theme='light'] {
+:root[data-skek-theme-base='light'] {
   color-scheme: light;
   --bg: #ffffff;
   --bg-alt: #f7f7f8;
@@ -35,7 +40,32 @@
   --muted: #3b3b44;
   --error: #971311;
 }
-:root:not([data-theme]) body { visibility: hidden; }
+/* Every other theme, from its colors in features/themes/palettes.css. accent and focus are the
+   button's color made lighter, as features/themes/twitch-colors.css does for Twitch's purples 11
+   and 10: max() leaves a button that's already a light color as it is. */
+:root[data-skek-theme-base]:not([data-skek-theme='dark'], [data-skek-theme='light']) {
+  --bg: var(--skek-t-base);
+  --bg-alt: var(--skek-t-bg);
+  --card: rgb(from var(--skek-t-text) r g b / 0.08);
+  --selected: rgb(from var(--skek-t-accent) r g b / 0.22);
+  --accent: oklch(from var(--skek-t-accent) max(l, calc(min(l, 0.6) + 0.15)) calc(c * 0.85) h);
+  --input-border: rgb(from var(--skek-t-text) r g b / 0.8);
+  --focus: oklch(from var(--skek-t-accent) max(l, calc(min(l, 0.6) + 0.07)) c h);
+  --hover: rgb(from var(--skek-t-text) r g b / 0.15);
+  --text: var(--skek-t-text);
+  --muted: color-mix(in oklab, var(--skek-t-base) 15%, var(--skek-t-text));
+  --button: var(--skek-t-accent);
+  --button-hover: oklch(from var(--skek-t-accent) calc(l - 0.05) c h);
+  --on-button: var(--skek-t-on-accent);
+}
+/* On a light background they're made darker instead, as Twitch's purples 7 and 9 are. min() does
+   the same for a button that's a light color, like Summer's, which wouldn't show otherwise. */
+:root[data-skek-theme-base='light']:not([data-skek-theme='light']) {
+  --accent: oklch(from var(--skek-t-accent) calc(min(l, 0.6) - 0.15) calc(c * 0.9) h);
+  --input-border: rgb(from var(--skek-t-text) r g b / 0.55);
+  --focus: oklch(from var(--skek-t-accent) min(l, 0.6) c h);
+}
+:root:not([data-skek-theme]) body { visibility: hidden; }
 
 * { box-sizing: border-box; }
 
@@ -71,6 +101,6 @@ body {
   background: var(--text);
   transition: transform 0.1s ease;
 }
-.skek-switch:checked { background: #9147ff; box-shadow: none; }
-.skek-switch:checked::before { background: #fff; transform: translateX(16px); }
+.skek-switch:checked { background: var(--button); box-shadow: none; }
+.skek-switch:checked::before { background: var(--on-button); transform: translateX(16px); }
 .skek-switch:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }

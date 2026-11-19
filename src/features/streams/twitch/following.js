@@ -153,9 +153,15 @@
       content.prepend(sectionEl);
     }
 
-    // Same card width as Twitch's, which depends on the window size.
-    const card = content.querySelector('article [data-a-target="preview-card-image-link"]');
-    const width = card ? `${Math.round(card.getBoundingClientRect().width)}px` : '';
+    // Same card width as Twitch's, which depends on the window size. A card can be there with no
+    // width, when another extension hides the channel, so this takes the first one that shows.
+    let width = '';
+    for (const card of content.querySelectorAll('article [data-a-target="preview-card-image-link"]')) {
+      const cardWidth = Math.round(card.getBoundingClientRect().width);
+      if (!cardWidth) continue;
+      width = `${cardWidth}px`;
+      break;
+    }
     if (sectionEl.style.getPropertyValue('--skek-card-width') !== width) {
       sectionEl.style.setProperty('--skek-card-width', width);
     }

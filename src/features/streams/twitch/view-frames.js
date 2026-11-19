@@ -3,7 +3,7 @@
   'use strict';
 
   const shared = skek.streams;
-  const { el, theme } = skek.helpers;
+  const { el, theme, themeBase } = skek.helpers;
   const { state, siteOf } = shared;
 
   function frame(className, src, allow) {
@@ -31,7 +31,7 @@
 
   // What a chat frame gets in its address.
   function chatSettings() {
-    return `#skek-theme=${theme()}&skek-twitch-font=${twitchChatFontSize()}`;
+    return `#skek-theme=${theme()}&skek-theme-base=${themeBase()}&skek-twitch-font=${twitchChatFontSize()}`;
   }
 
   function loadStream(channel, stream) {

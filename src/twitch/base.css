@@ -1,6 +1,6 @@
-/* Everything uses Twitch's own design tokens, so what sits among Twitch's content matches
-   Twitch's theme. Floating popups and the stream view follow the Theme setting instead; for
-   the stream view, see the top of stream-view.css. */
+/* Everything uses Twitch's own design tokens, so it matches Twitch in whichever theme the Theme
+   setting has it: page-sync.js puts the theme on <html>, and features/themes/twitch-colors.css
+   recolors Twitch's tokens for the themes that aren't Twitch's own. */
 
 html {
   --skek-popup-bg: #26262c;
@@ -10,16 +10,22 @@ html {
   /* Stacked mode's stream: its width at 16:9, leaving room for chat in a wide window. */
   --skek-stacked-player-height: min(56.25vw, calc(100vh - 240px));
 }
-html[data-skek-theme='light'] {
+html[data-skek-theme-base='light'] {
   --skek-popup-bg: #ffffff;
   --skek-popup-text: #0e0e10;
   --skek-popup-shadow: rgba(0, 0, 0, 0.25);
   --skek-popup-scrollbar: rgba(173, 173, 184, 0.35);
 }
+/* Every other theme, from its colors in features/themes/palettes.css. */
+html[data-skek-theme-base]:not([data-skek-theme='dark'], [data-skek-theme='light']) {
+  --skek-popup-bg: var(--skek-t-float);
+  --skek-popup-text: var(--skek-t-text);
+  --skek-popup-scrollbar: rgb(from var(--skek-t-text) r g b / 0.2);
+}
 
 .skek-icon { display: inline-flex; align-items: center; justify-content: center; }
 
-/* Twitch's tooltip shape, in the Theme setting's colors, opening above. */
+/* Twitch's tooltip shape, in the theme's colors, opening above. */
 [data-skek-tooltip] { position: relative; }
 [data-skek-tooltip]:hover::after {
   content: attr(data-skek-tooltip);

@@ -1,6 +1,7 @@
-/* The stream view follows the extension's Theme setting, not Twitch's theme, so it sets
-   the tokens it uses to Twitch's values for that theme. */
-.skek-view {
+/* The stream view sets the tokens it uses to Twitch's values for its Dark and Light themes itself,
+   so it's right even before Twitch has switched to the one the Theme setting asks for. In every
+   other theme it gets them from the page, which features/themes/twitch-colors.css has recolored. */
+html[data-skek-theme='dark'] .skek-view {
   --color-background-body: #0e0e10;
   --color-background-base: #18181b;
   --color-background-interactable-hover: rgba(83, 83, 95, 0.48);
@@ -168,8 +169,8 @@ html[data-skek-theme='light'] .skek-view {
   --color-background-interactable-hover: rgba(255, 255, 255, 0.18);
   --color-border-base: rgba(255, 255, 255, 0.3);
   --color-text-base: #fff;
-  --color-text-link: #bf94ff;
-  --color-text-link-hover: #a970ff;
+  --color-text-link: var(--color-twitch-purple-11, #bf94ff);
+  --color-text-link-hover: var(--color-twitch-purple-10, #a970ff);
   --color-text-live: #ff8280;
   position: absolute;
   top: 0;

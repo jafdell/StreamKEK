@@ -5,7 +5,6 @@
 
   if (!location.ancestorOrigins[0]?.endsWith('.twitch.tv')) return;
 
-  const { settingDefaults } = skek;
   const root = document.documentElement;
   root.classList.add('skek');
 
@@ -14,7 +13,7 @@
     '#ff0000', '#0000ff', '#008000', '#b22222', '#ff7f50', '#9acd32', '#ff4500', '#2e8b57',
     '#daa520', '#d2691e', '#5f9ea0', '#1e90ff', '#ff69b4', '#8a2be2', '#00ff7f',
   ];
-  // Readable stand-ins for the colours that fade into each theme's background.
+  // Readable stand-ins for the colours that fade into a dark or a light theme's background.
   const READABLE = {
     dark: { '#0000ff': '#6b6bff', '#008000': '#2ea82e', '#8a2be2': '#a970ff', '#b22222': '#e05050' },
     light: {
@@ -27,7 +26,7 @@
     let hash = 0;
     for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) | 0;
     const color = COLORS[Math.abs(hash) % COLORS.length];
-    return READABLE[root.dataset.skekTheme]?.[color] ?? color;
+    return READABLE[root.dataset.skekThemeBase]?.[color] ?? color;
   }
 
   function paint(repaintAll = false) {
@@ -40,24 +39,19 @@
     }
   }
 
-  function setTheme(theme) {
-    root.dataset.skekTheme = theme;
-    // YouTube's own dark mode covers parts we don't restyle (menus, super chats).
-    root.toggleAttribute('dark', theme === 'dark');
+  // streams/frames/chat-settings.js keeps the theme on <html>. YouTube's own dark mode covers the
+  // parts we don't restyle (menus, super chats), and YouTube sets that attribute itself while
+  // loading, going by its own theme setting.
+  let paintedBase = null;
+  function followTheme() {
+    const base = root.dataset.skekThemeBase;
+    if (root.hasAttribute('dark') !== (base === 'dark')) root.toggleAttribute('dark', base === 'dark');
+    if (base === paintedBase) return;
+    paintedBase = base;
     paint(true);
   }
-  // Read from the address so the first paint is already right; storage would answer too late.
-  setTheme(location.hash.match(/skek-theme=(\w+)/)?.[1] ?? settingDefaults.theme);
-
-  chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && changes.theme) setTheme(changes.theme.newValue ?? settingDefaults.theme);
-  });
-
-  // YouTube sets this attribute itself while loading, going by its own theme setting.
-  new MutationObserver(() => {
-    const dark = root.dataset.skekTheme === 'dark';
-    if (root.hasAttribute('dark') !== dark) root.toggleAttribute('dark', dark);
-  }).observe(root, { attributes: true, attributeFilter: ['dark'] });
+  followTheme();
+  new MutationObserver(followTheme).observe(root, { attributes: true, attributeFilter: ['dark', 'data-skek-theme-base'] });
 
   let queued = false;
   function start() {

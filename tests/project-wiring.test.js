@@ -84,6 +84,53 @@ test('every setting the CSS uses exists', () => {
   }
 });
 
+test('every theme has its colors', () => {
+  const palettes = read('src/features/themes/palettes.css');
+  const themes = context.skek.SETTINGS.find((setting) => setting.key === 'theme').choices;
+  for (const { value, base, group } of themes) {
+    assert.ok(group, `the theme ${value} needs a group`);
+    assert.match(base, /^(dark|light)$/, `the theme ${value} needs dark or light as its base`);
+    assert.ok(palettes.includes(`[data-skek-theme='${value}'] {`), `the theme ${value} has no colors in palettes.css`);
+  }
+  for (const [, value] of palettes.matchAll(/\[data-skek-theme='([\w-]+)'\] \{/g)) {
+    assert.ok(themes.some((theme) => theme.value === value), `palettes.css has colors for ${value}, which isn't a theme`);
+  }
+});
+
+// How far apart two colors are in brightness, from 1 to 21, as WCAG works it out. Text needs 4.5.
+function contrast(first, second) {
+  const brightness = (hex) => {
+    const digits = hex.length === 4 ? [...hex.slice(1)].map((digit) => digit + digit).join('') : hex.slice(1);
+    const [red, green, blue] = [0, 2, 4].map((at) => {
+      const part = parseInt(digits.slice(at, at + 2), 16) / 255;
+      return part <= 0.04045 ? part / 12.92 : ((part + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+  };
+  const [lighter, darker] = [brightness(first), brightness(second)].sort((a, b) => b - a);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+test('every theme sets every color, and its text can be read', () => {
+  const palettes = read('src/features/themes/palettes.css');
+  const backgrounds = ['bg', 'base', 'raised', 'float'];
+  for (const [, theme, block] of palettes.matchAll(/\[data-skek-theme='([\w-]+)'\] \{([^}]+)\}/g)) {
+    const colors = Object.fromEntries([...block.matchAll(/--skek-t-([\w-]+):\s*([^;]+);/g)].map(([, name, value]) => [name, value.trim()]));
+    // A tile in the theme picker gets whatever it doesn't set from the theme that's on.
+    for (const name of [...backgrounds, 'text', 'accent', 'on-accent', 'accent-2', 'link', 'backdrop']) {
+      assert.ok(colors[name], `the theme ${theme} needs --skek-t-${name}`);
+    }
+    for (const name of [...backgrounds, 'text', 'accent', 'on-accent', 'link']) {
+      assert.match(colors[name], /^#([0-9a-f]{3}|[0-9a-f]{6})$/i, `the theme ${theme} needs --skek-t-${name} as a hex color, to check it can be read`);
+    }
+    for (const background of backgrounds) {
+      assert.ok(contrast(colors.text, colors[background]) >= 7, `the theme ${theme}'s text is hard to read on its ${background}`);
+      assert.ok(contrast(colors.link, colors[background]) >= 4.5, `the theme ${theme}'s link is hard to read on its ${background}`);
+    }
+    assert.ok(contrast(colors['on-accent'], colors.accent) >= 4.5, `the theme ${theme}'s buttons are hard to read: pick another on-accent, or a darker or lighter accent`);
+  }
+});
+
 test('every setting with a message has a handler', () => {
   const handlers = { ...youtubeHandlers, ...kickHandlers };
   for (const { key, message } of context.skek.SETTINGS) {

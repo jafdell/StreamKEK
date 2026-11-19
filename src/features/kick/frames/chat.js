@@ -1,5 +1,5 @@
 // Runs in Kick's chat frame in the stream view, where chat.css makes it look like Twitch's.
-// streams/frames/chat-settings.js does the rest. Normal Kick tabs are untouched.
+// streams/frames/chat-settings.js does the rest, the theme included. Normal Kick tabs are untouched.
 (() => {
   'use strict';
 

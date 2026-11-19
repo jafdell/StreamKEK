@@ -6,7 +6,7 @@ html:not([data-skek-audio-state]) .skek-player-button--audio {
 }
 
 html[data-skek-audio-state='on'] .skek-player-button--audio button {
-  color: #bf94ff;
+  color: var(--color-twitch-purple-11, #bf94ff);
 }
 
 /* Says why the player is black. Under Twitch's controls, which come after .video-ref. */

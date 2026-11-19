@@ -45,9 +45,13 @@
     return span;
   }
 
-  // The extension's Theme setting, which page-sync.js keeps on <html>. Not Twitch's own theme.
+  // The theme that's showing, and the one of Twitch's own two themes it's built on. page-sync.js
+  // keeps both on <html>.
   function theme() {
-    return document.documentElement.dataset.skekTheme ?? skek.settingDefaults.theme;
+    return document.documentElement.dataset.skekTheme ?? 'dark';
+  }
+  function themeBase() {
+    return document.documentElement.dataset.skekThemeBase ?? 'dark';
   }
 
   function send(message) {
@@ -95,5 +99,5 @@
     }).observe(document.body, { childList: true, subtree: true });
   }
 
-  skek.helpers = { el, icon, theme, send, isPlainClick, onBodyReady, onPageChange };
+  skek.helpers = { el, icon, theme, themeBase, send, isPlainClick, onBodyReady, onPageChange };
 })();

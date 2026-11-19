@@ -79,6 +79,10 @@
         "src/features/player/go-live.js"
       ],
       "css": [
+        "src/features/themes/palettes.css",
+        "src/features/themes/twitch-colors.css",
+        "src/features/themes/twitch-fixed-colors.css",
+        "src/features/themes/twitch-effects.css",
         "src/twitch/base.css",
         "src/twitch/settings-button.css",
         "src/features/sidebar/sections.css",
@@ -125,6 +129,7 @@
         "https://www.twitch.tv/*"
       ],
       "js": [
+        "src/features/themes/twitch-base.js",
         "src/features/chat/chat-box-emotes.js"
       ],
       "all_frames": true,
@@ -175,6 +180,9 @@
         "src/features/chat/followed.js"
       ],
       "css": [
+        "src/features/themes/palettes.css",
+        "src/features/themes/twitch-colors.css",
+        "src/features/themes/twitch-fixed-colors.css",
         "src/features/chat/font-size.css",
         "src/features/chat/timestamps.css",
         "src/features/chat/sections.css",
@@ -200,6 +208,7 @@
         "src/features/chat/chat-words.js"
       ],
       "css": [
+        "src/features/themes/palettes.css",
         "src/features/youtube/frames/chat.css",
         "src/features/chat/chat-words.css"
       ],
@@ -246,6 +255,7 @@
         "src/features/chat/chat-words.js"
       ],
       "css": [
+        "src/features/themes/palettes.css",
         "src/features/kick/frames/chat.css",
         "src/features/chat/chat-words.css"
       ],

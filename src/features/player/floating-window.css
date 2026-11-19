@@ -4,21 +4,16 @@
 
 html {
   --skek-float-bar-height: 32px;
-  --skek-float-rgb: 24 24 27;
+  --skek-float-color: #18181b;
   --skek-float-halo: #000;
 }
-html.tw-root--theme-light {
-  --skek-float-rgb: 255 255 255;
+html[data-skek-theme-base='light'] {
+  --skek-float-color: #fff;
   --skek-float-halo: #fff;
 }
-/* The stream view follows the Theme setting, not Twitch's theme. */
-html[data-skek-theme='dark'] .skek-view {
-  --skek-float-rgb: 24 24 27;
-  --skek-float-halo: #000;
-}
-html[data-skek-theme='light'] .skek-view {
-  --skek-float-rgb: 255 255 255;
-  --skek-float-halo: #fff;
+/* Every other theme, from its colors in features/themes/palettes.css. */
+html[data-skek-theme-base]:not([data-skek-theme='dark'], [data-skek-theme='light']) {
+  --skek-float-color: var(--skek-t-base);
 }
 
 /* !important because Twitch sizes its column with inline styles and fixed widths. */
@@ -32,7 +27,7 @@ html[data-skek-player-mode='floating'] .right-column--theatre,
   width: var(--skek-float-width) !important;
   height: calc(var(--skek-float-height) - var(--skek-float-bar-height)) !important;
   border: 0 !important;
-  background: rgb(var(--skek-float-rgb) / var(--skek-float-opacity)) !important;
+  background: rgb(from var(--skek-float-color) r g b / var(--skek-float-opacity)) !important;
 }
 
 .skek-float {
@@ -71,7 +66,7 @@ html:has(.right-column--theatre:hover, .skek-view--floating .skek-chat:hover) .s
   opacity: 1;
 }
 .skek-float__title { flex: 1 1 auto; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.skek-float__opacity { flex: 0 0 90px; width: 90px; margin: 0; accent-color: #9147ff; cursor: pointer; }
+.skek-float__opacity { flex: 0 0 90px; width: 90px; margin: 0; accent-color: var(--color-twitch-purple-9, #9147ff); cursor: pointer; }
 
 .skek-float__edge { position: absolute; touch-action: none; pointer-events: auto; }
 .skek-float__edge--e { top: var(--skek-float-bar-height); bottom: 0; right: -4px; width: 8px; cursor: ew-resize; }

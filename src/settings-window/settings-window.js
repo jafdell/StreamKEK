@@ -131,6 +131,7 @@
 
   function settingRow(setting, value) {
     if (setting.dropdown) return dropdownRow(setting, value);
+    if (setting.swatches) return swatchRow(setting, value);
     return setting.choices ? choiceRow(setting, value) : switchRow(setting, value);
   }
 
@@ -181,6 +182,63 @@
     }
 
     row.append(cardText(setting), group);
+    return row;
+  }
+
+  // A small picture of a theme: the page with its backdrop, a panel on it, a line of text, a link
+  // and a button. It has data-skek-theme, so features/themes/palettes.css gives it that theme's
+  // colors.
+  function themeScene(theme) {
+    const scene = document.createElement('span');
+    scene.className = 'swatch__scene';
+    scene.dataset.skekTheme = theme;
+    const main = document.createElement('span');
+    main.className = 'swatch__main';
+    for (const part of ['swatch__text', 'swatch__text swatch__text--link', 'swatch__button']) {
+      main.append(Object.assign(document.createElement('span'), { className: part }));
+    }
+    scene.append(Object.assign(document.createElement('span'), { className: 'swatch__panel' }), main);
+    return scene;
+  }
+
+  // Radio buttons drawn as pictures, under a heading for each group.
+  function swatchRow(setting, selected) {
+    const row = document.createElement('div');
+    row.className = 'card';
+    row.dataset.search = searchText(setting);
+
+    const picker = document.createElement('div');
+    picker.className = 'swatches';
+    picker.setAttribute('role', 'radiogroup');
+    picker.setAttribute('aria-label', setting.label);
+    for (const group of new Set(setting.choices.map((choice) => choice.group))) {
+      const heading = document.createElement('p');
+      heading.className = 'swatches__group';
+      heading.textContent = group;
+      const grid = document.createElement('div');
+      grid.className = 'swatches__grid';
+      for (const choice of setting.choices.filter((each) => each.group === group)) {
+        const option = document.createElement('label');
+        option.className = 'swatch';
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = setting.key;
+        radio.value = choice.value;
+        radio.checked = choice.value === selected;
+        radio.addEventListener('change', () => chrome.storage.local.set({ [setting.key]: choice.value }));
+        const preview = document.createElement('span');
+        preview.className = 'swatch__preview';
+        preview.append(themeScene(choice.value));
+        const name = document.createElement('span');
+        name.className = 'swatch__name';
+        name.textContent = choice.label;
+        option.append(radio, preview, name);
+        grid.append(option);
+      }
+      picker.append(heading, grid);
+    }
+
+    row.append(cardText(setting), picker);
     return row;
   }
 
