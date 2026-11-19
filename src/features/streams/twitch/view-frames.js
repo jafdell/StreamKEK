@@ -11,7 +11,6 @@
       class: className,
       src,
       allow,
-      allowFullscreen: true,
       referrerPolicy: 'strict-origin-when-cross-origin',
     });
   }
