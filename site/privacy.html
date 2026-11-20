@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en" data-skek-theme="dark" data-skek-theme-base="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy policy | StreamKEK</title>
+  <meta name="description" content="What the StreamKEK browser extension stores, what it sends and where. It has no server, no account and no analytics.">
+  <meta name="theme-color" content="#0e0e10">
+  <link rel="canonical" href="https://streamkek.com/privacy">
+  <link rel="icon" href="assets/icon-48.png" type="image/png">
+  <link rel="stylesheet" href="palettes.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top__in">
+      <a class="brand" href="./"><img src="assets/icon-128.png" alt="" width="28" height="28">StreamKEK</a>
+      <nav aria-label="Main">
+        <a class="top__jump" href="./#features">Features</a>
+        <a href="privacy.html" aria-current="page">Privacy</a>
+        <a href="support.html">Support</a>
+        <a href="https://github.com/jafdell/StreamKEK">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="doc__head">
+      <h1>Privacy policy</h1>
+      <p class="small">Last updated 20 November 2026</p>
+      <p class="doc__lead"><strong>The short version:</strong> StreamKEK has no server, no account and no analytics. Nothing you do with it is sent to its developer. What it saves stays in your browser, and your sign-ins to Twitch, YouTube and Kick only go to the site they belong to.</p>
+      <p>This policy covers the StreamKEK browser extension and this website, streamkek.com.</p>
+    </div>
+
+    <section class="section">
+      <h2>What StreamKEK saves</h2>
+      <div class="section__body prose">
+        <p>Everything below is saved in your browser on your own computer, in the extension's local storage. It is not synced to your browser account and not sent anywhere.</p>
+        <ul>
+          <li>Your StreamKEK settings, such as switches, theme, stream quality and chat font size.</li>
+          <li>The YouTube and Kick channels you added, your live YouTube subscriptions and Kick follows, and the channels you chose to hide. Each has a name, an ID and the address of its picture.</li>
+          <li>Your favorite channels, in your order.</li>
+          <li>Your blocked and highlighted chat words.</li>
+          <li>The names of the emotes you sent last in Twitch chat.</li>
+          <li>Small things that make it remember how you left it: where the floating chat window is, whether chat is hidden, Kick's volume, and which streams you were already notified about.</li>
+          <li>Which channels are live right now, and when that was last checked.</li>
+        </ul>
+        <p>A few values are kept in Twitch's own page storage in your browser instead, because they have to be read before Twitch's page starts: your theme, the sort order you picked on Browse, and short-lived notes such as whether audio only is on in a tab.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>What StreamKEK sends, and where</h2>
+      <div class="section__body prose">
+        <p>StreamKEK talks to the sites it works with, directly from your browser. None of it passes through the developer.</p>
+
+        <h3>Twitch</h3>
+        <ul>
+          <li>It asks Twitch which of your favorite Twitch channels are live, and for details of the channel or video you are watching. These requests contain channel names and video IDs.</li>
+          <li>Twitch only tells the date you followed a channel to you. So the <code>/followed</code> command and your own card in chat ask Twitch using the sign-in Twitch's own page uses. It goes only to Twitch, only then, and is not saved. Turn off <strong>Show when you followed a channel</strong> to stop it.</li>
+        </ul>
+
+        <h3>YouTube and Kick</h3>
+        <ul>
+          <li>To show who is live, StreamKEK asks YouTube and Kick about once a minute while a Twitch tab is open, using your sign-in on each site. Each sign-in goes only to the site it belongs to.</li>
+          <li>With go-live notifications on and a favorite on that site, it keeps asking with no Twitch tab open.</li>
+          <li>When you open a YouTube or Kick stream inside Twitch, the player and chat are those sites' own pages in a frame. They work under YouTube's and Kick's own privacy policies, as they would in a normal tab.</li>
+        </ul>
+
+        <h3>BetterTTV, FrankerFaceZ and 7TV</h3>
+        <p>To show their emotes in Twitch chat, StreamKEK asks these three services for their emote lists. The request contains the Twitch ID of the channel you are watching, never your own ID or name. As with any website you load something from, they can see your IP address. Their own privacy policies apply to what they do with it.</p>
+
+        <h3>Pictures</h3>
+        <p>Channel pictures, stream previews and emote images are loaded from the image servers of Twitch, YouTube, Kick and the three emote services.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Cookies</h2>
+      <div class="section__body prose">
+        <ul>
+          <li>To play streams and let you chat inside Twitch, StreamKEK allows YouTube's and Kick's cookies on twitch.tv. This is why your browser warns about cookie settings when you install it.</li>
+          <li>For Kick, it keeps a copy of your Kick sign-in cookie and your answer to Kick's cookie prompt. Your browser only sends the copy to Kick, and only when Kick is shown inside Twitch. Your real Kick cookies are not changed. The copy lasts a day at most.</li>
+          <li>For YouTube, it reads one sign-in cookie to ask YouTube for your subscriptions. It is sent only to YouTube and is not saved.</li>
+          <li>This website sets no cookies.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>What the developer receives</h2>
+      <div class="section__body prose">
+        <p>Nothing. StreamKEK has no analytics, no error reporting, no tracking and no server of its own. The developer cannot see who uses it, what you watch or what you saved.</p>
+        <p>StreamKEK does not sell or transfer your data to anyone, does not use it for advertising and does not use it to decide on creditworthiness or lending. Its use of information follows the Chrome Web Store User Data Policy, including the Limited Use requirements.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>What Twitch can see</h2>
+      <div class="section__body prose">
+        <p>StreamKEK adds things to Twitch's own page. Your live YouTube subscriptions and Kick follows, the channels you added, your favorites, the stream you are watching and your StreamKEK settings are all in that page, so Twitch and other scripts running on it could read them. The stream you are watching is also in the address, which reaches Twitch's servers if you reload. Your sign-ins cannot be read this way.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Backups</h2>
+      <div class="section__body prose">
+        <p>You can save your settings, channels, favorites and chat words to a file from the settings window. You make that file and you keep it. It contains no sign-in, cookie or password.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Removing your data</h2>
+      <div class="section__body prose">
+        <ul>
+          <li>Removing the extension deletes everything it saved in its local storage.</li>
+          <li>The copy of your Kick sign-in cookie expires within a day of removing or turning off the extension.</li>
+          <li>The few values kept in Twitch's page storage stay until you clear Twitch's site data in your browser.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>This website</h2>
+      <div class="section__body prose">
+        <p>streamkek.com is a few static pages with no forms, no analytics and no cookies. It is hosted by Cloudflare, which, like any web host, processes the address your request comes from in order to deliver the page.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Changes</h2>
+      <div class="section__body prose">
+        <p>If StreamKEK starts handling data differently, this page will be updated before the change is released, and the date at the top will change.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Contact</h2>
+      <div class="section__body prose">
+        <p>Questions about this policy: <a href="mailto:support@streamkek.com">support@streamkek.com</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot__in">
+      <div>
+        <p>StreamKEK is unofficial. It is not affiliated with or endorsed by Twitch, YouTube or Kick.</p>
+        <p>Its code is public under MIT with the Commons Clause: free to use, change and share, but not to sell.</p>
+      </div>
+      <nav aria-label="Footer">
+        <a href="privacy.html">Privacy</a>
+        <a href="https://github.com/jafdell/StreamKEK">Source on GitHub</a>
+        <a href="support.html">Support</a>
+        <a href="https://github.com/jafdell/StreamKEK/issues/new?template=bug_report.yml">Report a bug</a>
+        <a href="https://github.com/jafdell/StreamKEK/blob/main/LICENSE">License</a>
+        <a href="https://github.com/jafdell/StreamKEK/issues/new?template=feature_request.yml">Request a feature</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

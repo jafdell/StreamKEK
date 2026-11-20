@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en" data-skek-theme="dark" data-skek-theme-base="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Support | StreamKEK</title>
+  <meta name="description" content="Report a StreamKEK bug or request a feature on GitHub, and fixes for common problems.">
+  <meta name="theme-color" content="#0e0e10">
+  <link rel="canonical" href="https://streamkek.com/support">
+  <link rel="icon" href="assets/icon-48.png" type="image/png">
+  <link rel="stylesheet" href="palettes.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top__in">
+      <a class="brand" href="./"><img src="assets/icon-128.png" alt="" width="28" height="28">StreamKEK</a>
+      <nav aria-label="Main">
+        <a class="top__jump" href="./#features">Features</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="support.html" aria-current="page">Support</a>
+        <a href="https://github.com/jafdell/StreamKEK">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="doc__head">
+      <h1>Support</h1>
+      <p class="doc__lead">Found a bug or have an idea? Open an issue on GitHub, for both bug reports and feature requests, or use the Feedback links in the settings window.</p>
+      <p class="actions">
+        <a class="button" href="https://github.com/jafdell/StreamKEK/issues/new?template=bug_report.yml">Report a bug</a>
+        <a class="button button--quiet" href="https://github.com/jafdell/StreamKEK/issues/new?template=feature_request.yml">Request a feature</a>
+        <a href="https://github.com/jafdell/StreamKEK/issues">See what others have reported</a>
+      </p>
+      <p class="small">Each button opens a short form on GitHub, which needs a GitHub account. Without one, write to <a href="mailto:support@streamkek.com">support@streamkek.com</a>.</p>
+    </div>
+
+    <section class="section">
+      <h2>Before you report a bug</h2>
+      <div class="section__body prose">
+        <ul>
+          <li>Reload the Twitch tab and see if it still happens.</li>
+          <li>Turn off your other Twitch extensions and check again, since they can change the same parts of the page.</li>
+          <li>The form asks which browser you use, StreamKEK's version, shown at the bottom left of the settings window, and what you were watching: a Twitch stream, a Twitch video, a YouTube stream or a Kick stream.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>If something's off</h2>
+      <div class="section__body">
+        <dl class="spec">
+          <div class="spec__row">
+            <dt>"Sign in to chat" in Brave</dt>
+            <dd>If chat says this while you are signed in to YouTube or Kick, open Brave Shields on twitch.tv and allow cross-site cookies.</dd>
+          </div>
+          <div class="spec__row">
+            <dt>A Kick stream keeps loading</dt>
+            <dd>Open kick.com in a normal tab and answer its cookie prompt once.</dd>
+          </div>
+          <div class="spec__row">
+            <dt>No notifications</dt>
+            <dd>Check that your computer lets the browser show notifications, and that Do Not Disturb or a Focus mode is not holding them back.</dd>
+          </div>
+          <div class="spec__row">
+            <dt>Streams lag on a second screen</dt>
+            <dd>If your screens have different refresh rates, like 170 Hz and 60 Hz, streams can lag on the slower one while the browser is the selected window, especially with several open. Chrome and Brave both do this. The easiest fix is to move the browser to your fastest screen.</dd>
+          </div>
+          <div class="spec__row">
+            <dt>Something stopped working</dt>
+            <dd>StreamKEK relies on how Twitch, YouTube and Kick build their pages, so their updates can break parts of it. First reload the Twitch tab. If it still happens, report it.</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Moving to a new computer</h2>
+      <div class="section__body prose">
+        <p>Open the settings window and save a backup. It holds your settings, channels, favorites and chat words, and no sign-ins. Restore it from the same place after installing StreamKEK again.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Elsewhere</h2>
+      <div class="section__body prose">
+        <ul>
+          <li>The <a href="https://github.com/jafdell/StreamKEK/blob/main/CHANGELOG.md">changelog</a> says what each version added. The settings window shows it too, under What's new.</li>
+          <li>The <a href="https://github.com/jafdell/StreamKEK">code</a> is public on GitHub, and <a href="https://github.com/jafdell/StreamKEK/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> covers how it is laid out and how to send a change.</li>
+          <li>For anything that doesn't fit an issue, write to <a href="mailto:support@streamkek.com">support@streamkek.com</a>.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot__in">
+      <div>
+        <p>StreamKEK is unofficial. It is not affiliated with or endorsed by Twitch, YouTube or Kick.</p>
+        <p>Its code is public under MIT with the Commons Clause: free to use, change and share, but not to sell.</p>
+      </div>
+      <nav aria-label="Footer">
+        <a href="privacy.html">Privacy</a>
+        <a href="https://github.com/jafdell/StreamKEK">Source on GitHub</a>
+        <a href="support.html">Support</a>
+        <a href="https://github.com/jafdell/StreamKEK/issues/new?template=bug_report.yml">Report a bug</a>
+        <a href="https://github.com/jafdell/StreamKEK/blob/main/LICENSE">License</a>
+        <a href="https://github.com/jafdell/StreamKEK/issues/new?template=feature_request.yml">Request a feature</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
