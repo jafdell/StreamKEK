@@ -154,6 +154,26 @@ a.setting:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px;
 .version-card__changes { margin: 6px 0 0; padding-left: 18px; color: var(--muted); }
 .version-card__changes li { margin-top: 4px; }
 .version-card__changes strong { color: var(--text); font-weight: 600; }
+.version-card--older:focus { outline: none; }
+.version-card--older:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+/* Only the latest versions show until the button under them is pressed. Searching looks through
+   every version, and the button has nothing to add then. */
+.groups:not(.groups--searching) .category--latest-only .version-card--older,
+.groups--searching .more-versions { display: none; }
+.more-versions {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.more-versions:hover { background: var(--hover); }
+.more-versions:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
 
 /* Pick one of a few values: radio buttons drawn as one joined control. */
 .choices { flex: 0 0 auto; display: flex; gap: 2px; padding: 2px; border-radius: 8px; background: var(--card); }

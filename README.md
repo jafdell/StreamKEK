@@ -2,7 +2,7 @@
 
 StreamKEK is a browser extension that makes Twitch the one place you watch live streams. It brings YouTube and Kick streams and their chat into Twitch, lets you watch several streams side by side, and gives you more control over Twitch's player, chat and sidebar.
 
-It works in Chrome, Brave and other Chromium browsers, with no API key and no extra account.
+It works in Chrome, Brave and other Chromium browsers, with no API key and no extra account. Its website is [streamkek.com](https://streamkek.com).
 
 > Unofficial: StreamKEK is not affiliated with or endorsed by Twitch, YouTube or Kick.
 

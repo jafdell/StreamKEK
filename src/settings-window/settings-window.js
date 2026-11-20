@@ -9,6 +9,7 @@
   const { SETTINGS, settingDefaults, sites, chatWords, backup, changelog } = skek;
 
   const REPO = 'https://github.com/jafdell/StreamKEK';
+  const WEBSITE = 'https://streamkek.com';
   const VERSION = chrome.runtime.getManifest().version;
 
   // Things in a category that aren't settings. `build` returns what goes under the label, and
@@ -63,6 +64,12 @@
       hint: "See StreamKEK's code, releases and what others have reported.",
       href: REPO,
     },
+    {
+      category: 'Feedback',
+      label: 'Website',
+      hint: 'What StreamKEK does, help when something is off, and the privacy policy.',
+      href: WEBSITE,
+    },
   ];
 
   // Only ever fed into innerHTML from these constants.
@@ -84,6 +91,8 @@
   const BOTTOM_CATEGORIES = ['Backup', 'Feedback'];
   // Each version's changes, from CHANGELOG.md. It goes after the bottom categories once that's been read.
   const WHATS_NEW = "What's new";
+  // How many versions it shows until its button for the rest is pressed.
+  const LATEST_VERSIONS = 5;
 
   const search = document.getElementById('search');
   const categoryLinks = document.getElementById('categories');
@@ -452,6 +461,32 @@
     return card;
   }
 
+  // What's new: the latest versions, with a button under them for the rest, since the list grows
+  // with every version. The older ones are hidden by a class and not `hidden`, which is the
+  // search's: searching looks through every version.
+  function whatsNewSection(versions) {
+    const cards = versions.map(versionCard);
+    const section = categorySection(WHATS_NEW, cards);
+    const older = cards.slice(LATEST_VERSIONS);
+    if (!older.length) return section;
+
+    for (const card of older) card.classList.add('version-card--older');
+    section.classList.add('category--latest-only');
+    const more = document.createElement('button');
+    more.className = 'more-versions';
+    more.type = 'button';
+    more.textContent = `Show all ${versions.length} versions`;
+    more.addEventListener('click', () => {
+      section.classList.remove('category--latest-only');
+      more.remove();
+      // The first one it brought out takes the focus the button had, without moving the page.
+      older[0].tabIndex = -1;
+      older[0].focus({ preventScroll: true });
+    });
+    section.append(more);
+    return section;
+  }
+
   // The version under the list becomes the way to What's new.
   function linkVersionLabel() {
     const link = document.createElement('button');
@@ -597,7 +632,7 @@
     // What's new comes last, since it grows with every version and would bury what's after it. It
     // isn't there at all without the file.
     if (versions.length) {
-      groups.append(categorySection(WHATS_NEW, versions.map(versionCard)));
+      groups.append(whatsNewSection(versions));
       categories.push(WHATS_NEW);
       feedbackLink.append(categoryLink(WHATS_NEW));
       linkVersionLabel();
