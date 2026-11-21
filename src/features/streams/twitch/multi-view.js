@@ -21,6 +21,10 @@
   const MOVING_CLASS = 'skek-multi--moving';
   const RESIZING_CLASS = 'skek-multi--resizing';
   const DIVIDER_ACTIVE_CLASS = 'skek-multi__divider--active';
+  const CONTROLS_CLASS = 'skek-multi--controls';
+  const UNDER_BAR_CLASS = 'skek-multi__cell--under-bar';
+  // How long the bars stay after the mouse last moved, in fullscreen.
+  const CONTROLS_MS = 3000;
   // The two dividers multi-layout.js can give. A divider's grip is this far to each side of its line,
   // and where two dividers meet a bigger grip drags both.
   const SPLITS = ['main', 'cross'];
@@ -42,6 +46,9 @@
   // The stream whose bar is being dragged, with what shows while it is.
   let moving = null;
   let layoutQueued = false;
+  let controlsTimer = null;
+  // Where the mouse last was on the screen.
+  let lastMouse = '';
 
   // The icon is only replaced when it changes, so the sound bars don't restart their animation each
   // time the layout is worked out again, which happens many times while the window is resized.
@@ -122,19 +129,26 @@
   function applyLayout() {
     const { multi } = state;
     if (!multi?.entries.length) return;
-    const { stage, picker } = multi.refs;
+    const { stage, picker, bar } = multi.refs;
     const layout = multiLayout({
       count: multi.entries.length,
       width: stage.clientWidth,
       height: stage.clientHeight,
       chat: !multi.chatHidden,
       splits: multi.splits,
+      bars: !isFullscreen(),
     });
     multi.sharedChat = !!layout.chat;
     multi.dividers = layout.dividers;
 
+    // For fullscreen, where the view's bar lies over the streams: it stops where a chat beside them
+    // starts, and the streams at the top have their own bars under it. See multi-view.css.
+    bar.style.right = layout.picker?.x ? `${stage.clientWidth - layout.picker.x}px` : '';
+    const barHeight = bar.offsetHeight;
+
     multi.entries.forEach((entry, i) => {
       place(entry.cell, layout.players[i]);
+      entry.cell.classList.toggle(UNDER_BAR_CLASS, layout.players[i].y < barHeight);
       if (layout.chats) showChat(entry, layout.chats[i]);
       else if (layout.chat && entry.id === multi.chatId) showChat(entry, layout.chat);
       else place(entry.chatBox, null);
@@ -456,16 +470,20 @@
     const ref = (name, node) => ((refs[name] = node), node);
     const root = el(
       'div',
-      { id: VIEW_ID, class: 'skek-view skek-multi' },
-      el(
-        'div',
-        { class: 'skek-multi__bar' },
-        el('h2', { class: 'skek-multi__title' }, 'Multi-stream'),
-        ref('hint', el('span', { class: 'skek-multi__hint' })),
-        el('span', { class: 'skek-multi__spacer' }),
-        ref('chatToggle', barButton('', () => setChatHidden(!state.multi.chatHidden))),
-        ref('fullToggle', barButton('', () => setFull(!state.multi.full))),
-        ref('close', barButton('', () => shared.leaveMulti(null))),
+      { id: VIEW_ID, class: 'skek-view skek-multi', on: { mousemove: onMouseMove } },
+      ref(
+        'bar',
+        el(
+          'div',
+          { class: 'skek-multi__bar' },
+          el('h2', { class: 'skek-multi__title' }, 'Multi-stream'),
+          ref('hint', el('span', { class: 'skek-multi__hint' })),
+          el('span', { class: 'skek-multi__spacer' }),
+          ref('chatToggle', barButton('', () => setChatHidden(!state.multi.chatHidden))),
+          ref('fullToggle', barButton('', () => setFull(!state.multi.full))),
+          ref('screenToggle', barButton('', toggleFullscreen)),
+          ref('close', barButton('', () => shared.leaveMulti(null))),
+        ),
       ),
       ref(
         'stage',
@@ -492,12 +510,62 @@
 
   function setFull(full) {
     const { multi } = state;
+    // Nothing would show for it in fullscreen, only once that ends.
+    if (isFullscreen()) return;
     multi.full = full;
     multi.root.classList.toggle('skek-view--full-window', full);
     setButton(multi.refs.fullToggle, full ? 'Exit theatre mode (Alt+T)' : 'Theatre mode (Alt+T)', 'theatre');
     multi.refs.fullToggle.classList.toggle('skek-multi__button--on', full);
     placeMulti();
   }
+
+  // Real fullscreen for the whole view, streams and chats together. A player's own fullscreen button
+  // still shows that stream alone, on top of this, and leaving it comes back here.
+  // The streams get the whole screen then: the view's bar and each stream's bar lie over the video
+  // instead of above it, which multi-view.css does, and only show while the mouse moves.
+  function isFullscreen() {
+    return !!state.multi?.root.matches(':fullscreen');
+  }
+
+  function toggleFullscreen() {
+    const done = isFullscreen() ? document.exitFullscreen() : state.multi.root.requestFullscreen();
+    // Refused, or already gone. The button says which it is.
+    done.catch(() => {});
+  }
+
+  function showControls() {
+    if (!isFullscreen()) return;
+    state.multi.root.classList.add(CONTROLS_CLASS);
+    clearTimeout(controlsTimer);
+    controlsTimer = setTimeout(() => state.multi?.root.classList.remove(CONTROLS_CLASS), CONTROLS_MS);
+  }
+
+  // Over anything of this page's. A player's frame says so itself: frames/mouse-activity.js.
+  // The browser can also report a move when only the page under a still mouse changed, as when the
+  // bars go, and that isn't one.
+  function onMouseMove({ screenX, screenY }) {
+    const at = `${screenX},${screenY}`;
+    if (at === lastMouse) return;
+    lastMouse = at;
+    showControls();
+  }
+
+  // Theatre mode has nothing to change in fullscreen, so its button goes while that's on, and setFull
+  // leaves it as it was.
+  function updateFullscreen() {
+    const { multi } = state;
+    if (!multi) return;
+    const on = isFullscreen();
+    setButton(multi.refs.screenToggle, on ? 'Exit fullscreen' : 'Fullscreen', on ? 'fullscreenExit' : 'fullscreen');
+    multi.refs.screenToggle.classList.toggle('skek-multi__button--on', on);
+    multi.refs.fullToggle.hidden = on;
+    clearTimeout(controlsTimer);
+    multi.root.classList.remove(CONTROLS_CLASS);
+    showControls();
+    applyLayout();
+  }
+
+  document.addEventListener('fullscreenchange', updateFullscreen);
 
   function placeMulti() {
     if (state.multi) placeRoot(state.multi.root, state.multi.full);
@@ -509,6 +577,7 @@
     savedTitle = document.title;
     setChatHidden(false);
     setFull(false);
+    updateFullscreen();
     observer = new ResizeObserver(applyLayout);
     observer.observe(refs.stage);
     tickTimer = setInterval(() => {
@@ -524,6 +593,7 @@
     if (!state.multi) return;
     if (moving) endMove(false);
     clearInterval(tickTimer);
+    clearTimeout(controlsTimer);
     observer?.disconnect();
     state.multi.root.remove();
     state.multi = null;
@@ -714,12 +784,13 @@
     true,
   );
 
-  // The frames report keys and a click on their own mute button, which never reach this page.
+  // The frames report the mouse, keys and a click on their own mute button, which never reach this page.
   addEventListener('message', (event) => {
     const { multi } = state;
     if (!multi || ![...multi.root.querySelectorAll('iframe')].some((node) => node.contentWindow === event.source)) return;
     const message = event.data?.skekFrame;
-    if (message === 'toggle-theatre') setFull(!multi.full);
+    if (message === 'activity') showControls();
+    else if (message === 'toggle-theatre') setFull(!multi.full);
     else if (message === 'exit-theatre' && multi.full) setFull(false);
     else if (message === 'audio') {
       const entry = multi.entries.find((e) => e.playerFrame?.contentWindow === event.source);

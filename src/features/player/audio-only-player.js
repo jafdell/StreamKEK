@@ -2,7 +2,7 @@
 // stream or a Twitch video and its audio-only version. audio-only.js has the button and says how
 // the two talk.
 // Twitch's player never lists audio only as a quality, even when the stream's list has it, so
-// this loads that version's own playlist into the player, and the stream's address to go back.
+// this loads a list of just that version into the player, and the stream's address to go back.
 // Reaching the player means going through React's internals, as quality.js does. If they change,
 // there's no answer on <html> and the button doesn't show.
 // Not in Twitch's embedded player, so not in multi-stream: a reload there would take every
@@ -19,6 +19,7 @@
   // The address Twitch's player loads for a live stream or a video, which answers with the list
   // of its versions. A clip is a plain file with no such list.
   const STREAM = /^https:\/\/usher\.ttvnw\.net\/(?:api\/(?:v2\/)?channel\/hls|vod(?:\/v2)?)\/[^/?]+\.m3u8\?/;
+  const PLAYLIST = 'application/x-mpegURL';
   const root = document.documentElement;
 
   // What the audio came from, to go back to: { stream, audio, login }.
@@ -81,7 +82,11 @@
     return true;
   }
 
-  // The audio-only version's own playlist. Twitch lists that version only when asked to.
+  // A list of just the audio-only version, with its line from the stream's list, which Twitch
+  // gives only when asked to. That line says the version has no video: loaded on its own, its
+  // playlist is taken for video and audio, and where Twitch sends it as MP4 pieces, as it does for
+  // some channels, the player stops with error #4000. The player takes the list from a blob:
+  // address, but only when told it's a playlist, so `load` says so.
   // `status` is Twitch's answer when it refuses, which is 403 for a pass it doesn't accept.
   async function audioAddress(stream) {
     const url = new URL(stream);
@@ -90,8 +95,16 @@
     if (!response.ok) return { status: response.status };
     const lines = (await response.text()).split('\n');
     const at = lines.findIndex((line) => line.startsWith('#EXT-X-STREAM-INF') && line.includes('"audio_only"'));
-    const address = at === -1 ? '' : (lines[at + 1] ?? '').trim();
-    return { address: address.startsWith('https://') ? address : '' };
+    const playlist = at === -1 ? '' : (lines[at + 1] ?? '').trim();
+    if (!playlist.startsWith('https://')) return { address: '' };
+    const list = `#EXTM3U\n${lines[at].trim()}\n${playlist}\n`;
+    return { address: URL.createObjectURL(new Blob([list], { type: PLAYLIST })) };
+  }
+
+  // Drops what the audio came from, and its list with it.
+  function forget() {
+    if (source) URL.revokeObjectURL(source.audio);
+    source = null;
   }
 
   // Loading starts a video from its beginning, at normal speed and playing, so its place, its
@@ -100,7 +113,7 @@
   async function load(player, address, { stream, login }) {
     const paused = player.isPaused?.();
     const place = isVideo(stream) ? { seconds: player.getPosition(), speed: player.getPlaybackRate() } : null;
-    player.load(address, undefined, login);
+    player.load(address, address.startsWith('blob:') ? { mediaType: PLAYLIST } : undefined, login);
     if (place) player.seekTo(place.seconds);
     const until = Date.now() + SETTLE_MS;
     while (Date.now() < until && !(player.getPath() === address && player.getState() === 'Playing')) await wait(100);
@@ -115,7 +128,10 @@
     const login = player.getLoadedChannelLogin?.();
     const { address, status } = await audioAddress(stream);
     // Switched off, or Twitch moved to another stream, while that was loading.
-    if (!wanted() || player.getPath() !== stream) return;
+    if (!wanted() || player.getPath() !== stream) {
+      if (address) URL.revokeObjectURL(address);
+      return;
+    }
     if (address) {
       source = { stream, audio: address, login };
       if (await load(player, address, source)) return;
@@ -123,7 +139,7 @@
       return;
     }
     // No audio-only version, or nothing worked: take the request back, so the button says so.
-    source = null;
+    forget();
     root.removeAttribute('data-skek-audio-only');
   }
 
@@ -144,11 +160,11 @@
       if (!wanted()) await showVideo(player);
     } else if (STREAM.test(path)) {
       // Twitch loaded a stream itself: another channel or video, or this one again.
-      source = null;
+      forget();
       setState('off');
       if (wanted()) await playAudio(player, path);
     } else {
-      source = null;
+      forget();
       setState(null);
     }
   }

@@ -22,8 +22,12 @@
   overflow-wrap: anywhere;
 }
 
+/* Centered by hand: Twitch's buttons take their text-align from the page, which leaves the ✕ at the left. */
 .skek-followed__close {
   flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 24px;
   height: 24px;
   padding: 0;
