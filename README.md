@@ -2,7 +2,7 @@
 
 StreamKEK is a browser extension that makes Twitch the one place you watch live streams. It brings YouTube and Kick streams and their chat into Twitch, lets you watch several streams side by side, and gives you more control over Twitch's player, chat and sidebar.
 
-It works in Chrome, Brave and other Chromium browsers, with no API key and no extra account. Its website is [streamkek.com](https://streamkek.com).
+It works in Chrome, Brave and other Chromium browsers, with no API key and no extra account. Get it from the [Chrome Web Store](https://chromewebstore.google.com/detail/streamkek/ndkccdbljjejloelgdcbikabojjaeomc), or visit [streamkek.com](https://streamkek.com) for more.
 
 > Unofficial: StreamKEK is not affiliated with or endorsed by Twitch, YouTube or Kick.
 
@@ -50,6 +50,10 @@ It works in Chrome, Brave and other Chromium browsers, with no API key and no ex
 - **What's new:** see what each version added, there or in the [changelog](CHANGELOG.md).
 
 ## Install
+
+Install it from the [Chrome Web Store](https://chromewebstore.google.com/detail/streamkek/ndkccdbljjejloelgdcbikabojjaeomc), which also works in Brave, Edge and other Chromium browsers, and keeps it up to date.
+
+To run the code from this repo instead:
 
 1. Download this repo (**Code > Download ZIP**) and unzip it, or clone it, somewhere it can stay.
 2. Open `chrome://extensions` (or `brave://extensions`).
