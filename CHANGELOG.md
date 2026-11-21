@@ -5,6 +5,11 @@ What's new in each version of StreamKEK, newest first.
 <!-- The settings window shows this file under What's new, so keep its shape: a "## version - date"
      heading, then one "- " line per change, with ** around the part to show in bold. -->
 
+## 1.9.0 - 2026-11-21
+
+- **Fullscreen in multi-stream:** a new button in multi-stream's top bar fills the whole screen with every stream and chat. The bars hide there, so the streams get all the room, and come back when you move the mouse.
+- **Fixed:** audio only no longer stops with error #4000 on some Twitch channels.
+
 ## 1.8.0 - 2026-11-19
 
 - **Themes:** 16 themes recolor Twitch, the settings window, the stream view and YouTube's chat, like Midnight, Slate, Synthwave and one for each season. Pick one under Appearance. Dark and Light are Twitch's own two, and the setting takes over from Twitch's Dark Theme switch.
