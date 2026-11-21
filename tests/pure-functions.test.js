@@ -541,6 +541,14 @@ test('multiLayout keeps streams from overlapping or leaving the view, at any siz
   }
 });
 
+test('multiLayout gives the streams their bars\' room too where the bars lie over them', () => {
+  const { players } = plain(multiLayout({ count: 4, width: 1600, height: 900, chat: false, bars: false }));
+  assert.deepEqual(players, [{ x: 0, y: 0, w: 800, h: 450 }, { x: 800, y: 0, w: 800, h: 450 }, { x: 0, y: 450, w: 800, h: 450 }, { x: 800, y: 450, w: 800, h: 450 }]);
+  const two = plain(multiLayout({ count: 2, width: 1600, height: 900, chat: true, bars: false }));
+  assert.equal(two.players[0].h, 450);
+  assert.equal(two.chats[0].y, 450);
+});
+
 test('multiLayout survives having no room at all, as before the page has laid out', () => {
   assert.equal(multiLayout({ count: 3, width: 0, height: 0, chat: true }).players.length, 3);
 });

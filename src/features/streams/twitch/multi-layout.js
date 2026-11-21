@@ -27,15 +27,16 @@
     return split == null ? natural : Math.min(1 - least, Math.max(least, split)) * length;
   }
 
-  // Each stream is a 16:9 video with its bar on top, as big as fits its part of the room. The dividers
+  // Each stream is a 16:9 video with its bar on top, as big as fits its part of the room. `head` is that
+  // bar's height, which is 0 in fullscreen, where the bar lies over the video instead. The dividers
   // between those parts can be dragged, which `splits` remembers: `main` is between the first stream
   // and the rest, `cross` the other one. Three get one bigger than the others, on top or to the left,
   // whichever leaves it biggest before any dragging.
   // A divider's `start` and `length` are the room it moves in, so a split is (position - start) / length.
-  function fitStreams(count, area, splits = {}) {
+  function fitStreams(count, area, splits, head) {
     const { w, h } = area;
-    const widthIn = (tileWidth, tileHeight) => Math.max(0, Math.min(tileWidth, (tileHeight - HEAD_HEIGHT) / ASPECT));
-    const cellHeight = (width) => width * ASPECT + HEAD_HEIGHT;
+    const widthIn = (tileWidth, tileHeight) => Math.max(0, Math.min(tileWidth, (tileHeight - head) / ASPECT));
+    const cellHeight = (width) => width * ASPECT + head;
     const vertical = (split, at, from = 0) => ({ split, axis: 'x', x: at, y: from, w: 0, h: h - from, start: area.x, length: w });
     const horizontal = (split, at, from = 0) => ({ split, axis: 'y', x: from, y: at, w: w - from, h: 0, start: area.y, length: h });
 
@@ -55,9 +56,9 @@
       }
     } else if (count === 3) {
       // The two small ones' bars take up room too, so the big one on the left isn't exactly twice their size.
-      const barsShift = (HEAD_HEIGHT * 8) / 9;
-      const onTop = Math.max(0, Math.min(w, (h - 2 * HEAD_HEIGHT) / (ASPECT * 1.5)));
-      const onLeft = Math.max(0, Math.min((w + barsShift) / 1.5, (h - HEAD_HEIGHT) / ASPECT));
+      const barsShift = (head * 8) / 9;
+      const onTop = Math.max(0, Math.min(w, (h - 2 * head) / (ASPECT * 1.5)));
+      const onLeft = Math.max(0, Math.min((w + barsShift) / 1.5, (h - head) / ASPECT));
       // The main divider starts where the big one ends when all three are centered together.
       if (onTop >= onLeft) {
         const edge = dividerAt(splits.main, (h + cellHeight(onTop) - cellHeight(onTop / 2)) / 2, h);
@@ -98,15 +99,17 @@
 
   // Two streams each keep their chat under them. More than that share one chat with a picker: beside
   // them, or under them if the window is too narrow. `chats` is one per stream, `chat` the shared one.
-  function multiLayout({ count, width, height, chat, splits = {} }) {
+  // `bars` is false where the streams' bars take up no room: see fitStreams.
+  function multiLayout({ count, width, height, chat, splits = {}, bars = true }) {
+    const head = bars ? HEAD_HEIGHT : 0;
     const whole = { x: 0, y: 0, w: width, h: height };
-    if (!chat) return { ...fitStreams(count, whole, splits), chats: null, chat: null, picker: null };
+    if (!chat) return { ...fitStreams(count, whole, splits, head), chats: null, chat: null, picker: null };
 
     if (count === 2 && width / 2 >= MIN_COLUMN_WIDTH) {
       const edge = dividerAt(splits.main, width / 2, width, Math.max(MIN_SPLIT, MIN_COLUMN_WIDTH / width));
       const columns = [{ x: 0, w: edge }, { x: edge, w: width - edge }].map((column) => {
-        const video = Math.max(0, Math.min(column.w * ASPECT, height - HEAD_HEIGHT - MIN_CHAT_HEIGHT));
-        return { ...column, top: video + HEAD_HEIGHT };
+        const video = Math.max(0, Math.min(column.w * ASPECT, height - head - MIN_CHAT_HEIGHT));
+        return { ...column, top: video + head };
       });
       return {
         players: columns.map(({ x, w, top }) => round({ x, y: 0, w, h: top })),
@@ -128,7 +131,7 @@
       side = { x: 0, y: height - chatHeight, w: width, h: chatHeight };
     }
     return {
-      ...fitStreams(count, streams, splits),
+      ...fitStreams(count, streams, splits, head),
       chats: null,
       chat: round({ ...side, y: side.y + PICKER_HEIGHT, h: side.h - PICKER_HEIGHT }),
       picker: round({ ...side, h: PICKER_HEIGHT }),

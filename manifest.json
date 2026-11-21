@@ -143,6 +143,7 @@
       "js": [
         "src/settings.js",
         "src/features/streams/frames/layout-keys.js",
+        "src/features/streams/frames/mouse-activity.js",
         "src/features/streams/frames/audio.js",
         "src/features/player/embed-settings.js"
       ],

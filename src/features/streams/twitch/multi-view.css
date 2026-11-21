@@ -88,6 +88,25 @@
 .skek-multi__divider--active::after { opacity: 1; }
 .skek-multi--resizing iframe { pointer-events: none; }
 
+/* In fullscreen the streams get the whole screen. The view's bar and each stream's bar lie over the
+   video instead, and show while the mouse moves, which multi-view.js marks, or rests on one of them.
+   The view's bar is on top, so a stream at the top of the screen has its own bar under that one: 36px
+   is the bar's height. Above the dividers (1), level with the swap overlay, which comes later. */
+.skek-multi:fullscreen :is(.skek-multi__bar, .skek-multi__head) {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+.skek-multi:fullscreen .skek-multi__bar { z-index: 2; }
+.skek-multi:fullscreen .skek-multi__cell--under-bar .skek-multi__head { top: 36px; }
+.skek-multi--controls:fullscreen :is(.skek-multi__bar, .skek-multi__head),
+.skek-multi--moving:fullscreen :is(.skek-multi__bar, .skek-multi__head),
+.skek-multi:fullscreen :is(.skek-multi__bar, .skek-multi__head):hover { opacity: 1; pointer-events: auto; }
+
 .skek-multi__chat { position: absolute; box-sizing: border-box; background: var(--color-background-base); outline: 1px solid var(--color-border-base); }
 
 .skek-multi__picker {
