@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- A laughing face for the KEK in the name, with play buttons for eyes. The tile fills the whole
+       square and is bright, so it shows on dark and light toolbars alike. -->
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a65bff"/>
+      <stop offset="0.55" stop-color="#7a4dff"/>
+      <stop offset="1" stop-color="#2fc8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#tile)"/>
+  <g fill="#fff" stroke="#fff" stroke-width="34" stroke-linejoin="round">
+    <path d="M110 136 L110 240 L204 188Z"/>
+    <path d="M402 136 L402 240 L308 188Z"/>
+    <path d="M124 308 H388 C388 372 330 424 256 424 C182 424 124 372 124 308Z"/>
+  </g>
+</svg>
