@@ -5,6 +5,10 @@ What's new in each version of StreamKEK, newest first.
 <!-- The settings window shows this file under What's new, so keep its shape: a "## version - date"
      heading, then one "- " line per change, with ** around the part to show in bold. -->
 
+## 1.9.1 - 2026-11-23
+
+- **New logo:** StreamKEK has a new icon in the browser toolbar, Twitch's top bar and the settings window.
+
 ## 1.9.0 - 2026-11-21
 
 - **Fullscreen in multi-stream:** a new button in multi-stream's top bar fills the whole screen with every stream and chat. The bars hide there, so the streams get all the room, and come back when you move the mouse.
