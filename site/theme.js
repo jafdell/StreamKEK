@@ -87,9 +87,17 @@
     });
   }
 
-  // An emote in the picker is sent to the chat beside it, and its name goes in the chat box, which
-  // shows the emote chat used last. The buttons are off in the page until they can work.
-  function followEmotes(picker, lines, latest) {
+  // The empty chat box shows the name of the emote chat used last, as it does with the extension:
+  // the one in the newest message that has any.
+  function showLatestEmote(chat) {
+    const box = chat.closest('.twchat')?.querySelector('[data-latest-emote]');
+    const names = chat.querySelectorAll('.emote-name');
+    if (box && names.length) box.textContent = names[names.length - 1].textContent;
+  }
+
+  // An emote in the picker is sent to the chat beside it. The buttons are off in the page until
+  // they can work.
+  function followEmotes(picker, lines) {
     for (const button of picker.querySelectorAll('button')) {
       button.disabled = false;
       button.addEventListener('click', () => {
@@ -105,7 +113,7 @@
         word.textContent = button.dataset.name;
         line.append(name, ': ', emote, word);
         lines.append(line);
-        if (latest) latest.textContent = button.dataset.name;
+        showLatestEmote(lines);
       });
     }
   }
@@ -153,8 +161,19 @@
         if (!oldest || Math.random() > 0.65) continue;
         if ('own' in oldest.dataset) oldest.remove();
         else chat.append(oldest);
+        showLatestEmote(chat);
       }
     }, 1300);
+  }
+
+  // Switching the extension off in the first drawing shows a Twitch channel, so that one is picked
+  // there too. Switched back on, it's the same stream and chat, to compare.
+  const power = document.getElementById('skek-on');
+  const twitch = document.getElementById('watch-chess');
+  if (power && twitch) {
+    power.addEventListener('change', () => {
+      if (!power.checked) twitch.checked = true;
+    });
   }
 
   const themes = document.getElementById('themes-picker');
@@ -167,6 +186,6 @@
   if (floating) makeDraggable(floating);
   const emotes = document.querySelector('.skek-picker');
   const lines = document.getElementById('lab-lines');
-  if (emotes && lines) followEmotes(emotes, lines, document.getElementById('lab-latest'));
+  if (emotes && lines) followEmotes(emotes, lines);
   runChats(document.querySelectorAll('[data-live-chat]'));
 })();

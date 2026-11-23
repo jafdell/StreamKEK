@@ -46,6 +46,8 @@
     <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/></g></symbol>
     <symbol id="i-bell" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 4a5 5 0 0 0-5 5v4l-2 3.5h14L17 13V9a5 5 0 0 0-5-5Zm-2 15.5a2 2 0 0 0 4 0"/></symbol>
     <symbol id="i-bubble" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M5 5h14v10.5h-8L7 19v-3.500H5V5Z"/></symbol>
+    <symbol id="i-gift" viewBox="0 0 24 24"><path d="M9 3a3 3 0 0 1 3 1.8A3 3 0 1 1 15 9h5v4H4V9h5a3 3 0 0 1 0-6Zm0 2a1 1 0 0 0 0 2h2a2 2 0 0 0-2-2Zm6 0a2 2 0 0 0-2 2h2a1 1 0 0 0 0-2ZM5 15h6v6H5v-6Zm8 0h6v6h-6v-6Z"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M8 3h8v2l-1 1v5l3 3v2h-5v5l-1 1-1-1v-5H6v-2l3-3V6L8 5V3Z"/></symbol>
     <symbol id="i-smile" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 14c.9 1.4 2.1 2 3.5 2s2.6-.6 3.5-2"/><path d="M9.2 9.8v.4M14.8 9.8v.4"/></g></symbol>
   </svg>
 
@@ -88,7 +90,7 @@
         <label class="power">
           <input class="skek-switch" type="checkbox" role="switch" id="skek-on" autocomplete="off" checked>
           <span class="when-on">StreamKEK is on. Switch it off to compare.</span>
-          <span class="when-off">StreamKEK is off. This is Twitch without it.</span>
+          <span class="when-off">StreamKEK is off. This is Twitch without it. Switch it on to compare.</span>
         </label>
       </div>
       <p class="visually-hidden">Next is a drawing of Twitch with StreamKEK on, with made-up channels: Twitch's top bar with StreamKEK's icon in it, the stream of the channel picked in the sidebar, the sidebar with its Favorites, YouTube Live and Kick Live sections, and that stream's chat.</p>
@@ -178,6 +180,30 @@
               </div>
             </div>
           </div>
+          <div class="view" aria-hidden="true" data-stream="pixel">
+            <div class="skek-player"><img class="pic" src="assets/streams/pixel.svg" alt="" width="640" height="360"></div>
+            <div class="skek-info">
+              <div class="skek-info__avatar"><span class="skek-info__img"><span class="av av--3">S</span></span><span class="skek-info__badge">LIVE</span></div>
+              <div class="skek-info__body">
+                <div class="skek-info__row">
+                  <span class="skek-info__name">saltmarsh</span>
+                  <div class="skek-info__actions">
+                    <span class="skek-button skek-button--icon"><svg width="20" height="20" fill="currentColor"><use href="#i-floating"/></svg></span>
+                    <span class="skek-button skek-button--icon"><svg width="20" height="20" fill="currentColor"><use href="#i-stacked"/></svg></span>
+                    <span class="skek-button skek-button--icon"><svg width="20" height="20" fill="currentColor"><use href="#i-theatre"/></svg></span>
+                    <span class="skek-button skek-button--kick"><svg width="20" height="20" fill="currentColor"><use href="#i-external"/></svg><span>Watch on Kick</span></span>
+                  </div>
+                </div>
+                <div class="skek-info__row">
+                  <div class="skek-info__text"><p class="skek-info__title">Stage 3-2 again, and this time with all the coins</p><p class="skek-info__category">Retro</p></div>
+                  <div class="skek-info__stats">
+                    <span class="skek-stat skek-stat--viewers"><svg width="20" height="20" fill="currentColor"><use href="#i-person"/></svg><span>356</span></span>
+                    <span class="skek-stat"><svg width="20" height="20" fill="currentColor"><use href="#i-clock"/></svg><span>1:07:44</span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="view" aria-hidden="true" data-stream="chess">
             <div class="skek-player"><img class="pic" src="assets/streams/chess.svg" alt="" width="640" height="360"></div>
             <div class="skek-info">
@@ -214,11 +240,12 @@
                 <span class="skek-card__text"><span class="skek-card__name-row"><span class="skek-card__name">Tin Roof Radio</span></span><span class="skek-card__meta">Music</span></span>
                 <span class="skek-card__live"><span class="skek-dot"></span><span>812</span></span>
               </label>
-              <div class="skek-card" aria-hidden="true">
+              <label class="skek-card skek-card--pick">
+                <input type="radio" name="watch" id="watch-pixel" aria-label="saltmarsh, a Kick stream" autocomplete="off">
                 <span class="skek-card__avatar"><span class="skek-card__img av av--3">S</span><span class="skek-card__platform skek-card__platform--kick"></span></span>
                 <span class="skek-card__text"><span class="skek-card__name-row"><span class="skek-card__name">saltmarsh</span></span><span class="skek-card__meta">Retro</span></span>
                 <span class="skek-card__live"><span class="skek-dot"></span><span>356</span></span>
-              </div>
+              </label>
           </div>
           <div class="skek-section tw-side__own">
             <div class="skek-section__head"><span class="skek-section__title">Followed Channels</span></div>
@@ -356,7 +383,55 @@
             </div>
             <div class="ytchat__input"><div class="ytchat__box"><span>Send a message</span><svg width="24" height="24"><use href="#i-smile"/></svg></div></div>
           </div>
+          <div class="kkchat" data-stream="pixel">
+            <div class="chat__lines" data-live-chat>
+              <p class="kkchat__line"><b class="twchat__name--1">quietgambit</b>this stage has the best music</p>
+              <p class="kkchat__line"><b class="twchat__name--4">tidepool</b>evening, did she get past the bricks?</p>
+              <p class="kkchat__line"><b class="twchat__name--2">mossbyte</b>second try on 3-2</p>
+              <p class="kkchat__line"><b class="twchat__name--5">harborcat</b>17 coins already, go for all of them</p>
+              <p class="kkchat__line"><b class="twchat__name--3">pixelbramble</b>no way she made that jump</p>
+              <p class="kkchat__line"><b class="twchat__name--6">nightferry</b>two hearts is plenty</p>
+              <p class="kkchat__line"><b class="twchat__name--7">oddsocks</b>the slime on the top bricks got her last time</p>
+              <p class="kkchat__line"><b class="twchat__name--3">saltmarsh</b>not this time</p>
+              <p class="kkchat__line"><b class="twchat__name--2">mossbyte</b>famous last words</p>
+              <p class="kkchat__line"><b class="twchat__name--1">quietgambit</b>the water gap is the real boss</p>
+              <p class="kkchat__line"><b class="twchat__name--4">tidepool</b>jump late, it is shorter than it looks</p>
+              <p class="kkchat__line"><b class="twchat__name--5">harborcat</b>that lantern hat though</p>
+              <p class="kkchat__line"><b class="twchat__name--6">nightferry</b>how many stages are there?</p>
+              <p class="kkchat__line"><b class="twchat__name--3">saltmarsh</b>eight worlds, four each</p>
+              <p class="kkchat__line"><b class="twchat__name--7">oddsocks</b>so we are here all night</p>
+              <p class="kkchat__line"><b class="twchat__name--2">mossbyte</b>good</p>
+              <p class="kkchat__line"><b class="twchat__name--1">quietgambit</b>coin 18</p>
+              <p class="kkchat__line"><b class="twchat__name--3">pixelbramble</b>here we go</p>
+              <p class="kkchat__line"><b class="twchat__name--4">tidepool</b>flag is right there</p>
+              <p class="kkchat__line"><b class="twchat__name--5">harborcat</b>do not look at the slime</p>
+              <p class="kkchat__line"><b class="twchat__name--6">nightferry</b>she looked at the slime</p>
+              <p class="kkchat__line"><b class="twchat__name--7">oddsocks</b>still two hearts, still fine</p>
+              <p class="kkchat__line"><b class="twchat__name--2">mossbyte</b>one more jump</p>
+              <p class="kkchat__line"><b class="twchat__name--1">quietgambit</b>cleanest run yet</p>
+            </div>
+            <div class="ytchat__input"><div class="ytchat__box"><span>Send a message</span><svg width="24" height="24"><use href="#i-smile"/></svg></div></div>
+          </div>
           <div class="twchat" data-stream="chess">
+            <!-- What Twitch puts over its chat, as it looks there: the strip of top supporters, a
+                 pinned message and a Hype Train. The extension has a setting to hide each. -->
+            <div class="tw-strip off-only">
+              <span><svg width="14" height="14" fill="currentColor"><use href="#i-gift"/></svg><b>tidepool</b>200</span>
+              <span><svg width="14" height="14" fill="currentColor"><use href="#i-gift"/></svg><b>mossbyte</b>150</span>
+              <span><svg width="14" height="14" fill="currentColor"><use href="#i-gift"/></svg><b>oddsocks</b>50</span>
+            </div>
+            <div class="tw-over off-only">
+              <div class="tw-pin">
+                <p class="tw-pin__by"><svg width="14" height="14" fill="currentColor"><use href="#i-pin"/></svg>Pinned by nightferry</p>
+                <p>Game 4 starts right after this one. The schedule is under the stream.</p>
+                <p class="tw-pin__by">nightferry sent at 7:12 PM</p>
+              </div>
+              <div class="tw-hype">
+                <p class="tw-hype__top"><b>Hype Train</b><span>Level 2</span><span class="tw-hype__time">1:48</span></p>
+                <div class="tw-hype__bar"><i></i></div>
+                <p class="tw-pin__by">64% to level 3</p>
+              </div>
+            </div>
             <div class="chat__lines twchat__lines" data-live-chat>
               <p class="twchat__line"><b class="twchat__name--5">harborcat</b>: good evening chat <img class="skek-emote" src="assets/emotes/ghost-wave.svg" alt="" width="28" height="28"><span class="emote-name">ghostWave</span></p>
               <p class="twchat__line"><b class="twchat__name--2">mossbyte</b>: game 3 already?</p>
@@ -387,7 +462,7 @@
               <p class="twchat__line"><b class="twchat__name--2">mossbyte</b>: this is why I watch rapid</p>
               <p class="twchat__line"><b class="twchat__name--4">tidepool</b>: three streams and one brain</p>
             </div>
-            <div class="twchat__input"><div class="twchat__box"><span class="twchat__placeholder">Send a message</span><span class="skek-picker-button skek-only"><svg width="20" height="20"><use href="#i-emote"/></svg></span></div></div>
+            <div class="twchat__input"><div class="twchat__box"><span class="skek-latest-emote skek-only" data-latest-emote>blobCheer</span><span class="twchat__placeholder off-only">Send a message</span><span class="skek-picker-button skek-only"><svg width="20" height="20"><use href="#i-emote"/></svg></span></div></div>
           </div>
         </div>
       </div>
@@ -632,7 +707,7 @@
                 <p class="skek-followed__text">You followed quietgambit on 3 March 2024, 2 years and 8 months ago.</p>
                 <span class="skek-followed__close">✕</span>
               </div>
-              <div class="twchat__box"><span class="skek-latest-emote" id="lab-latest">ggLamp</span><span class="skek-picker-button"><svg width="20" height="20"><use href="#i-emote"/></svg></span></div>
+              <div class="twchat__box"><span class="skek-latest-emote" data-latest-emote>ggLamp</span><span class="skek-picker-button"><svg width="20" height="20"><use href="#i-emote"/></svg></span></div>
             </div>
           </div>
           <div class="lab__side lab__side--picker">

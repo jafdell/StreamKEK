@@ -466,6 +466,42 @@ html[data-skek-theme-base='dark']:not([data-skek-theme='dark']) .kkchat { backgr
 }
 .skek-followed__text { flex: 1; align-self: center; }
 .skek-followed__close { flex: none; width: 24px; height: 24px; font-size: 12px; line-height: 24px; text-align: center; }
+/* What Twitch puts over its chat, drawn as it looks there: the strip of top supporters, and under
+   it a pinned message and a Hype Train. The extension has a setting to hide each, and
+   they're gone from the drawing with it on. */
+.tw-strip {
+  flex: 0 0 36px;
+  align-items: center;
+  gap: 14px;
+  padding: 0 12px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--color-border-base);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.tw-strip span { display: inline-flex; align-items: center; gap: 4px; }
+.tw-strip svg { color: light-dark(#a5700a, #f0c64a); }
+.tw-strip b { font-weight: 700; }
+.tw-over { flex: 0 0 auto; flex-direction: column; gap: 6px; padding: 8px 10px 4px; }
+.tw-pin,
+.tw-hype {
+  padding: 8px 10px;
+  border: 1px solid var(--color-border-base);
+  border-radius: 6px;
+  background: var(--raised);
+  box-shadow: 0 2px 4px light-dark(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.5));
+  font-size: 13px;
+  line-height: 1.45;
+}
+.tw-pin__by { display: flex; align-items: center; gap: 4px; color: var(--color-text-alt-2); font-size: 12px; }
+.tw-hype__top { display: flex; align-items: baseline; gap: 8px; }
+.tw-hype__top b { font-weight: 700; }
+.tw-hype__top span { color: var(--color-text-alt-2); font-size: 12px; }
+.tw-hype__time { margin-left: auto; font-variant-numeric: tabular-nums; }
+.tw-hype__bar { height: 8px; margin-block: 6px 4px; overflow: hidden; border-radius: 4px; background: var(--color-background-interactable-hover); }
+.tw-hype__bar i { display: block; width: 64%; height: 100%; border-radius: 4px; background: var(--button); }
+
 /* An emote is only its name where the extension's emotes are off. */
 .emote-name { display: none; }
 
@@ -648,6 +684,7 @@ html:not([data-skek-theme='dark'], [data-skek-theme='light']) .tw-top {
 .screen:has(#skek-on:checked):has(#watch-harbor:checked) [data-stream='harbor'],
 .screen:has(#skek-on:checked):has(#watch-music:checked) [data-stream='music'],
 .screen:has(#skek-on:checked):has(#watch-cooking:checked) [data-stream='cooking'],
+.screen:has(#skek-on:checked):has(#watch-pixel:checked) [data-stream='pixel'],
 .screen:has(#skek-on:checked):has(#watch-chess:checked) [data-stream='chess'],
 .screen:has(#skek-on:not(:checked)) [data-stream='chess'],
 .screen:has(#skek-on:not(:checked)) .off-only { display: flex; }
@@ -1222,7 +1259,8 @@ figcaption { margin-top: 10px; padding-inline: var(--screen-pad); color: var(--m
 @container screen (max-width: 899px) {
   /* No room for three columns: the stream is on top, the sidebar under it and chat last. */
   .frame { grid-template: 'top' 'main' 'side' 'chat' / minmax(0, 1fr); }
-  .frame__chat { height: 300px; border-left: 0; border-top: 1px solid var(--color-border-base); }
+  /* Tall enough for some messages under what Twitch puts over its chat. */
+  .frame__chat { height: 420px; border-left: 0; border-top: 1px solid var(--color-border-base); }
   .tw-side { border-top: 1px solid var(--color-border-base); }
   .band { grid-template-columns: minmax(0, 1fr); }
   .lab { grid-template-columns: minmax(0, 1fr); }
