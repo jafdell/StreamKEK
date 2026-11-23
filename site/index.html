@@ -1,7 +1,7 @@
 <!doctype html>
 <!-- The theme named here is the one the page starts in, with whether its seasons move. theme.js
-     changes both from the settings window drawn further down, palettes.css has each theme's colors
-     and effects.css the motion. -->
+     changes both from the themes further down, palettes.css has each theme's colors and
+     effects.css the motion. -->
 <html lang="en" data-skek-theme="dark" data-skek-theme-base="dark" data-skek-on="themeAnimations">
 <head>
   <meta charset="utf-8">
@@ -21,13 +21,15 @@
   <script src="theme.js" defer></script>
   <script src="install.js" defer></script>
 </head>
-<body>
-  <!-- The extension's own icons, from src/twitch/helpers.js, src/settings-window/settings-window.js
-       and src/features/chat/emote-picker.js. The sites' logos are left out. -->
+<body class="home">
+  <!-- The extension's own icons, from src/twitch/helpers.js and src/features/chat/emote-picker.js,
+       and a few plain ones for Twitch's top bar and the other sites' chat boxes. The sites' logos
+       are left out. -->
   <svg class="sprite" aria-hidden="true" focusable="false">
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6Z"/></symbol>
     <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6h-2V7.4l-7.3 7.3-1.4-1.4L16.6 6H14V4ZM5 6h5v2H6v10h10v-4h2v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z"/></symbol>
     <symbol id="i-collapse" viewBox="0 0 24 24"><path d="M4 11h10.6l-3.3-3.3 1.4-1.4 5.7 5.7-5.7 5.7-1.4-1.4 3.3-3.3H4v-2Zm15-6h2v14h-2V5Z"/></symbol>
+    <symbol id="i-collapse-left" viewBox="0 0 24 24"><path transform="translate(24 0) scale(-1 1)" d="M4 11h10.6l-3.3-3.3 1.4-1.4 5.7 5.7-5.7 5.7-1.4-1.4 3.3-3.3H4v-2Zm15-6h2v14h-2V5Z"/></symbol>
     <symbol id="i-theatre" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm1 2v10h11V7H4Zm13 0v10h3V7h-3Z"/></symbol>
     <symbol id="i-stacked" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M3 3h18a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm1 2v9h16V5H4Zm0 11v3h16v-3H4Z"/></symbol>
     <symbol id="i-floating" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm1 2v10h16V7H4Zm9 2h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1Z"/></symbol>
@@ -41,99 +43,73 @@
     <symbol id="i-sound-bars" viewBox="0 0 24 24"><rect class="skek-sound-bar" x="3" y="10" width="3" height="10" rx="1.5"/><rect class="skek-sound-bar" x="8" y="4" width="3" height="16" rx="1.5"/><rect class="skek-sound-bar" x="13" y="13" width="3" height="7" rx="1.5"/><rect class="skek-sound-bar" x="18" y="7" width="3" height="13" rx="1.5"/></symbol>
     <symbol id="i-star-outline" viewBox="0 0 24 24"><path fill-rule="evenodd" d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Zm0 4.5-1.5 3-3.3.5 2.4 2.3-.6 3.3 3-1.6 3 1.6-.6-3.3 2.4-2.3-3.3-.5-1.5-3Z"/></symbol>
     <symbol id="i-emote" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M8 14.5c1 1.5 2.4 2.2 4 2.2s3-.7 4-2.2"/><path d="M9 9.5v.5M15 9.5v.5"/></g></symbol>
-    <symbol id="c-appearance" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 2v14a7 7 0 0 1 0-14Z"/></symbol>
-    <symbol id="c-chat" viewBox="0 0 24 24"><path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9.5L5 21v-4H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/></symbol>
-    <symbol id="c-notifications" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-6 6v4l-2 3v1h16v-1l-2-3V9a6 6 0 0 0-6-6Zm-2 16a2 2 0 0 0 4 0h-4Z"/></symbol>
-    <symbol id="c-player" viewBox="0 0 24 24"><path d="M8 5v14l11-7L8 5Z"/></symbol>
-    <symbol id="c-sidebar" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm1 2v10h4V7H5Zm6 0v10h8V7h-8Z"/></symbol>
-    <symbol id="c-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></symbol>
-    <symbol id="c-backup" viewBox="0 0 24 24"><path d="M12 3a1 1 0 0 1 1 1v9.6l3.3-3.3 1.4 1.4L12 17.4l-5.7-5.7 1.4-1.4 3.3 3.3V4a1 1 0 0 1 1-1ZM4 19h16v2H4v-2Z"/></symbol>
-    <symbol id="c-feedback" viewBox="0 0 24 24"><path d="M3 20.5 22 12 3 3.5V10l12 2-12 2v6.5Z"/></symbol>
-    <symbol id="c-whats-new" viewBox="0 0 24 24"><path d="m12 2 2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2Z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/></g></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 4a5 5 0 0 0-5 5v4l-2 3.5h14L17 13V9a5 5 0 0 0-5-5Zm-2 15.5a2 2 0 0 0 4 0"/></symbol>
+    <symbol id="i-bubble" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M5 5h14v10.5h-8L7 19v-3.500H5V5Z"/></symbol>
+    <symbol id="i-gift" viewBox="0 0 24 24"><path d="M9 3a3 3 0 0 1 3 1.8A3 3 0 1 1 15 9h5v4H4V9h5a3 3 0 0 1 0-6Zm0 2a1 1 0 0 0 0 2h2a2 2 0 0 0-2-2Zm6 0a2 2 0 0 0-2 2h2a1 1 0 0 0 0-2ZM5 15h6v6H5v-6Zm8 0h6v6h-6v-6Z"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M8 3h8v2l-1 1v5l3 3v2h-5v5l-1 1-1-1v-5H6v-2l3-3V6L8 5V3Z"/></symbol>
+    <symbol id="i-smile" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 14c.9 1.4 2.1 2 3.5 2s2.6-.6 3.5-2"/><path d="M9.2 9.8v.4M14.8 9.8v.4"/></g></symbol>
   </svg>
 
-  <!-- top-nav__menu and, on the first drawing's sidebar, side-nav are Twitch's own names for these
-       two, which effects.css looks for. -->
-  <header class="top top-nav__menu">
-    <div class="wrap top__in">
+  <!-- The page's own bar, where Twitch has its top bar. top-nav__menu and, on the sidebar under
+       it, side-nav are Twitch's own names for these two, which effects.css looks for. -->
+  <header class="bar top-nav__menu">
+    <div class="bar__in">
       <a class="brand" href="./"><img src="assets/icon-128.png" alt="" width="28" height="28">StreamKEK</a>
       <nav aria-label="Main">
-        <a class="top__jump" href="#features">Features</a>
         <a href="privacy.html">Privacy</a>
         <a href="support.html">Support</a>
         <a href="https://github.com/jafdell/StreamKEK">GitHub</a>
       </nav>
+      <a class="pill" data-install="bar" href="https://chromewebstore.google.com/detail/streamkek/ndkccdbljjejloelgdcbikabojjaeomc">Add to Chrome</a>
     </div>
   </header>
 
-  <main class="wrap">
-    <div class="hero">
-      <h1>Watch YouTube and Kick streams inside Twitch.</h1>
-      <div class="hero__row">
-        <p class="hero__lead">StreamKEK is a free browser extension. It brings YouTube and Kick streams and their chat into Twitch, lets you watch up to four streams side by side, and gives you more control over Twitch's player, chat and sidebar.</p>
-        <div class="hero__get">
-          <a class="button" data-install href="https://chromewebstore.google.com/detail/streamkek/ndkccdbljjejloelgdcbikabojjaeomc">Add to Chrome</a>
-          <p class="small">For Chrome, Brave and other Chromium browsers. No API key and no extra account.</p>
+  <main>
+    <!-- The first screen: the headline, then Twitch drawn with the extension on, its sidebar, a
+         stream and chat. The channels marked as radio buttons open their stream, and the switch
+         over the drawing turns the extension off in it. Both work without JavaScript: see
+         styles.css. -->
+    <section class="screen screen--first">
+      <div class="band band--title">
+        <!-- The extension's icon beside the headline, at a size to remember it by: it's what to
+             look for in Twitch's top bar and the browser's toolbar. -->
+        <div class="band__title">
+          <img class="band__icon" src="assets/icon-128.png" alt="StreamKEK's icon" width="112" height="112">
+          <h1>Watch YouTube and Kick streams inside Twitch.</h1>
+        </div>
+        <div class="band__more">
+          <p>StreamKEK is a free browser extension. Your live YouTube subscriptions and Kick follows show in Twitch's sidebar and on its Following page, and open there with their chat.</p>
+          <p class="actions"><a class="pill pill--big" data-install href="https://chromewebstore.google.com/detail/streamkek/ndkccdbljjejloelgdcbikabojjaeomc">Add to Chrome</a></p>
           <p class="small">Unofficial: not affiliated with or endorsed by Twitch, YouTube or Kick.</p>
         </div>
       </div>
-    </div>
-
-    <figure class="figure figure--stream">
-      <div class="shot" role="img" aria-label="Twitch's sidebar with the three sections StreamKEK adds: Favorites, with a channel from each site, YouTube Live and Kick Live. Beside it, a YouTube stream is open in Twitch with its own chat.">
-        <div class="tw-side side-nav">
-          <div class="skek-section">
-            <div class="skek-section__head"><span class="skek-section__title">Favorites</span></div>
-            <div class="skek-card">
-              <span class="skek-card__avatar"><span class="skek-card__img av av--1">Q</span><span class="skek-card__platform skek-card__platform--twitch"></span></span>
-              <span class="skek-card__text"><span class="skek-card__name-row"><span class="skek-card__name">quietgambit</span></span><span class="skek-card__meta">Chess</span></span>
-              <span class="skek-card__live"><span class="skek-dot"></span><span>2.4K</span></span>
-            </div>
-            <div class="skek-card">
-              <span class="skek-card__avatar"><span class="skek-card__img av av--2">T</span><span class="skek-card__platform skek-card__platform--youtube"></span></span>
-              <span class="skek-card__text"><span class="skek-card__name-row"><span class="skek-card__name">Tin Roof Radio</span></span><span class="skek-card__meta">Music</span></span>
-              <span class="skek-card__live"><span class="skek-dot"></span><span>812</span></span>
-            </div>
-            <div class="skek-card">
-              <span class="skek-card__avatar"><span class="skek-card__img av av--3">S</span><span class="skek-card__platform skek-card__platform--kick"></span></span>
-              <span class="skek-card__text"><span class="skek-card__name-row"><span class="skek-card__name">saltmarsh</span></span><span class="skek-card__meta">Retro</span></span>
-              <span class="skek-card__live"><span class="skek-dot"></span><span>356</span></span>
-            </div>
-          </div>
-          <div class="theirs">Twitch's own Followed Channels</div>
-          <div class="skek-section">
-            <div class="skek-section__head">
-              <span class="skek-section__title">YouTube Live</span>
-              <span class="skek-iconbtn skek-section__add"><svg width="20" height="20" fill="currentColor"><use href="#i-plus"/></svg></span>
-            </div>
-            <div class="skek-card skek-card--active">
-              <span class="skek-card__avatar"><span class="skek-card__img av av--4">M</span></span>
-              <span class="skek-card__text"><span class="skek-card__name-row"><span class="skek-card__name">Moth &amp; Lantern</span></span><span class="skek-card__meta">Art</span></span>
-              <span class="skek-card__live"><span class="skek-dot"></span><span>1.1K</span></span>
-            </div>
-            <div class="skek-card skek-card--hover">
-              <span class="skek-card__avatar"><span class="skek-card__img av av--5">B</span></span>
-              <span class="skek-card__text"><span class="skek-card__name-row"><span class="skek-card__name">Bench Notes</span></span><span class="skek-card__meta">Woodworking</span></span>
-              <span class="skek-card__live"><span class="skek-dot"></span><span>94</span></span>
-              <span class="skek-iconbtn skek-star"><svg width="20" height="20" fill="currentColor"><use href="#i-star-outline"/></svg></span>
-              <span class="skek-iconbtn skek-card__hide"><svg width="20" height="20" fill="currentColor"><use href="#i-hide"/></svg></span>
-            </div>
-          </div>
-          <div class="skek-section">
-            <div class="skek-section__head">
-              <span class="skek-section__title">Kick Live</span>
-              <span class="skek-iconbtn skek-section__add"><svg width="20" height="20" fill="currentColor"><use href="#i-plus"/></svg></span>
-            </div>
-            <div class="skek-card">
-              <span class="skek-card__avatar"><span class="skek-card__img av av--6">C</span></span>
-              <span class="skek-card__text"><span class="skek-card__name-row"><span class="skek-card__name">copperkettle</span></span><span class="skek-card__meta">Cooking</span></span>
-              <span class="skek-card__live"><span class="skek-dot"></span><span>207</span></span>
-            </div>
+      <div class="try">
+        <span class="try__tag">Try it</span>
+        <span class="when-on">Click a channel in the sidebar to open its stream</span>
+        <label class="power">
+          <input class="skek-switch" type="checkbox" role="switch" id="skek-on" autocomplete="off" checked>
+          <span class="when-on">StreamKEK is on. Switch it off to compare.</span>
+          <span class="when-off">StreamKEK is off. This is Twitch without it. Switch it on to compare.</span>
+        </label>
+      </div>
+      <p class="visually-hidden">Next is a drawing of Twitch with StreamKEK on, with made-up channels: Twitch's top bar with StreamKEK's icon in it, the stream of the channel picked in the sidebar, the sidebar with its Favorites, YouTube Live and Kick Live sections, and that stream's chat.</p>
+      <div class="frame shot">
+        <!-- Twitch's top bar, without its logo. The extension's icon in it opens the settings. -->
+        <div class="tw-top" aria-hidden="true">
+          <div class="tw-top__links"><span class="tw-top__on">Following</span><span>Browse</span><span class="tw-top__dots"><i></i><i></i><i></i></span></div>
+          <div class="tw-top__search"><span>Search</span><b><svg width="20" height="20"><use href="#i-search"/></svg></b></div>
+          <div class="tw-top__right">
+            <span class="tw-top__icon skek-only"><img src="assets/icon-128.png" alt="" width="22" height="22"></span>
+            <span class="tw-top__icon"><svg width="22" height="22"><use href="#i-bell"/></svg></span>
+            <span class="tw-top__icon"><svg width="22" height="22"><use href="#i-bubble"/></svg></span>
+            <span class="tw-top__me"></span>
           </div>
         </div>
-        <div class="skek-view">
-          <div class="skek-main">
-            <div class="skek-player theirs theirs--video">YouTube's player</div>
+        <div class="frame__main">
+          <!-- One of these shows: the stream of the channel picked in the sidebar. -->
+          <div class="view" aria-hidden="true" data-stream="harbor">
+            <div class="skek-player"><img class="pic" src="assets/streams/harbor.svg" alt="" width="640" height="360"></div>
             <div class="skek-info">
               <div class="skek-info__avatar"><span class="skek-info__img"><span class="av av--4">M</span></span><span class="skek-info__badge">LIVE</span></div>
               <div class="skek-info__body">
@@ -147,10 +123,7 @@
                   </div>
                 </div>
                 <div class="skek-info__row">
-                  <div class="skek-info__text">
-                    <p class="skek-info__title">Painting a harbor at dusk, part 3</p>
-                    <p class="skek-info__category">Art</p>
-                  </div>
+                  <div class="skek-info__text"><p class="skek-info__title">Painting a harbor at dusk, part 3</p><p class="skek-info__category">Art</p></div>
                   <div class="skek-info__stats">
                     <span class="skek-stat skek-stat--viewers"><svg width="20" height="20" fill="currentColor"><use href="#i-person"/></svg><span>1,104</span></span>
                     <span class="skek-stat"><svg width="20" height="20" fill="currentColor"><use href="#i-clock"/></svg><span>2:14:07</span></span>
@@ -159,58 +132,361 @@
               </div>
             </div>
           </div>
-          <div class="skek-chat">
-            <div class="skek-chat__head">
-              <span class="skek-iconbtn"><svg width="20" height="20" fill="currentColor"><use href="#i-collapse"/></svg></span>
-              <span class="skek-chat__title">Stream Chat</span>
-              <span class="skek-chat__spacer"></span>
+          <div class="view" aria-hidden="true" data-stream="music">
+            <div class="skek-player"><img class="pic" src="assets/streams/music.svg" alt="" width="640" height="360"></div>
+            <div class="skek-info">
+              <div class="skek-info__avatar"><span class="skek-info__img"><span class="av av--2">T</span></span><span class="skek-info__badge">LIVE</span></div>
+              <div class="skek-info__body">
+                <div class="skek-info__row">
+                  <span class="skek-info__name">Tin Roof Radio</span>
+                  <div class="skek-info__actions">
+                    <span class="skek-button skek-button--icon"><svg width="20" height="20" fill="currentColor"><use href="#i-floating"/></svg></span>
+                    <span class="skek-button skek-button--icon"><svg width="20" height="20" fill="currentColor"><use href="#i-stacked"/></svg></span>
+                    <span class="skek-button skek-button--icon"><svg width="20" height="20" fill="currentColor"><use href="#i-theatre"/></svg></span>
+                    <span class="skek-button skek-button--youtube"><svg width="20" height="20" fill="currentColor"><use href="#i-external"/></svg><span>Watch on YouTube</span></span>
+                  </div>
+                </div>
+                <div class="skek-info__row">
+                  <div class="skek-info__text"><p class="skek-info__title">Late mix: slow records for a quiet room</p><p class="skek-info__category">Music</p></div>
+                  <div class="skek-info__stats">
+                    <span class="skek-stat skek-stat--viewers"><svg width="20" height="20" fill="currentColor"><use href="#i-person"/></svg><span>812</span></span>
+                    <span class="skek-stat"><svg width="20" height="20" fill="currentColor"><use href="#i-clock"/></svg><span>3:41:55</span></span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="skek-chat__body theirs">YouTube's chat</div>
+          </div>
+          <div class="view" aria-hidden="true" data-stream="cooking">
+            <div class="skek-player"><img class="pic" src="assets/streams/cooking.svg" alt="" width="640" height="360"></div>
+            <div class="skek-info">
+              <div class="skek-info__avatar"><span class="skek-info__img"><span class="av av--6">C</span></span><span class="skek-info__badge">LIVE</span></div>
+              <div class="skek-info__body">
+                <div class="skek-info__row">
+                  <span class="skek-info__name">copperkettle</span>
+                  <div class="skek-info__actions">
+                    <span class="skek-button skek-button--icon"><svg width="20" height="20" fill="currentColor"><use href="#i-floating"/></svg></span>
+                    <span class="skek-button skek-button--icon"><svg width="20" height="20" fill="currentColor"><use href="#i-stacked"/></svg></span>
+                    <span class="skek-button skek-button--icon"><svg width="20" height="20" fill="currentColor"><use href="#i-theatre"/></svg></span>
+                    <span class="skek-button skek-button--kick"><svg width="20" height="20" fill="currentColor"><use href="#i-external"/></svg><span>Watch on Kick</span></span>
+                  </div>
+                </div>
+                <div class="skek-info__row">
+                  <div class="skek-info__text"><p class="skek-info__title">One-pan lemon rice, and what to do with the leftovers</p><p class="skek-info__category">Cooking</p></div>
+                  <div class="skek-info__stats">
+                    <span class="skek-stat skek-stat--viewers"><svg width="20" height="20" fill="currentColor"><use href="#i-person"/></svg><span>207</span></span>
+                    <span class="skek-stat"><svg width="20" height="20" fill="currentColor"><use href="#i-clock"/></svg><span>0:48:21</span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="view" aria-hidden="true" data-stream="pixel">
+            <div class="skek-player"><img class="pic" src="assets/streams/pixel.svg" alt="" width="640" height="360"></div>
+            <div class="skek-info">
+              <div class="skek-info__avatar"><span class="skek-info__img"><span class="av av--3">S</span></span><span class="skek-info__badge">LIVE</span></div>
+              <div class="skek-info__body">
+                <div class="skek-info__row">
+                  <span class="skek-info__name">saltmarsh</span>
+                  <div class="skek-info__actions">
+                    <span class="skek-button skek-button--icon"><svg width="20" height="20" fill="currentColor"><use href="#i-floating"/></svg></span>
+                    <span class="skek-button skek-button--icon"><svg width="20" height="20" fill="currentColor"><use href="#i-stacked"/></svg></span>
+                    <span class="skek-button skek-button--icon"><svg width="20" height="20" fill="currentColor"><use href="#i-theatre"/></svg></span>
+                    <span class="skek-button skek-button--kick"><svg width="20" height="20" fill="currentColor"><use href="#i-external"/></svg><span>Watch on Kick</span></span>
+                  </div>
+                </div>
+                <div class="skek-info__row">
+                  <div class="skek-info__text"><p class="skek-info__title">Stage 3-2 again, and this time with all the coins</p><p class="skek-info__category">Retro</p></div>
+                  <div class="skek-info__stats">
+                    <span class="skek-stat skek-stat--viewers"><svg width="20" height="20" fill="currentColor"><use href="#i-person"/></svg><span>356</span></span>
+                    <span class="skek-stat"><svg width="20" height="20" fill="currentColor"><use href="#i-clock"/></svg><span>1:07:44</span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="view" aria-hidden="true" data-stream="chess">
+            <div class="skek-player"><img class="pic" src="assets/streams/chess.svg" alt="" width="640" height="360"></div>
+            <div class="skek-info">
+              <div class="skek-info__avatar"><span class="skek-info__img"><span class="av av--1">Q</span></span><span class="skek-info__badge">LIVE</span></div>
+              <div class="skek-info__body">
+                <div class="skek-info__row">
+                  <span class="skek-info__name">quietgambit</span>
+                </div>
+                <div class="skek-info__row">
+                  <div class="skek-info__text"><p class="skek-info__title">Rapid, game 3 of 5</p><p class="skek-info__category">Chess</p></div>
+                  <div class="skek-info__stats">
+                    <span class="skek-stat skek-stat--viewers"><svg width="20" height="20" fill="currentColor"><use href="#i-person"/></svg><span>2,412</span></span>
+                    <span class="skek-stat"><svg width="20" height="20" fill="currentColor"><use href="#i-clock"/></svg><span>1:32:10</span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tw-side side-nav" role="radiogroup" aria-label="Channel to open">
+          <div class="skek-section skek-only">
+            <div class="skek-section__head"><span class="skek-section__title">Favorites</span><span class="skek-iconbtn skek-section__add" aria-hidden="true"><svg width="20" height="20" fill="currentColor"><use href="#i-collapse-left"/></svg></span></div>
+            <p class="added">Channels from all three sites, in your order</p>
+              <label class="skek-card skek-card--pick">
+                <input type="radio" name="watch" id="watch-chess" aria-label="quietgambit, a Twitch stream" autocomplete="off">
+                <span class="skek-card__avatar"><span class="skek-card__img av av--1">Q</span><span class="skek-card__platform skek-card__platform--twitch"></span></span>
+                <span class="skek-card__text"><span class="skek-card__name-row"><span class="skek-card__name">quietgambit</span></span><span class="skek-card__meta">Chess</span></span>
+                <span class="skek-card__live"><span class="skek-dot"></span><span>2.4K</span></span>
+              </label>
+              <label class="skek-card skek-card--pick">
+                <input type="radio" name="watch" id="watch-music" aria-label="Tin Roof Radio, a YouTube stream" autocomplete="off">
+                <span class="skek-card__avatar"><span class="skek-card__img av av--2">T</span><span class="skek-card__platform skek-card__platform--youtube"></span></span>
+                <span class="skek-card__text"><span class="skek-card__name-row"><span class="skek-card__name">Tin Roof Radio</span></span><span class="skek-card__meta">Music</span></span>
+                <span class="skek-card__live"><span class="skek-dot"></span><span>812</span></span>
+              </label>
+              <label class="skek-card skek-card--pick">
+                <input type="radio" name="watch" id="watch-pixel" aria-label="saltmarsh, a Kick stream" autocomplete="off">
+                <span class="skek-card__avatar"><span class="skek-card__img av av--3">S</span><span class="skek-card__platform skek-card__platform--kick"></span></span>
+                <span class="skek-card__text"><span class="skek-card__name-row"><span class="skek-card__name">saltmarsh</span></span><span class="skek-card__meta">Retro</span></span>
+                <span class="skek-card__live"><span class="skek-dot"></span><span>356</span></span>
+              </label>
+          </div>
+          <div class="skek-section tw-side__own">
+            <div class="skek-section__head"><span class="skek-section__title">Followed Channels</span></div>
+              <div class="skek-card skek-card--active off-only" aria-hidden="true">
+                <span class="skek-card__avatar"><span class="skek-card__img av av--1">Q</span></span>
+                <span class="skek-card__text"><span class="skek-card__name-row"><span class="skek-card__name">quietgambit</span></span><span class="skek-card__meta">Chess</span></span>
+                <span class="skek-card__live"><span class="skek-dot"></span><span>2.4K</span></span>
+              </div>
+              <div class="skek-card" aria-hidden="true">
+                <span class="skek-card__avatar"><span class="skek-card__img av av--7">N</span></span>
+                <span class="skek-card__text"><span class="skek-card__name-row"><span class="skek-card__name">nightferry</span></span><span class="skek-card__meta">Retro</span></span>
+                <span class="skek-card__live"><span class="skek-dot"></span><span>530</span></span>
+              </div>
+              <div class="skek-card" aria-hidden="true">
+                <span class="skek-card__avatar"><span class="skek-card__img av av--8">H</span></span>
+                <span class="skek-card__text"><span class="skek-card__name-row"><span class="skek-card__name">harborcat</span></span><span class="skek-card__meta">Just Chatting</span></span>
+                <span class="skek-card__live"><span class="skek-dot"></span><span>1.8K</span></span>
+              </div>
+          </div>
+          <div class="skek-section skek-only">
+            <div class="skek-section__head"><span class="skek-section__title">YouTube Live</span><span class="skek-iconbtn skek-section__add" aria-hidden="true"><svg width="20" height="20" fill="currentColor"><use href="#i-plus"/></svg></span></div>
+            <p class="added">Your subscriptions that are live</p>
+              <label class="skek-card skek-card--pick">
+                <input type="radio" name="watch" id="watch-harbor" aria-label="Moth &amp; Lantern, a YouTube stream" autocomplete="off" checked>
+                <span class="skek-card__avatar"><span class="skek-card__img av av--4">M</span></span>
+                <span class="skek-card__text"><span class="skek-card__name-row"><span class="skek-card__name">Moth &amp; Lantern</span></span><span class="skek-card__meta">Art</span></span>
+                <span class="skek-card__live"><span class="skek-dot"></span><span>1.1K</span></span>
+              </label>
+              <div class="skek-card skek-card--hover" aria-hidden="true">
+                <span class="skek-card__avatar"><span class="skek-card__img av av--5">B</span></span>
+                <span class="skek-card__text"><span class="skek-card__name-row"><span class="skek-card__name">Bench Notes</span></span><span class="skek-card__meta">Woodworking</span></span>
+                <span class="skek-card__live"><span class="skek-dot"></span><span>94</span></span>
+                <span class="skek-iconbtn skek-star"><svg width="20" height="20" fill="currentColor"><use href="#i-star-outline"/></svg></span>
+                <span class="skek-iconbtn skek-card__hide"><svg width="20" height="20" fill="currentColor"><use href="#i-hide"/></svg></span>
+              </div>
+          </div>
+          <div class="skek-section skek-only">
+            <div class="skek-section__head"><span class="skek-section__title">Kick Live</span><span class="skek-iconbtn skek-section__add" aria-hidden="true"><svg width="20" height="20" fill="currentColor"><use href="#i-plus"/></svg></span></div>
+            <p class="added">Your follows that are live</p>
+              <label class="skek-card skek-card--pick">
+                <input type="radio" name="watch" id="watch-cooking" aria-label="copperkettle, a Kick stream" autocomplete="off">
+                <span class="skek-card__avatar"><span class="skek-card__img av av--6">C</span></span>
+                <span class="skek-card__text"><span class="skek-card__name-row"><span class="skek-card__name">copperkettle</span></span><span class="skek-card__meta">Cooking</span></span>
+                <span class="skek-card__live"><span class="skek-dot"></span><span>207</span></span>
+              </label>
+          </div>
+        </div>
+
+        <div class="frame__chat" aria-hidden="true">
+          <div class="skek-chat__head"><span class="skek-iconbtn"><svg width="20" height="20" fill="currentColor"><use href="#i-collapse"/></svg></span><span class="skek-chat__title">Stream Chat</span><span class="skek-chat__spacer"></span></div>
+          <div class="ytchat" data-stream="harbor">
+            <div class="chat__lines" data-live-chat>
+              <p class="ytchat__line"><b>bluehourben</b>just got here, what did I miss?</p>
+              <p class="ytchat__line"><b class="member">slowtide</b>the whole sky, basically</p>
+              <p class="ytchat__line"><b>tumbleweedtea</b>the colors in the clouds are so soft</p>
+              <p class="ytchat__line"><b>juniper.ink</b>I could watch the water all day</p>
+              <p class="ytchat__line"><b>oddsocks</b>is the pier new since last week?</p>
+              <p class="ytchat__line"><b class="mod">Moth &amp; Lantern</b>it is, I added it this morning</p>
+              <p class="ytchat__line"><b>paperlark</b>the light on the water is unreal</p>
+              <p class="ytchat__line"><b class="member">slowtide</b>part 3 already, I missed the sky going in</p>
+              <p class="ytchat__line"><b>fenwick_draws</b>which brush is that for the reflections?</p>
+              <p class="ytchat__line"><b class="mod">Moth &amp; Lantern</b>soft round at 48, low flow, lots of patience</p>
+              <p class="ytchat__line"><b>juniper.ink</b>writing that down</p>
+              <p class="ytchat__line"><b>oddsocks</b>the little boat in the back is my favorite</p>
+              <p class="ytchat__line"><b class="member">harborcat</b>can you show the layers again after this?</p>
+              <p class="ytchat__line"><b>paperlark</b>that lighthouse beam!</p>
+              <p class="ytchat__line"><b>tumbleweedtea</b>first time here, this is so calming</p>
+              <p class="ytchat__line"><b class="member">slowtide</b>welcome, it is like this every week</p>
+              <p class="ytchat__line"><b>bluehourben</b>more orange near the horizon maybe?</p>
+              <p class="ytchat__line"><b>fenwick_draws</b>no it is perfect, leave it</p>
+              <p class="ytchat__line"><b>juniper.ink</b>will the brushes be in the description?</p>
+              <p class="ytchat__line"><b>oddsocks</b>dusk is the best time of day, no notes</p>
+              <p class="ytchat__line"><b>tumbleweedtea</b>how long does one of these take?</p>
+              <p class="ytchat__line"><b class="mod">Moth &amp; Lantern</b>about six hours over three streams</p>
+              <p class="ytchat__line"><b>bluehourben</b>worth every minute</p>
+              <p class="ytchat__line"><b class="member">harborcat</b>the reflections are doing all the work</p>
+            </div>
+            <div class="ytchat__input"><div class="ytchat__box"><span>Chat…</span><svg width="24" height="24"><use href="#i-smile"/></svg></div></div>
+          </div>
+          <div class="ytchat" data-stream="music">
+            <div class="chat__lines" data-live-chat>
+              <p class="ytchat__line"><b>fenwick_draws</b>evening everyone</p>
+              <p class="ytchat__line"><b>bluehourben</b>this is the good hour</p>
+              <p class="ytchat__line"><b class="member">harborcat</b>the crackle on this pressing is perfect</p>
+              <p class="ytchat__line"><b>juniper.ink</b>what turntable is that?</p>
+              <p class="ytchat__line"><b class="mod">Tin Roof Radio</b>an old belt drive, older than me</p>
+              <p class="ytchat__line"><b>oddsocks</b>it shows, in a good way</p>
+              <p class="ytchat__line"><b class="member">slowtide</b>this one again, yes</p>
+              <p class="ytchat__line"><b>paperlark</b>what was the track before this?</p>
+              <p class="ytchat__line"><b class="mod">Tin Roof Radio</b>Slow Lamps, it is on the list under the stream</p>
+              <p class="ytchat__line"><b>bluehourben</b>perfect for a late shift</p>
+              <p class="ytchat__line"><b>juniper.ink</b>the bass on this record is so warm</p>
+              <p class="ytchat__line"><b>oddsocks</b>rain outside and this on, cannot complain</p>
+              <p class="ytchat__line"><b>tumbleweedtea</b>saving the whole list</p>
+              <p class="ytchat__line"><b class="member">harborcat</b>play Third Shelf before you go</p>
+              <p class="ytchat__line"><b>fenwick_draws</b>drawing to this right now</p>
+              <p class="ytchat__line"><b>paperlark</b>good night from the coast</p>
+              <p class="ytchat__line"><b class="member">slowtide</b>one more side, please</p>
+              <p class="ytchat__line"><b>bluehourben</b>Kitchen Light is next, I can feel it</p>
+              <p class="ytchat__line"><b>juniper.ink</b>best hour of the week</p>
+              <p class="ytchat__line"><b>oddsocks</b>turning the lights down for this</p>
+              <p class="ytchat__line"><b>tumbleweedtea</b>is this on every night?</p>
+              <p class="ytchat__line"><b class="mod">Tin Roof Radio</b>Thursdays and Sundays, same time</p>
+              <p class="ytchat__line"><b>fenwick_draws</b>that needle drop was clean</p>
+              <p class="ytchat__line"><b>paperlark</b>adding this one to my list</p>
+            </div>
+            <div class="ytchat__input"><div class="ytchat__box"><span>Chat…</span><svg width="24" height="24"><use href="#i-smile"/></svg></div></div>
+          </div>
+          <div class="kkchat" data-stream="cooking">
+            <div class="chat__lines" data-live-chat>
+              <p class="kkchat__line"><b class="twchat__name--1">harborcat</b>what are we making today?</p>
+              <p class="kkchat__line"><b class="twchat__name--5">copperkettle</b>lemon rice, one pan, twenty minutes</p>
+              <p class="kkchat__line"><b class="twchat__name--6">nightferry</b>my kind of recipe</p>
+              <p class="kkchat__line"><b class="twchat__name--2">mossbyte</b>the knife skills though</p>
+              <p class="kkchat__line"><b class="twchat__name--7">oddsocks</b>how much stock goes in?</p>
+              <p class="kkchat__line"><b class="twchat__name--5">copperkettle</b>twice the rice, a little more if it looks dry</p>
+              <p class="kkchat__line"><b class="twchat__name--3">saltmarsh</b>toast it longer, trust the process</p>
+              <p class="kkchat__line"><b class="twchat__name--2">mossbyte</b>lemon goes in at the end right?</p>
+              <p class="kkchat__line"><b class="twchat__name--5">copperkettle</b>zest now, juice at the end</p>
+              <p class="kkchat__line"><b class="twchat__name--1">pixelbramble</b>making this tonight</p>
+              <p class="kkchat__line"><b class="twchat__name--4">tidepool</b>that pan has seen things</p>
+              <p class="kkchat__line"><b class="twchat__name--6">nightferry</b>step 4 of 7 and I am already hungry</p>
+              <p class="kkchat__line"><b class="twchat__name--7">oddsocks</b>what rice is that?</p>
+              <p class="kkchat__line"><b class="twchat__name--5">copperkettle</b>long grain, rinsed twice</p>
+              <p class="kkchat__line"><b class="twchat__name--1">harborcat</b>the sizzle</p>
+              <p class="kkchat__line"><b class="twchat__name--3">juniper.ink</b>writing this one down too</p>
+              <p class="kkchat__line"><b class="twchat__name--2">bluehourben</b>no onions? bold</p>
+              <p class="kkchat__line"><b class="twchat__name--3">saltmarsh</b>onions were step 2</p>
+              <p class="kkchat__line"><b class="twchat__name--4">tidepool</b>saving the leftovers part for later</p>
+              <p class="kkchat__line"><b class="twchat__name--6">nightferry</b>my kitchen never looks like this</p>
+              <p class="kkchat__line"><b class="twchat__name--7">oddsocks</b>does it work with brown rice?</p>
+              <p class="kkchat__line"><b class="twchat__name--5">copperkettle</b>yes, give it ten more minutes</p>
+              <p class="kkchat__line"><b class="twchat__name--1">pixelbramble</b>the wooden spoon is carrying</p>
+              <p class="kkchat__line"><b class="twchat__name--2">mossbyte</b>smells good from here</p>
+            </div>
+            <div class="ytchat__input"><div class="ytchat__box"><span>Send a message</span><svg width="24" height="24"><use href="#i-smile"/></svg></div></div>
+          </div>
+          <div class="kkchat" data-stream="pixel">
+            <div class="chat__lines" data-live-chat>
+              <p class="kkchat__line"><b class="twchat__name--1">quietgambit</b>this stage has the best music</p>
+              <p class="kkchat__line"><b class="twchat__name--4">tidepool</b>evening, did she get past the bricks?</p>
+              <p class="kkchat__line"><b class="twchat__name--2">mossbyte</b>second try on 3-2</p>
+              <p class="kkchat__line"><b class="twchat__name--5">harborcat</b>17 coins already, go for all of them</p>
+              <p class="kkchat__line"><b class="twchat__name--3">pixelbramble</b>no way she made that jump</p>
+              <p class="kkchat__line"><b class="twchat__name--6">nightferry</b>two hearts is plenty</p>
+              <p class="kkchat__line"><b class="twchat__name--7">oddsocks</b>the slime on the top bricks got her last time</p>
+              <p class="kkchat__line"><b class="twchat__name--3">saltmarsh</b>not this time</p>
+              <p class="kkchat__line"><b class="twchat__name--2">mossbyte</b>famous last words</p>
+              <p class="kkchat__line"><b class="twchat__name--1">quietgambit</b>the water gap is the real boss</p>
+              <p class="kkchat__line"><b class="twchat__name--4">tidepool</b>jump late, it is shorter than it looks</p>
+              <p class="kkchat__line"><b class="twchat__name--5">harborcat</b>that lantern hat though</p>
+              <p class="kkchat__line"><b class="twchat__name--6">nightferry</b>how many stages are there?</p>
+              <p class="kkchat__line"><b class="twchat__name--3">saltmarsh</b>eight worlds, four each</p>
+              <p class="kkchat__line"><b class="twchat__name--7">oddsocks</b>so we are here all night</p>
+              <p class="kkchat__line"><b class="twchat__name--2">mossbyte</b>good</p>
+              <p class="kkchat__line"><b class="twchat__name--1">quietgambit</b>coin 18</p>
+              <p class="kkchat__line"><b class="twchat__name--3">pixelbramble</b>here we go</p>
+              <p class="kkchat__line"><b class="twchat__name--4">tidepool</b>flag is right there</p>
+              <p class="kkchat__line"><b class="twchat__name--5">harborcat</b>do not look at the slime</p>
+              <p class="kkchat__line"><b class="twchat__name--6">nightferry</b>she looked at the slime</p>
+              <p class="kkchat__line"><b class="twchat__name--7">oddsocks</b>still two hearts, still fine</p>
+              <p class="kkchat__line"><b class="twchat__name--2">mossbyte</b>one more jump</p>
+              <p class="kkchat__line"><b class="twchat__name--1">quietgambit</b>cleanest run yet</p>
+            </div>
+            <div class="ytchat__input"><div class="ytchat__box"><span>Send a message</span><svg width="24" height="24"><use href="#i-smile"/></svg></div></div>
+          </div>
+          <div class="twchat" data-stream="chess">
+            <!-- What Twitch puts over its chat, as it looks there: the strip of top supporters, a
+                 pinned message and a Hype Train. The extension has a setting to hide each. -->
+            <div class="tw-strip off-only">
+              <span><svg width="14" height="14" fill="currentColor"><use href="#i-gift"/></svg><b>tidepool</b>200</span>
+              <span><svg width="14" height="14" fill="currentColor"><use href="#i-gift"/></svg><b>mossbyte</b>150</span>
+              <span><svg width="14" height="14" fill="currentColor"><use href="#i-gift"/></svg><b>oddsocks</b>50</span>
+            </div>
+            <div class="tw-over off-only">
+              <div class="tw-pin">
+                <p class="tw-pin__by"><svg width="14" height="14" fill="currentColor"><use href="#i-pin"/></svg>Pinned by nightferry</p>
+                <p>Game 4 starts right after this one. The schedule is under the stream.</p>
+                <p class="tw-pin__by">nightferry sent at 7:12 PM</p>
+              </div>
+              <div class="tw-hype">
+                <p class="tw-hype__top"><b>Hype Train</b><span>Level 2</span><span class="tw-hype__time">1:48</span></p>
+                <div class="tw-hype__bar"><i></i></div>
+                <p class="tw-pin__by">64% to level 3</p>
+              </div>
+            </div>
+            <div class="chat__lines twchat__lines" data-live-chat>
+              <p class="twchat__line"><b class="twchat__name--5">harborcat</b>: good evening chat <img class="skek-emote" src="assets/emotes/ghost-wave.svg" alt="" width="28" height="28"><span class="emote-name">ghostWave</span></p>
+              <p class="twchat__line"><b class="twchat__name--2">mossbyte</b>: game 3 already?</p>
+              <p class="twchat__line"><b class="twchat__name--4">tidepool</b>: he won the second one on time</p>
+              <p class="twchat__line"><b class="twchat__name--6">oddsocks</b>: that was a robbery <img class="skek-emote" src="assets/emotes/flame-hype.svg" alt="" width="28" height="28"><span class="emote-name">flameHype</span></p>
+              <p class="twchat__line"><b class="twchat__name--3">pixelbramble</b>: a win is a win</p>
+              <p class="twchat__line"><b class="twchat__name--7">saltmarsh</b>: brassfinch plays so fast</p>
+              <p class="twchat__line"><b class="twchat__name--1">nightferry</b>: who has white?</p>
+              <p class="twchat__line"><b class="twchat__name--2">mossbyte</b>: quietgambit does <img class="skek-emote" src="assets/emotes/heart-pop.svg" alt="" width="28" height="28"><span class="emote-name">heartPop</span></p>
+              <p class="twchat__line"><b class="twchat__name--4">tidepool</b>: English opening again</p>
+              <p class="twchat__line"><b class="twchat__name--5">harborcat</b>: <img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="" width="28" height="28"><span class="emote-name">blobCheer</span> here we go</p>
+              <p class="twchat__line"><b class="twchat__name--1">nightferry</b>: back just in time for the endgame</p>
+              <p class="twchat__line"><b class="twchat__name--3">pixelbramble</b>: he is up a pawn, it's fine</p>
+              <p class="twchat__line"><b class="twchat__name--2">mossbyte</b>: that rook lift though <img class="skek-emote" src="assets/emotes/flame-hype.svg" alt="" width="28" height="28"><span class="emote-name">flameHype</span></p>
+              <p class="twchat__line"><b class="twchat__name--4">tidepool</b>: the clock is the real opponent here</p>
+              <p class="twchat__line"><b class="twchat__name--5">harborcat</b>: <img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="" width="28" height="28"><span class="emote-name">blobCheer</span> <img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="" width="28" height="28"><span class="emote-name">blobCheer</span> <img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="" width="28" height="28"><span class="emote-name">blobCheer</span></p>
+              <p class="twchat__line"><b class="twchat__name--6">oddsocks</b>: watching this and the cooking stream at the same time</p>
+              <p class="twchat__line"><b class="twchat__name--1">nightferry</b>: Re3 was so calm <img class="skek-emote" src="assets/emotes/kettle-steam.svg" alt="" width="28" height="28"><span class="emote-name">kettleSteam</span></p>
+              <p class="twchat__line"><b class="twchat__name--7">saltmarsh</b>: queen trade and it's won <img class="skek-emote" src="assets/emotes/heart-pop.svg" alt="" width="28" height="28"><span class="emote-name">heartPop</span></p>
+              <p class="twchat__line"><b class="twchat__name--3">pixelbramble</b>: don't say that yet</p>
+              <p class="twchat__line"><b class="twchat__name--2">mossbyte</b>: four minutes is plenty <img class="skek-emote" src="assets/emotes/ghost-wave.svg" alt="" width="28" height="28"><span class="emote-name">ghostWave</span></p>
+              <p class="twchat__line"><b class="twchat__name--4">tidepool</b>: game 3 of 5, no pressure</p>
+              <p class="twchat__line"><b class="twchat__name--5">harborcat</b>: <img class="skek-emote" src="assets/emotes/gg-lamp.svg" alt="" width="34" height="28"><span class="emote-name">ggLamp</span> in advance</p>
+              <p class="twchat__line"><b class="twchat__name--6">oddsocks</b>: brassfinch is thinking for a long time</p>
+              <p class="twchat__line"><b class="twchat__name--7">saltmarsh</b>: <img class="skek-emote" src="assets/emotes/flame-hype.svg" alt="" width="28" height="28"><span class="emote-name">flameHype</span> <img class="skek-emote" src="assets/emotes/flame-hype.svg" alt="" width="28" height="28"><span class="emote-name">flameHype</span></p>
+              <p class="twchat__line"><b class="twchat__name--1">nightferry</b>: the knight has nowhere to go</p>
+              <p class="twchat__line"><b class="twchat__name--3">pixelbramble</b>: ok now I believe <img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="" width="28" height="28"><span class="emote-name">blobCheer</span></p>
+              <p class="twchat__line"><b class="twchat__name--2">mossbyte</b>: this is why I watch rapid</p>
+              <p class="twchat__line"><b class="twchat__name--4">tidepool</b>: three streams and one brain</p>
+            </div>
+            <div class="twchat__input"><div class="twchat__box"><span class="skek-latest-emote skek-only" data-latest-emote>blobCheer</span><span class="twchat__placeholder off-only">Send a message</span><span class="skek-picker-button skek-only"><svg width="20" height="20"><use href="#i-emote"/></svg></span></div></div>
           </div>
         </div>
       </div>
-      <figcaption>Drawn from the extension's own styles, with made-up channels. The hatched parts are where a site's own video, chat or list goes.</figcaption>
-    </figure>
-
-    <section class="section" id="features">
-      <h2>Watching</h2>
-      <div class="section__body">
-        <dl class="spec">
-          <div class="spec__row">
-            <dt>YouTube and Kick streams inside Twitch</dt>
-            <dd>Your live YouTube subscriptions and Kick follows show in Twitch's sidebar and on the Following page, and open with their chat in a Twitch-style view. Add other channels with the <strong>+</strong> button, and hide the ones you don't want.</dd>
-          </div>
-          <div class="spec__row">
-            <dt>Favorites</dt>
-            <dd>Press a channel's star, or drag it to the top of the sidebar, to keep channels from all three sites together in your own order while they're live.</dd>
-          </div>
-          <div class="spec__row">
-            <dt>Go-live notifications</dt>
-            <dd>Get a notification when a favorite starts a stream, also with no Twitch tab open. <span class="off">Off by default.</span></dd>
-          </div>
-          <div class="spec__row">
-            <dt>Stream previews</dt>
-            <dd>Hover a live channel in the sidebar to see an image of its stream.</dd>
-          </div>
-        </dl>
-      </div>
     </section>
 
-    <section class="section" id="multi-stream">
-      <h2>Multi-stream</h2>
-      <div class="section__body">
-        <p>Drag a channel from the sidebar onto the page to watch two to four streams at once, with their chats, from any mix of Twitch, YouTube and Kick. Drag between streams to resize them, drag a stream's name onto another to swap them, and choose which one has the sound.</p>
-        <figure class="figure figure--wide figure--multi">
-          <div class="multi__ask">
+    <div id="features">
+      <section class="screen" id="multi-stream">
+        <div class="band">
+          <h2>Up to four streams at once.</h2>
+          <p>Drag a channel from the sidebar onto the page to watch two to four streams, with their chats, from any mix of Twitch, YouTube and Kick. Drag between streams to resize them, drag a stream's name onto another to swap them, and choose which one has the sound.</p>
+        </div>
+        <figure class="figure figure--multi">
+          <div class="try">
+            <span class="try__tag">Try it</span>
             <span id="multi-count">Streams</span>
             <div class="choices" role="radiogroup" aria-labelledby="multi-count">
-              <label class="choice"><input type="radio" name="streams" value="2"><span>2</span></label>
-              <label class="choice"><input type="radio" name="streams" value="3" checked><span>3</span></label>
-              <label class="choice"><input type="radio" name="streams" value="4"><span>4</span></label>
+              <label class="choice"><input type="radio" name="streams" value="2" autocomplete="off"><span>2</span></label>
+              <label class="choice"><input type="radio" name="streams" value="3" autocomplete="off"><span>3</span></label>
+              <label class="choice"><input type="radio" name="streams" value="4" autocomplete="off" checked><span>4</span></label>
             </div>
+            <span class="try__more">and click a stream's speaker to move the sound</span>
           </div>
-          <div class="shot skek-multi" role="img" aria-label="The multi-stream view with streams from Twitch, YouTube and Kick side by side. Each has a bar with its name, its viewers and buttons for its chat, its sound and closing it.">
-            <div class="skek-multi__bar">
+          <div class="shot skek-multi">
+            <div class="skek-multi__bar" aria-hidden="true">
               <span class="skek-multi__title">Multi-stream</span>
               <span class="skek-multi__hint"><span class="multi__hint-add">Drag a channel from the sidebar to add it. </span>Drag a stream's name onto another to swap them. Drag between streams to resize them.</span>
               <span class="skek-multi__spacer"></span>
@@ -227,11 +503,15 @@
                     <span class="skek-multi__name">quietgambit</span>
                     <span class="skek-multi__viewers">2.4K</span>
                     <span class="skek-multi__spacer"></span>
-                    <span class="skek-iconbtn skek-multi__button skek-multi__button--on multi__chat-button"><svg width="20" height="20" fill="currentColor"><use href="#i-chat"/></svg></span>
-                    <span class="skek-iconbtn skek-multi__button skek-multi__button--on"><svg width="20" height="20" fill="currentColor"><use href="#i-sound-bars"/></svg></span>
+                    <span class="skek-iconbtn skek-multi__button multi__chat-button skek-multi__button--on"><svg width="20" height="20" fill="currentColor"><use href="#i-chat"/></svg></span>
+                    <label class="skek-iconbtn skek-multi__button multi__sound">
+                      <input type="radio" name="sound" autocomplete="off" aria-label="Sound from quietgambit" checked>
+                      <svg class="multi__sound-on" width="20" height="20" fill="currentColor"><use href="#i-sound-bars"/></svg>
+                      <svg class="multi__sound-off" width="20" height="20" fill="currentColor"><use href="#i-speaker-off"/></svg>
+                    </label>
                     <span class="skek-iconbtn skek-multi__button"><svg width="20" height="20" fill="currentColor"><use href="#i-close"/></svg></span>
                   </div>
-                  <div class="skek-multi__player theirs theirs--video">Twitch's player</div>
+                  <div class="skek-multi__player"><img src="assets/streams/chess.svg" alt="" width="640" height="360"></div>
                 </div>
                 <div class="skek-multi__cell">
                   <div class="skek-multi__head">
@@ -241,10 +521,14 @@
                     <span class="skek-multi__spacer"></span>
                     <span class="skek-iconbtn skek-multi__button multi__enlarge"><svg width="20" height="20" fill="currentColor"><use href="#i-theatre"/></svg></span>
                     <span class="skek-iconbtn skek-multi__button multi__chat-button"><svg width="20" height="20" fill="currentColor"><use href="#i-chat"/></svg></span>
-                    <span class="skek-iconbtn skek-multi__button"><svg width="20" height="20" fill="currentColor"><use href="#i-speaker-off"/></svg></span>
+                    <label class="skek-iconbtn skek-multi__button multi__sound">
+                      <input type="radio" name="sound" autocomplete="off" aria-label="Sound from Moth &amp; Lantern">
+                      <svg class="multi__sound-on" width="20" height="20" fill="currentColor"><use href="#i-sound-bars"/></svg>
+                      <svg class="multi__sound-off" width="20" height="20" fill="currentColor"><use href="#i-speaker-off"/></svg>
+                    </label>
                     <span class="skek-iconbtn skek-multi__button"><svg width="20" height="20" fill="currentColor"><use href="#i-close"/></svg></span>
                   </div>
-                  <div class="skek-multi__player theirs theirs--video">YouTube's player</div>
+                  <div class="skek-multi__player"><img src="assets/streams/harbor.svg" alt="" width="640" height="360"></div>
                 </div>
                 <div class="skek-multi__cell">
                   <div class="skek-multi__head">
@@ -254,305 +538,390 @@
                     <span class="skek-multi__spacer"></span>
                     <span class="skek-iconbtn skek-multi__button multi__enlarge"><svg width="20" height="20" fill="currentColor"><use href="#i-theatre"/></svg></span>
                     <span class="skek-iconbtn skek-multi__button multi__chat-button"><svg width="20" height="20" fill="currentColor"><use href="#i-chat"/></svg></span>
-                    <span class="skek-iconbtn skek-multi__button"><svg width="20" height="20" fill="currentColor"><use href="#i-speaker-off"/></svg></span>
+                    <label class="skek-iconbtn skek-multi__button multi__sound">
+                      <input type="radio" name="sound" autocomplete="off" aria-label="Sound from copperkettle">
+                      <svg class="multi__sound-on" width="20" height="20" fill="currentColor"><use href="#i-sound-bars"/></svg>
+                      <svg class="multi__sound-off" width="20" height="20" fill="currentColor"><use href="#i-speaker-off"/></svg>
+                    </label>
                     <span class="skek-iconbtn skek-multi__button"><svg width="20" height="20" fill="currentColor"><use href="#i-close"/></svg></span>
                   </div>
-                  <div class="skek-multi__player theirs theirs--video">Kick's player</div>
+                  <div class="skek-multi__player"><img src="assets/streams/cooking.svg" alt="" width="640" height="360"></div>
                 </div>
                 <div class="skek-multi__cell">
                   <div class="skek-multi__head">
-                    <span class="site site--twitch"></span>
-                    <span class="skek-multi__name">nightferry</span>
-                    <span class="skek-multi__viewers">530</span>
+                    <span class="site site--youtube"></span>
+                    <span class="skek-multi__name">Tin Roof Radio</span>
+                    <span class="skek-multi__viewers">812</span>
                     <span class="skek-multi__spacer"></span>
                     <span class="skek-iconbtn skek-multi__button multi__chat-button"><svg width="20" height="20" fill="currentColor"><use href="#i-chat"/></svg></span>
-                    <span class="skek-iconbtn skek-multi__button"><svg width="20" height="20" fill="currentColor"><use href="#i-speaker-off"/></svg></span>
+                    <label class="skek-iconbtn skek-multi__button multi__sound">
+                      <input type="radio" name="sound" autocomplete="off" aria-label="Sound from Tin Roof Radio">
+                      <svg class="multi__sound-on" width="20" height="20" fill="currentColor"><use href="#i-sound-bars"/></svg>
+                      <svg class="multi__sound-off" width="20" height="20" fill="currentColor"><use href="#i-speaker-off"/></svg>
+                    </label>
                     <span class="skek-iconbtn skek-multi__button"><svg width="20" height="20" fill="currentColor"><use href="#i-close"/></svg></span>
                   </div>
-                  <div class="skek-multi__player theirs theirs--video">Twitch's player</div>
+                  <div class="skek-multi__player"><img src="assets/streams/music.svg" alt="" width="640" height="360"></div>
                 </div>
-                <div class="skek-multi__chat theirs">Twitch's chat</div>
-                <div class="skek-multi__chat theirs">YouTube's chat</div>
+                <div class="skek-multi__chat twchat" aria-hidden="true">
+                  <div class="chat__lines twchat__lines" data-live-chat>
+                    <p class="twchat__line"><b class="twchat__name--1">nightferry</b>: back just in time for the endgame</p>
+                    <p class="twchat__line"><b class="twchat__name--3">pixelbramble</b>: he is up a pawn, it's fine</p>
+                    <p class="twchat__line"><b class="twchat__name--2">mossbyte</b>: that rook lift though <img class="skek-emote" src="assets/emotes/flame-hype.svg" alt="" width="28" height="28"><span class="emote-name">flameHype</span></p>
+                    <p class="twchat__line"><b class="twchat__name--4">tidepool</b>: the clock is the real opponent here</p>
+                    <p class="twchat__line"><b class="twchat__name--5">harborcat</b>: <img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="" width="28" height="28"><span class="emote-name">blobCheer</span> <img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="" width="28" height="28"><span class="emote-name">blobCheer</span> <img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="" width="28" height="28"><span class="emote-name">blobCheer</span></p>
+                    <p class="twchat__line"><b class="twchat__name--6">oddsocks</b>: watching this and the cooking stream at the same time</p>
+                    <p class="twchat__line"><b class="twchat__name--1">nightferry</b>: Re3 was so calm <img class="skek-emote" src="assets/emotes/kettle-steam.svg" alt="" width="28" height="28"><span class="emote-name">kettleSteam</span></p>
+                    <p class="twchat__line"><b class="twchat__name--7">saltmarsh</b>: queen trade and it's won <img class="skek-emote" src="assets/emotes/heart-pop.svg" alt="" width="28" height="28"><span class="emote-name">heartPop</span></p>
+                  </div>
+                </div>
+                <div class="skek-multi__chat ytchat" aria-hidden="true">
+                  <div class="chat__lines" data-live-chat>
+                    <p class="ytchat__line"><b>paperlark</b>the light on the water is unreal</p>
+                    <p class="ytchat__line"><b class="member">slowtide</b>part 3 already, I missed the sky going in</p>
+                    <p class="ytchat__line"><b>fenwick_draws</b>which brush is that for the reflections?</p>
+                    <p class="ytchat__line"><b class="mod">Moth &amp; Lantern</b>soft round at 48, low flow, lots of patience</p>
+                    <p class="ytchat__line"><b>juniper.ink</b>writing that down</p>
+                    <p class="ytchat__line"><b>oddsocks</b>the little boat in the back is my favorite</p>
+                    <p class="ytchat__line"><b class="member">harborcat</b>can you show the layers again after this?</p>
+                    <p class="ytchat__line"><b>paperlark</b>that lighthouse beam!</p>
+                  </div>
+                </div>
               </div>
-              <div class="multi__side">
+              <div class="multi__side" aria-hidden="true">
                 <div class="skek-multi__picker">
                   <span class="skek-multi__tab skek-multi__tab--active"><span class="site site--twitch"></span><span class="skek-multi__tab-name">quietgambit</span></span>
                   <span class="skek-multi__tab"><span class="site site--youtube"></span><span class="skek-multi__tab-name">Moth &amp; Lantern</span></span>
                   <span class="skek-multi__tab"><span class="site site--kick"></span><span class="skek-multi__tab-name">copperkettle</span></span>
-                  <span class="skek-multi__tab"><span class="site site--twitch"></span><span class="skek-multi__tab-name">nightferry</span></span>
+                  <span class="skek-multi__tab"><span class="site site--youtube"></span><span class="skek-multi__tab-name">Tin Roof Radio</span></span>
                 </div>
-                <div class="skek-multi__chat theirs">Twitch's chat</div>
+                <div class="skek-multi__chat twchat">
+                  <div class="chat__lines twchat__lines" data-live-chat>
+                    <p class="twchat__line"><b class="twchat__name--5">harborcat</b>: good evening chat <img class="skek-emote" src="assets/emotes/ghost-wave.svg" alt="" width="28" height="28"><span class="emote-name">ghostWave</span></p>
+                    <p class="twchat__line"><b class="twchat__name--2">mossbyte</b>: game 3 already?</p>
+                    <p class="twchat__line"><b class="twchat__name--4">tidepool</b>: he won the second one on time</p>
+                    <p class="twchat__line"><b class="twchat__name--6">oddsocks</b>: that was a robbery <img class="skek-emote" src="assets/emotes/flame-hype.svg" alt="" width="28" height="28"><span class="emote-name">flameHype</span></p>
+                    <p class="twchat__line"><b class="twchat__name--3">pixelbramble</b>: a win is a win</p>
+                    <p class="twchat__line"><b class="twchat__name--7">saltmarsh</b>: brassfinch plays so fast</p>
+                    <p class="twchat__line"><b class="twchat__name--1">nightferry</b>: who has white?</p>
+                    <p class="twchat__line"><b class="twchat__name--2">mossbyte</b>: quietgambit does <img class="skek-emote" src="assets/emotes/heart-pop.svg" alt="" width="28" height="28"><span class="emote-name">heartPop</span></p>
+                    <p class="twchat__line"><b class="twchat__name--4">tidepool</b>: English opening again</p>
+                    <p class="twchat__line"><b class="twchat__name--5">harborcat</b>: <img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="" width="28" height="28"><span class="emote-name">blobCheer</span> here we go</p>
+                    <p class="twchat__line"><b class="twchat__name--1">nightferry</b>: back just in time for the endgame</p>
+                    <p class="twchat__line"><b class="twchat__name--3">pixelbramble</b>: he is up a pawn, it's fine</p>
+                    <p class="twchat__line"><b class="twchat__name--2">mossbyte</b>: that rook lift though <img class="skek-emote" src="assets/emotes/flame-hype.svg" alt="" width="28" height="28"><span class="emote-name">flameHype</span></p>
+                    <p class="twchat__line"><b class="twchat__name--4">tidepool</b>: the clock is the real opponent here</p>
+                    <p class="twchat__line"><b class="twchat__name--5">harborcat</b>: <img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="" width="28" height="28"><span class="emote-name">blobCheer</span> <img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="" width="28" height="28"><span class="emote-name">blobCheer</span> <img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="" width="28" height="28"><span class="emote-name">blobCheer</span></p>
+                    <p class="twchat__line"><b class="twchat__name--6">oddsocks</b>: watching this and the cooking stream at the same time</p>
+                    <p class="twchat__line"><b class="twchat__name--1">nightferry</b>: Re3 was so calm <img class="skek-emote" src="assets/emotes/kettle-steam.svg" alt="" width="28" height="28"><span class="emote-name">kettleSteam</span></p>
+                    <p class="twchat__line"><b class="twchat__name--7">saltmarsh</b>: queen trade and it's won <img class="skek-emote" src="assets/emotes/heart-pop.svg" alt="" width="28" height="28"><span class="emote-name">heartPop</span></p>
+                    <p class="twchat__line"><b class="twchat__name--3">pixelbramble</b>: don't say that yet</p>
+                    <p class="twchat__line"><b class="twchat__name--2">mossbyte</b>: four minutes is plenty <img class="skek-emote" src="assets/emotes/ghost-wave.svg" alt="" width="28" height="28"><span class="emote-name">ghostWave</span></p>
+                    <p class="twchat__line"><b class="twchat__name--4">tidepool</b>: game 3 of 5, no pressure</p>
+                    <p class="twchat__line"><b class="twchat__name--5">harborcat</b>: <img class="skek-emote" src="assets/emotes/gg-lamp.svg" alt="" width="34" height="28"><span class="emote-name">ggLamp</span> in advance</p>
+                    <p class="twchat__line"><b class="twchat__name--6">oddsocks</b>: brassfinch is thinking for a long time</p>
+                    <p class="twchat__line"><b class="twchat__name--7">saltmarsh</b>: <img class="skek-emote" src="assets/emotes/flame-hype.svg" alt="" width="28" height="28"><span class="emote-name">flameHype</span> <img class="skek-emote" src="assets/emotes/flame-hype.svg" alt="" width="28" height="28"><span class="emote-name">flameHype</span></p>
+                    <p class="twchat__line"><b class="twchat__name--1">nightferry</b>: the knight has nowhere to go</p>
+                    <p class="twchat__line"><b class="twchat__name--3">pixelbramble</b>: ok now I believe <img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="" width="28" height="28"><span class="emote-name">blobCheer</span></p>
+                    <p class="twchat__line"><b class="twchat__name--2">mossbyte</b>: this is why I watch rapid</p>
+                    <p class="twchat__line"><b class="twchat__name--4">tidepool</b>: three streams and one brain</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <figcaption>Change the number of streams to see how they're laid out in a window this wide. A dot stands in for each site's logo: purple for Twitch, red for YouTube and green for Kick.</figcaption>
+          <figcaption>A dot stands in for each site's logo: purple for Twitch, red for YouTube and green for Kick.</figcaption>
         </figure>
-      </div>
-    </section>
+      </section>
 
-    <section class="section" id="player">
-      <h2>Player</h2>
-      <div class="section__body">
-        <figure class="figure figure--float">
+      <section class="screen" id="floating-chat">
+        <div class="band">
+          <h2>Fullscreen, with chat floating over it.</h2>
+          <p>Press <span class="keys"><kbd>Alt</kbd>+<kbd>C</kbd></span> to watch Twitch, YouTube or Kick fullscreen with chat in a window you can move, resize and make see-through.</p>
+        </div>
+        <figure class="figure">
+          <div class="try try--js">
+            <span class="try__tag">Try it</span>
+            <span>Drag the chat window by its bar, and fade it with the slider</span>
+          </div>
           <div class="shot float-shot">
-            <div class="float-shot__video theirs theirs--video" aria-hidden="true">Twitch's player, fullscreen</div>
-            <div class="skek-float">
+            <img class="float-shot__pic" src="assets/streams/pixel.svg" alt="" width="640" height="360">
+            <div class="skek-float" id="float-window">
               <div class="skek-float__bar">
                 <span class="skek-float__title" aria-hidden="true">Stream Chat</span>
                 <!-- theme.js turns it on, which it needs to work. -->
-                <input class="skek-float__opacity" id="float-opacity" type="range" min="0" max="100" step="5" value="70" title="Background transparency" aria-label="Background transparency of the floating chat in this drawing" disabled>
+                <input class="skek-float__opacity" id="float-opacity" type="range" min="0" max="100" step="5" value="85" title="Background transparency" aria-label="Background transparency of the floating chat in this drawing" disabled>
               </div>
               <div class="skek-float__chat" aria-hidden="true">
-                <p class="twchat__line"><b class="twchat__name--1">nightferry</b>: is this the last game?</p>
-                <p class="twchat__line"><b class="twchat__name--3">pixelbramble</b>: two more, he said</p>
-                <p class="twchat__line"><b class="twchat__name--4">tidepool</b>: that sacrifice was not sound</p>
-                <p class="twchat__line"><b class="twchat__name--2">mossbyte</b>: it worked though</p>
-                <p class="twchat__line"><b class="twchat__name--1">nightferry</b>: it always works</p>
-                <p class="twchat__line"><b class="twchat__name--3">pixelbramble</b>: gg</p>
+                <p class="twchat__line"><b class="twchat__name--1">quietgambit</b>: this stage has the best music</p>
+                <p class="twchat__line"><b class="twchat__name--7">saltmarsh</b>: 17 coins already, go for all of them <img class="skek-emote" src="assets/emotes/flame-hype.svg" alt="" width="28" height="28"><span class="emote-name">flameHype</span></p>
+                <p class="twchat__line"><b class="twchat__name--3">pixelbramble</b>: no way she made that jump <img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="" width="28" height="28"><span class="emote-name">blobCheer</span></p>
+                <p class="twchat__line"><b class="twchat__name--5">harborcat</b>: <img class="skek-emote" src="assets/emotes/ghost-wave.svg" alt="" width="28" height="28"><span class="emote-name">ghostWave</span> <img class="skek-emote" src="assets/emotes/ghost-wave.svg" alt="" width="28" height="28"><span class="emote-name">ghostWave</span> <img class="skek-emote" src="assets/emotes/ghost-wave.svg" alt="" width="28" height="28"><span class="emote-name">ghostWave</span></p>
+                <p class="twchat__line"><b class="twchat__name--2">mossbyte</b>: two hearts is plenty <img class="skek-emote" src="assets/emotes/heart-pop.svg" alt="" width="28" height="28"><span class="emote-name">heartPop</span> <img class="skek-emote" src="assets/emotes/heart-pop.svg" alt="" width="28" height="28"><span class="emote-name">heartPop</span></p>
+                <p class="twchat__line"><b class="twchat__name--1">quietgambit</b>: the slime on the top bricks got her last time</p>
+                <p class="twchat__line"><b class="twchat__name--3">pixelbramble</b>: here we go</p>
+                <p class="twchat__line"><b class="twchat__name--2">mossbyte</b>: not today, she has this <img class="skek-emote" src="assets/emotes/kettle-steam.svg" alt="" width="28" height="28"><span class="emote-name">kettleSteam</span> <img class="skek-emote" src="assets/emotes/gg-lamp.svg" alt="" width="34" height="28"><span class="emote-name">ggLamp</span></p>
               </div>
             </div>
           </div>
-          <figcaption>Floating chat over a fullscreen stream. The slider on its bar works here: it fades the window's background and leaves the text, as it does in the extension.</figcaption>
         </figure>
-        <dl class="spec">
-          <div class="spec__row">
-            <dt>Floating chat <span class="keys"><kbd>Alt</kbd>+<kbd>C</kbd></span></dt>
-            <dd>Watch Twitch, YouTube or Kick fullscreen with chat in a window you can move, resize and make see-through.</dd>
-          </div>
-          <div class="spec__row">
-            <dt>Stacked mode <span class="keys"><kbd>Alt</kbd>+<kbd>S</kbd></span></dt>
-            <dd>The stream at full width with chat under it, for narrow windows.</dd>
-          </div>
-          <div class="spec__row">
-            <dt>Theatre mode <span class="keys"><kbd>Alt</kbd>+<kbd>T</kbd></span></dt>
-            <dd>On YouTube and Kick streams, like Twitch's own.</dd>
-          </div>
-          <div class="spec__row">
-            <dt>Audio only <span class="keys"><kbd>Alt</kbd>+<kbd>A</kbd></span></dt>
-            <dd>Listen to a Twitch stream or video without the picture, which saves data and battery.</dd>
-          </div>
-          <div class="spec__row">
-            <dt>Stream quality</dt>
-            <dd>Choose what streams start at on Twitch, YouTube and Kick, up to 1440p.</dd>
-          </div>
-          <div class="spec__row">
-            <dt>Keep quality in background tabs</dt>
-            <dd>Stop Twitch lowering a live stream to 360p when its tab is in the background. <span class="off">Off by default.</span></dd>
-          </div>
-          <div class="spec__row">
-            <dt>Reload player on errors</dt>
-            <dd>Twitch's player reloads itself when a stream stops with an error, instead of you doing it by hand.</dd>
-          </div>
-          <div class="spec__row">
-            <dt>Start when a channel goes live</dt>
-            <dd>Wait on an offline Twitch channel and the stream starts by itself when it goes live, with no refresh. <span class="off">Off by default.</span></dd>
-          </div>
-        </dl>
-      </div>
-    </section>
+      </section>
 
-    <section class="section" id="chat">
-      <h2>Chat</h2>
-      <div class="section__body split">
-        <dl class="spec">
-          <div class="spec__row">
-            <dt>7TV, BTTV and FFZ emotes</dt>
-            <dd>See them in Twitch chat, animated ones included, with no other extension. Pick one from the button in the chat box, which lists your recently used emotes at the top, click one in chat to add it to your message, or type its name.</dd>
+      <section class="screen" id="chat">
+        <div class="band">
+          <h2>7TV, BTTV and FFZ emotes in Twitch chat.</h2>
+          <p>Animated ones included, with no other extension. And in Twitch, YouTube and Kick chat alike, messages with the words you choose stand out or disappear, at one text size for all three.</p>
+        </div>
+        <div class="lab shot">
+          <div class="lab__side">
+            <div class="try"><span class="try__tag">Try it</span></div>
+            <label class="lab__switch"><input class="skek-switch" type="checkbox" role="switch" id="lab-emotes" autocomplete="off" checked><span><b>7TV, BTTV and FFZ emotes</b>Pictures where chat would show only their names.</span></label>
+            <label class="lab__switch"><input class="skek-switch" type="checkbox" role="switch" id="lab-words" autocomplete="off" checked><span><b>Highlighted words</b>Messages with a word you choose stand out, in all three sites' chat. Here it's "giveaway".</span></label>
+            <label class="lab__switch"><input class="skek-switch" type="checkbox" role="switch" id="lab-blocked" autocomplete="off"><span><b>Blocked words</b>Messages with a word you choose are removed, in all three sites' chat. Here it's "spoiler".</span></label>
+            <label class="lab__switch"><input class="skek-switch" type="checkbox" role="switch" id="lab-deleted" autocomplete="off"><span><b>See deleted messages</b>Keep reading a message in Twitch chat after a moderator deletes it. Off by default.</span></label>
+            <label class="lab__switch"><input class="skek-switch" type="checkbox" role="switch" id="lab-big" autocomplete="off"><span><b>Chat font size</b>One text size for Twitch, YouTube and Kick chat. Here, larger.</span></label>
           </div>
-          <div class="spec__row">
-            <dt>Autocomplete emotes with Tab</dt>
-            <dd>Type the start of an emote's name in Twitch chat and press Tab. <span class="off">Off by default.</span></dd>
-          </div>
-          <div class="spec__row">
-            <dt>Latest emote in the chat box</dt>
-            <dd>The empty Twitch chat box shows the name of the emote chat used last, and Tab puts it in your message.</dd>
-          </div>
-          <div class="spec__row">
-            <dt>Blocked and highlighted words</dt>
-            <dd>Remove messages containing the words you choose, or make them stand out, in Twitch, YouTube and Kick chat.</dd>
-          </div>
-          <div class="spec__row">
-            <dt>See deleted messages</dt>
-            <dd>Keep reading a message in Twitch chat after a moderator deletes it. <span class="off">Off by default.</span></dd>
-          </div>
-          <div class="spec__row">
-            <dt>When you followed a channel</dt>
-            <dd>Type <code>/followed</code> in Twitch chat to see the date, shown only to you. Your own card in chat shows it too.</dd>
-          </div>
-          <div class="spec__row">
-            <dt>Chat font size</dt>
-            <dd>One text size for Twitch, YouTube and Kick chat.</dd>
-          </div>
-          <div class="spec__row">
-            <dt>Cleaner chat</dt>
-            <dd>Hide Twitch chat's timestamps, top strip, drops, pinned messages and Hype Train.</dd>
-          </div>
-        </dl>
-        <figure class="figure">
-          <div class="shot twchat" role="img" aria-label="Twitch chat with StreamKEK. One message has a highlighted word, and a deleted message is still readable, faded and crossed out. Above the chat box is the answer to /followed, and the empty chat box shows an emote's name.">
-            <div class="skek-chat__head"><span class="skek-chat__title">Stream Chat</span></div>
-            <div class="twchat__lines">
-              <p class="twchat__line"><b class="twchat__name--1">nightferry</b>: back just in time for the endgame</p>
+          <div class="lab__chat twchat">
+            <div class="skek-chat__head" aria-hidden="true"><span class="skek-chat__title">Stream Chat</span></div>
+            <div class="chat__lines twchat__lines" id="lab-lines" data-live-chat aria-hidden="true">
+              <p class="twchat__line"><b class="twchat__name--7">saltmarsh</b>: evening chat <img class="skek-emote" src="assets/emotes/heart-pop.svg" alt="" width="28" height="28"><span class="emote-name">heartPop</span></p>
+              <p class="twchat__line"><b class="twchat__name--3">pixelbramble</b>: who is winning?</p>
+              <p class="twchat__line"><b class="twchat__name--6">oddsocks</b>: quietgambit, by a pawn</p>
+              <p class="twchat__line"><b class="twchat__name--5">harborcat</b>: this is so tense <img class="skek-emote" src="assets/emotes/kettle-steam.svg" alt="" width="28" height="28"><span class="emote-name">kettleSteam</span></p>
+              <p class="twchat__line"><b class="twchat__name--4">tidepool</b>: the clock is ticking</p>
+              <p class="twchat__line"><b class="twchat__name--1">nightferry</b>: back just in time <img class="skek-emote" src="assets/emotes/ghost-wave.svg" alt="" width="28" height="28"><span class="emote-name">ghostWave</span></p>
               <p class="twchat__line twchat__line--highlight"><b class="twchat__name--2">mossbyte</b>: is the <mark>giveaway</mark> still on after this game?</p>
-              <p class="twchat__line"><b class="twchat__name--3">pixelbramble</b>: that rook lift though</p>
-              <p class="twchat__line twchat__line--deleted"><b class="twchat__name--4">tidepool</b>: <span>a moderator deleted this, and you can still read it</span></p>
-              <p class="twchat__line"><b class="twchat__name--1">nightferry</b>: gg</p>
+              <p class="twchat__line"><b class="twchat__name--3">pixelbramble</b>: that rook lift though <img class="skek-emote" src="assets/emotes/flame-hype.svg" alt="" width="28" height="28"><span class="emote-name">flameHype</span></p>
+              <p class="twchat__line twchat__line--deleted"><b class="twchat__name--4">tidepool</b>: <span class="deleted__gone">&lt;message deleted&gt;</span><span class="deleted__kept">he should resign, this is embarrassing</span></p>
+              <p class="twchat__line"><b class="twchat__name--5">harborcat</b>: <img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="" width="28" height="28"><span class="emote-name">blobCheer</span> <img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="" width="28" height="28"><span class="emote-name">blobCheer</span> <img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="" width="28" height="28"><span class="emote-name">blobCheer</span></p>
+              <p class="twchat__line twchat__line--blocked"><b class="twchat__name--6">oddsocks</b>: spoiler: he wins this one, I saw the result</p>
+              <p class="twchat__line"><b class="twchat__name--7">saltmarsh</b>: queen trade and it's won <img class="skek-emote" src="assets/emotes/heart-pop.svg" alt="" width="28" height="28"><span class="emote-name">heartPop</span></p>
+              <p class="twchat__line twchat__line--highlight"><b class="twchat__name--1">nightferry</b>: I only came for the <mark>giveaway</mark>, staying for the chess</p>
+              <p class="twchat__line"><b class="twchat__name--3">pixelbramble</b>: don't say that yet <img class="skek-emote" src="assets/emotes/kettle-steam.svg" alt="" width="28" height="28"><span class="emote-name">kettleSteam</span></p>
+              <p class="twchat__line"><b class="twchat__name--5">harborcat</b>: <img class="skek-emote" src="assets/emotes/gg-lamp.svg" alt="" width="34" height="28"><span class="emote-name">ggLamp</span> in advance</p>
+              <p class="twchat__line"><b class="twchat__name--2">mossbyte</b>: four minutes is plenty</p>
+              <p class="twchat__line twchat__line--blocked"><b class="twchat__name--6">oddsocks</b>: no spoiler from me this time</p>
             </div>
-            <div class="twchat__input">
+            <div class="twchat__input" aria-hidden="true">
               <div class="skek-followed">
                 <p class="skek-followed__text">You followed quietgambit on 3 March 2024, 2 years and 8 months ago.</p>
                 <span class="skek-followed__close">✕</span>
               </div>
-              <div class="twchat__box">
-                <span class="skek-latest-emote">catJAM</span>
-                <span class="skek-picker-button"><svg width="20" height="20"><use href="#i-emote"/></svg></span>
-              </div>
+              <div class="twchat__box"><span class="skek-latest-emote" data-latest-emote>ggLamp</span><span class="skek-picker-button"><svg width="20" height="20"><use href="#i-emote"/></svg></span></div>
             </div>
           </div>
-          <figcaption>From the top: a highlighted word, a message a moderator deleted, the answer to <code>/followed</code>, and the latest emote's name in the chat box, beside the button that opens the emotes.</figcaption>
-        </figure>
-      </div>
-    </section>
-
-    <section class="section" id="tidier">
-      <h2>A tidier Twitch</h2>
-      <div class="section__body">
-        <dl class="spec">
-          <div class="spec__row">
-            <dt>Sort order that sticks</dt>
-            <dd>The sort you pick on Browse, live channels and category pages stays in new tabs and after a restart, instead of going back to Recommended For You.</dd>
-          </div>
-          <div class="spec__row">
-            <dt>Cleaner sidebar</dt>
-            <dd>Hide For You, Live Channels, Recommended Categories and Viewers Also Watch, and turn off the YouTube Live and Kick Live sections.</dd>
-          </div>
-          <div class="spec__row">
-            <dt>Cleaner player</dt>
-            <dd>Hide what streamers' Twitch extensions show over the video.</dd>
-          </div>
-          <div class="spec__row">
-            <dt>Auto-claim channel points</dt>
-            <dd>Only in a tab where the stream is playing. <span class="off">Off by default.</span></dd>
-          </div>
-        </dl>
-      </div>
-    </section>
-
-    <section class="section" id="settings">
-      <h2>Settings</h2>
-      <div class="section__body">
-        <dl class="spec">
-          <div class="spec__row">
-            <dt>One searchable window</dt>
-            <dd>Open it from StreamKEK's icon in Twitch's top bar or the browser toolbar.</dd>
-          </div>
-          <div class="spec__row">
-            <dt>Backup and restore</dt>
-            <dd>Save your settings, channels, favorites and chat words to a file, and put them back after a reinstall.</dd>
-          </div>
-          <div class="spec__row">
-            <dt>What's new</dt>
-            <dd>See what each version added, there or in the <a href="https://github.com/jafdell/StreamKEK/blob/main/CHANGELOG.md">changelog</a>.</dd>
-          </div>
-        </dl>
-      </div>
-    </section>
-
-    <section class="section" id="themes">
-      <h2>Themes</h2>
-      <div class="section__body">
-        <p>16 themes recolor Twitch, the settings window and the YouTube and Kick stream view, besides Twitch's own dark and light. The seasons, Christmas and Halloween also move a little, like snow falling behind the sidebar, which a switch turns off. Kick's chat stays dark in a light theme.</p>
-        <p>Pick one below. This page takes the theme the way Twitch does: its colors, its backdrop where the page is empty and, in the Seasons and Specials, its motion. The drawings change with it.</p>
-        <figure class="figure">
-          <div class="shot sw">
-            <div class="sw-nav" aria-hidden="true">
-              <div class="sw-brand"><img src="assets/icon-48.png" alt="" width="24" height="24"><span>StreamKEK</span></div>
-              <div class="sw-search">Search settings</div>
-              <div class="sw-categories">
-                <div class="sw-link sw-link--current"><svg width="18" height="18" fill="currentColor"><use href="#c-appearance"/></svg>Appearance</div>
-                <div class="sw-link"><svg width="18" height="18" fill="currentColor"><use href="#c-chat"/></svg>Chat</div>
-                <div class="sw-link"><svg width="18" height="18" fill="currentColor"><use href="#c-notifications"/></svg>Notifications</div>
-                <div class="sw-link"><svg width="18" height="18" fill="currentColor"><use href="#c-player"/></svg>Player</div>
-                <div class="sw-link"><svg width="18" height="18" fill="currentColor"><use href="#c-sidebar"/></svg>Sidebar</div>
-                <div class="sw-divider"></div>
-                <div class="sw-link"><svg width="18" height="18" fill="currentColor"><use href="#c-dot"/></svg>Kick</div>
-                <div class="sw-link"><svg width="18" height="18" fill="currentColor"><use href="#c-dot"/></svg>YouTube</div>
+          <div class="lab__side lab__side--picker">
+            <!-- The emote picker, from src/features/chat/emote-picker.js. theme.js turns its
+                 buttons on, which they need to work. -->
+            <div class="skek-picker">
+              <span class="skek-picker__search" aria-hidden="true">Search emotes</span>
+              <p class="skek-picker__heading">Recently used</p>
+              <div class="skek-picker__grid">
+                <button type="button" class="skek-picker__emote" data-name="ghostWave" disabled><img class="skek-emote" src="assets/emotes/ghost-wave.svg" alt="ghostWave" width="28" height="28"></button>
+                <button type="button" class="skek-picker__emote" data-name="flameHype" disabled><img class="skek-emote" src="assets/emotes/flame-hype.svg" alt="flameHype" width="28" height="28"></button>
+                <button type="button" class="skek-picker__emote" data-name="ggLamp" disabled><img class="skek-emote" src="assets/emotes/gg-lamp.svg" alt="ggLamp" width="34" height="28"></button>
               </div>
-              <div class="sw-feedback">
-                <div class="sw-link"><svg width="18" height="18" fill="currentColor"><use href="#c-backup"/></svg>Backup</div>
-                <div class="sw-link"><svg width="18" height="18" fill="currentColor"><use href="#c-feedback"/></svg>Feedback</div>
-                <div class="sw-link"><svg width="18" height="18" fill="currentColor"><use href="#c-whats-new"/></svg>What's new</div>
+              <p class="skek-picker__heading">7TV channel emotes</p>
+              <div class="skek-picker__grid">
+                <button type="button" class="skek-picker__emote" data-name="blobCheer" disabled><img class="skek-emote" src="assets/emotes/blob-cheer.svg" alt="blobCheer" width="28" height="28"></button>
+                <button type="button" class="skek-picker__emote" data-name="heartPop" disabled><img class="skek-emote" src="assets/emotes/heart-pop.svg" alt="heartPop" width="28" height="28"></button>
+                <button type="button" class="skek-picker__emote" data-name="kettleSteam" disabled><img class="skek-emote" src="assets/emotes/kettle-steam.svg" alt="kettleSteam" width="28" height="28"></button>
+                <button type="button" class="skek-picker__emote" data-name="ghostWave" disabled><img class="skek-emote" src="assets/emotes/ghost-wave.svg" alt="ghostWave" width="28" height="28"></button>
+              </div>
+              <p class="skek-picker__heading">BTTV global emotes</p>
+              <div class="skek-picker__grid">
+                <button type="button" class="skek-picker__emote" data-name="flameHype" disabled><img class="skek-emote" src="assets/emotes/flame-hype.svg" alt="flameHype" width="28" height="28"></button>
+                <button type="button" class="skek-picker__emote" data-name="ggLamp" disabled><img class="skek-emote" src="assets/emotes/gg-lamp.svg" alt="ggLamp" width="34" height="28"></button>
               </div>
             </div>
-            <div class="sw-content">
-              <div class="sw-title" aria-hidden="true"><svg width="18" height="18" fill="currentColor"><use href="#c-appearance"/></svg>Appearance</div>
-              <div class="sw-card">
-                <span class="sw-card__text">
-                  <span class="sw-card__label" id="theme-label">Theme</span>
-                  <span class="sw-card__hint">Colors Twitch, this window, popups, the stream view and YouTube's chat. Kick's chat stays dark in a light theme.</span>
-                </span>
-                <!-- theme.js puts the picker here. -->
-                <div class="swatches" id="themes-picker" role="radiogroup" aria-labelledby="theme-label">
-                  <p class="swatches__group">The picker needs JavaScript</p>
-                </div>
-              </div>
-              <!-- Shown by theme.js, which it needs to work. -->
-              <label class="sw-card sw-setting" hidden>
-                <span class="sw-card__text">
-                  <span class="sw-card__label">Theme animations</span>
-                  <span class="sw-card__hint">Gentle motion in the Seasons and Specials themes, like snow falling in Winter. It shows behind the sidebar and where a page is empty, never over the video or chat.</span>
-                </span>
-                <input class="skek-switch" id="theme-animations" type="checkbox" role="switch" checked>
+            <p class="lab__hint">The emote picker opens from the button in the chat box, with your recently used emotes at the top. You can also click an emote in chat to add it to your message, or type its name. <span class="try__js">Here, click one to send it.</span> Made-up emotes stand in for real ones.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="themes">
+        <div class="band">
+          <h2>16 themes.<span class="js-only"> Pick one and this page takes it.</span></h2>
+          <p>They recolor Twitch, the settings window and the YouTube and Kick stream view, besides Twitch's own dark and light. The seasons, Christmas and Halloween also move a little, like snow falling behind the sidebar. Kick's chat stays dark in a light theme.</p>
+        </div>
+        <div class="wall">
+          <span id="theme-label" hidden>Theme</span>
+          <!-- The choices of the Theme setting in src/settings.js, without Twitch's own Dark and
+               Light: each is a small picture in its theme's colors, with data-base saying whether
+               it's a dark or a light one. theme.js turns them on, which they need to work. -->
+          <div class="swatches" id="themes-picker" role="radiogroup" aria-labelledby="theme-label">
+            <p class="swatches__group">Themes</p>
+            <div class="swatches__grid">
+              <label class="swatch">
+                <input type="radio" name="theme" value="midnight" data-base="dark" autocomplete="off" disabled>
+                <span class="swatch__preview"><span class="swatch__scene" data-skek-theme="midnight"><span class="swatch__panel"></span><span class="swatch__main"><span class="swatch__text"></span><span class="swatch__text swatch__text--link"></span><span class="swatch__button"></span></span></span></span>
+                <span class="swatch__name">Midnight</span>
+              </label>
+              <label class="swatch">
+                <input type="radio" name="theme" value="slate" data-base="dark" autocomplete="off" disabled>
+                <span class="swatch__preview"><span class="swatch__scene" data-skek-theme="slate"><span class="swatch__panel"></span><span class="swatch__main"><span class="swatch__text"></span><span class="swatch__text swatch__text--link"></span><span class="swatch__button"></span></span></span></span>
+                <span class="swatch__name">Slate</span>
+              </label>
+              <label class="swatch">
+                <input type="radio" name="theme" value="dusk" data-base="dark" autocomplete="off" disabled>
+                <span class="swatch__preview"><span class="swatch__scene" data-skek-theme="dusk"><span class="swatch__panel"></span><span class="swatch__main"><span class="swatch__text"></span><span class="swatch__text swatch__text--link"></span><span class="swatch__button"></span></span></span></span>
+                <span class="swatch__name">Dusk</span>
+              </label>
+              <label class="swatch">
+                <input type="radio" name="theme" value="forest" data-base="dark" autocomplete="off" disabled>
+                <span class="swatch__preview"><span class="swatch__scene" data-skek-theme="forest"><span class="swatch__panel"></span><span class="swatch__main"><span class="swatch__text"></span><span class="swatch__text swatch__text--link"></span><span class="swatch__button"></span></span></span></span>
+                <span class="swatch__name">Forest</span>
+              </label>
+              <label class="swatch">
+                <input type="radio" name="theme" value="ember" data-base="dark" autocomplete="off" disabled>
+                <span class="swatch__preview"><span class="swatch__scene" data-skek-theme="ember"><span class="swatch__panel"></span><span class="swatch__main"><span class="swatch__text"></span><span class="swatch__text swatch__text--link"></span><span class="swatch__button"></span></span></span></span>
+                <span class="swatch__name">Ember</span>
+              </label>
+              <label class="swatch">
+                <input type="radio" name="theme" value="aurora" data-base="dark" autocomplete="off" disabled>
+                <span class="swatch__preview"><span class="swatch__scene" data-skek-theme="aurora"><span class="swatch__panel"></span><span class="swatch__main"><span class="swatch__text"></span><span class="swatch__text swatch__text--link"></span><span class="swatch__button"></span></span></span></span>
+                <span class="swatch__name">Aurora</span>
+              </label>
+              <label class="swatch">
+                <input type="radio" name="theme" value="synthwave" data-base="dark" autocomplete="off" disabled>
+                <span class="swatch__preview"><span class="swatch__scene" data-skek-theme="synthwave"><span class="swatch__panel"></span><span class="swatch__main"><span class="swatch__text"></span><span class="swatch__text swatch__text--link"></span><span class="swatch__button"></span></span></span></span>
+                <span class="swatch__name">Synthwave</span>
+              </label>
+              <label class="swatch">
+                <input type="radio" name="theme" value="terminal" data-base="dark" autocomplete="off" disabled>
+                <span class="swatch__preview"><span class="swatch__scene" data-skek-theme="terminal"><span class="swatch__panel"></span><span class="swatch__main"><span class="swatch__text"></span><span class="swatch__text swatch__text--link"></span><span class="swatch__button"></span></span></span></span>
+                <span class="swatch__name">Terminal</span>
+              </label>
+              <label class="swatch">
+                <input type="radio" name="theme" value="paper" data-base="light" autocomplete="off" disabled>
+                <span class="swatch__preview"><span class="swatch__scene" data-skek-theme="paper"><span class="swatch__panel"></span><span class="swatch__main"><span class="swatch__text"></span><span class="swatch__text swatch__text--link"></span><span class="swatch__button"></span></span></span></span>
+                <span class="swatch__name">Paper</span>
+              </label>
+              <label class="swatch">
+                <input type="radio" name="theme" value="cotton-candy" data-base="light" autocomplete="off" disabled>
+                <span class="swatch__preview"><span class="swatch__scene" data-skek-theme="cotton-candy"><span class="swatch__panel"></span><span class="swatch__main"><span class="swatch__text"></span><span class="swatch__text swatch__text--link"></span><span class="swatch__button"></span></span></span></span>
+                <span class="swatch__name">Cotton Candy</span>
+              </label>
+            </div>
+            <p class="swatches__group">Seasons</p>
+            <div class="swatches__grid">
+              <label class="swatch">
+                <input type="radio" name="theme" value="winter" data-base="dark" autocomplete="off" disabled>
+                <span class="swatch__preview"><span class="swatch__scene" data-skek-theme="winter"><span class="swatch__panel"></span><span class="swatch__main"><span class="swatch__text"></span><span class="swatch__text swatch__text--link"></span><span class="swatch__button"></span></span></span></span>
+                <span class="swatch__name">Winter</span>
+              </label>
+              <label class="swatch">
+                <input type="radio" name="theme" value="spring" data-base="light" autocomplete="off" disabled>
+                <span class="swatch__preview"><span class="swatch__scene" data-skek-theme="spring"><span class="swatch__panel"></span><span class="swatch__main"><span class="swatch__text"></span><span class="swatch__text swatch__text--link"></span><span class="swatch__button"></span></span></span></span>
+                <span class="swatch__name">Spring</span>
+              </label>
+              <label class="swatch">
+                <input type="radio" name="theme" value="summer" data-base="light" autocomplete="off" disabled>
+                <span class="swatch__preview"><span class="swatch__scene" data-skek-theme="summer"><span class="swatch__panel"></span><span class="swatch__main"><span class="swatch__text"></span><span class="swatch__text swatch__text--link"></span><span class="swatch__button"></span></span></span></span>
+                <span class="swatch__name">Summer</span>
+              </label>
+              <label class="swatch">
+                <input type="radio" name="theme" value="autumn" data-base="dark" autocomplete="off" disabled>
+                <span class="swatch__preview"><span class="swatch__scene" data-skek-theme="autumn"><span class="swatch__panel"></span><span class="swatch__main"><span class="swatch__text"></span><span class="swatch__text swatch__text--link"></span><span class="swatch__button"></span></span></span></span>
+                <span class="swatch__name">Autumn</span>
+              </label>
+            </div>
+            <p class="swatches__group">Specials</p>
+            <div class="swatches__grid">
+              <label class="swatch">
+                <input type="radio" name="theme" value="christmas" data-base="dark" autocomplete="off" disabled>
+                <span class="swatch__preview"><span class="swatch__scene" data-skek-theme="christmas"><span class="swatch__panel"></span><span class="swatch__main"><span class="swatch__text"></span><span class="swatch__text swatch__text--link"></span><span class="swatch__button"></span></span></span></span>
+                <span class="swatch__name">Christmas</span>
+              </label>
+              <label class="swatch">
+                <input type="radio" name="theme" value="halloween" data-base="dark" autocomplete="off" disabled>
+                <span class="swatch__preview"><span class="swatch__scene" data-skek-theme="halloween"><span class="swatch__panel"></span><span class="swatch__main"><span class="swatch__text"></span><span class="swatch__text swatch__text--link"></span><span class="swatch__button"></span></span></span></span>
+                <span class="swatch__name">Halloween</span>
               </label>
             </div>
           </div>
-          <figcaption>The settings window's Appearance page. Its two settings work here, and the rest of the window is a drawing. Twitch's own Dark and Light are left out: this page starts in Twitch's Dark.</figcaption>
-        </figure>
-      </div>
-    </section>
-
-    <section class="section" id="privacy">
-      <h2>Privacy</h2>
-      <div class="section__body">
-        <p>StreamKEK has no server, no account and no analytics. Nothing you do with it is sent to its developer. What it saves stays in your browser, and your sign-ins to Twitch, YouTube and Kick only go to the site they belong to.</p>
-        <p>The <a href="privacy.html">privacy policy</a> lists what it saves, what it sends and where, and what Twitch can see.</p>
-      </div>
-    </section>
-
-    <section class="section" id="code">
-      <h2>Code and feedback</h2>
-      <div class="section__body">
-        <p>StreamKEK's code is public on GitHub, under MIT with the Commons Clause: free to use, change and share, but not to sell. Pull requests are welcome. For a bigger change, open an issue first so we can talk it through.</p>
-        <div class="linkrows">
-          <a class="linkrow" href="https://github.com/jafdell/StreamKEK/issues/new?template=bug_report.yml">
-            <span class="linkrow__text"><span class="linkrow__label">Report a bug</span><span class="linkrow__hint">Something not working? Opens a short form on GitHub, which needs a GitHub account.</span></span>
-            <svg width="18" height="18" fill="currentColor" aria-hidden="true"><use href="#i-external"/></svg>
-          </a>
-          <a class="linkrow" href="https://github.com/jafdell/StreamKEK/issues/new?template=feature_request.yml">
-            <span class="linkrow__text"><span class="linkrow__label">Request a feature</span><span class="linkrow__hint">Have an idea? Opens a short form on GitHub, which needs a GitHub account.</span></span>
-            <svg width="18" height="18" fill="currentColor" aria-hidden="true"><use href="#i-external"/></svg>
-          </a>
-          <a class="linkrow" href="https://github.com/jafdell/StreamKEK">
-            <span class="linkrow__text"><span class="linkrow__label">GitHub page</span><span class="linkrow__hint">See StreamKEK's code, releases and what others have reported.</span></span>
-            <svg width="18" height="18" fill="currentColor" aria-hidden="true"><use href="#i-external"/></svg>
-          </a>
+          <!-- Shown by theme.js, which it needs to work. -->
+          <label class="setting" hidden>
+            <span class="setting__text">
+              <span class="setting__label">Theme animations</span>
+              <span class="setting__hint">Gentle motion in the Seasons and Specials themes, like snow falling in Winter. It shows behind the sidebar and where a page is empty, never over the video or chat.</span>
+            </span>
+            <input class="skek-switch" id="theme-animations" type="checkbox" role="switch" checked>
+          </label>
         </div>
-        <p class="small">Also there: the <a href="https://github.com/jafdell/StreamKEK/blob/main/CHANGELOG.md">changelog</a>, the <a href="https://github.com/jafdell/StreamKEK/blob/main/LICENSE">license</a> and <a href="https://github.com/jafdell/StreamKEK/blob/main/CONTRIBUTING.md">how the code is laid out</a>.</p>
-      </div>
-    </section>
+      </section>
 
-    <section class="section" id="install">
-      <h2>Install</h2>
-      <div class="section__body">
-        <p>StreamKEK works in Chrome, Brave and other Chromium browsers, with no API key and no extra account. After installing it, reload any open Twitch tabs.</p>
-        <p>To play streams and let you chat inside Twitch, StreamKEK allows YouTube's and Kick's cookies on twitch.tv. This is why your browser warns about cookie settings when you install it.</p>
-        <p class="actions"><a class="button" data-install href="https://chromewebstore.google.com/detail/streamkek/ndkccdbljjejloelgdcbikabojjaeomc">Add to Chrome</a></p>
+      <section class="screen" id="more">
+        <div class="band">
+          <h2>And the smaller things.</h2>
+          <p>The rest of what StreamKEK does. Click a name to read about it.</p>
+        </div>
+        <div class="more">
+          <div class="more__group">
+            <h3>Sidebar</h3>
+            <details><summary>On the Following page too</summary><p>Your live YouTube subscriptions and Kick follows also show on Twitch's Following page.</p></details>
+            <details><summary>Add and hide channels</summary><p>The <strong>+</strong> button adds YouTube and Kick channels you don't follow, and the eye on a channel hides it.</p></details>
+            <details><summary>Favorites</summary><p>Press a channel's star, or drag it to the top of the sidebar, to keep channels from all three sites together in your own order while they're live.</p></details>
+            <details><summary>Go-live notifications <span class="more__tag">off by default</span></summary><p>Get a notification when a favorite starts a stream, also with no Twitch tab open.</p></details>
+            <details><summary>Stream previews</summary><p>Hover a live channel in the sidebar to see an image of its stream.</p></details>
+            <details><summary>Cleaner sidebar</summary><p>Hide For You, Live Channels, Recommended Categories and Viewers Also Watch, and turn off the YouTube Live and Kick Live sections.</p></details>
+          </div>
+          <div class="more__group">
+            <h3>Player</h3>
+            <details><summary>Stacked mode <span class="keys"><kbd>Alt</kbd>+<kbd>S</kbd></span></summary><p>The stream at full width with chat under it, for narrow windows.</p></details>
+            <details><summary>Theatre mode <span class="keys"><kbd>Alt</kbd>+<kbd>T</kbd></span></summary><p>On YouTube and Kick streams, like Twitch's own.</p></details>
+            <details><summary>Audio only <span class="keys"><kbd>Alt</kbd>+<kbd>A</kbd></span></summary><p>Listen to a Twitch stream or video without the picture, which saves data and battery.</p></details>
+            <details><summary>Stream quality</summary><p>Choose what streams start at on Twitch, YouTube and Kick, up to 1440p.</p></details>
+            <details><summary>Keep quality in background tabs <span class="more__tag">off by default</span></summary><p>Stop Twitch lowering a live stream to 360p when its tab is in the background.</p></details>
+            <details><summary>Reload player on errors</summary><p>Twitch's player reloads itself when a stream stops with an error, instead of you doing it by hand.</p></details>
+            <details><summary>Start when a channel goes live <span class="more__tag">off by default</span></summary><p>Wait on an offline Twitch channel and the stream starts by itself when it goes live, with no refresh.</p></details>
+            <details><summary>Cleaner player</summary><p>Hide what streamers' Twitch extensions show over the video.</p></details>
+          </div>
+          <div class="more__group">
+            <h3>Chat</h3>
+            <details><summary>Autocomplete emotes with Tab <span class="more__tag">off by default</span></summary><p>Type the start of an emote's name in Twitch chat and press Tab.</p></details>
+            <details><summary>Latest emote in the chat box</summary><p>The empty Twitch chat box shows the name of the emote chat used last, and Tab puts it in your message.</p></details>
+            <details><summary>When you followed a channel</summary><p>Type <code>/followed</code> in Twitch chat to see the date, shown only to you. Your own card in chat shows it too.</p></details>
+            <details><summary>Cleaner chat</summary><p>Hide Twitch chat's timestamps, top strip, drops, pinned messages and Hype Train.</p></details>
+            <h3>Twitch's pages</h3>
+            <details><summary>Sort order that sticks</summary><p>The sort you pick on Browse, live channels and category pages stays in new tabs and after a restart, instead of going back to Recommended For You.</p></details>
+            <details><summary>Auto-claim channel points <span class="more__tag">off by default</span></summary><p>Only in a tab where the stream is playing.</p></details>
+          </div>
+          <div class="more__group">
+            <h3>Settings</h3>
+            <details><summary>One searchable window</summary><p>Open it from StreamKEK's icon in Twitch's top bar or the browser toolbar.</p></details>
+            <details><summary>Backup and restore</summary><p>Save your settings, channels, favorites and chat words to a file, and put them back after a reinstall.</p></details>
+            <details><summary>What's new</summary><p>See what each version added, there or in the <a href="https://github.com/jafdell/StreamKEK/blob/main/CHANGELOG.md">changelog</a>.</p></details>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="closing">
+      <div class="closing__in">
+        <section id="privacy">
+          <h2>Privacy</h2>
+          <p>StreamKEK has no server, no account and no analytics. Nothing you do with it is sent to its developer. What it saves stays in your browser, and your sign-ins to Twitch, YouTube and Kick only go to the site they belong to.</p>
+          <p>The <a href="privacy.html">privacy policy</a> lists what it saves, what it sends and where, and what Twitch can see.</p>
+        </section>
+        <section id="code">
+          <h2>Code and feedback</h2>
+          <p>StreamKEK's code is public on <a href="https://github.com/jafdell/StreamKEK">GitHub</a>, under MIT with the Commons Clause: free to use, change and share, but not to sell. Pull requests are welcome. For a bigger change, open an issue first so we can talk it through.</p>
+          <p><a href="https://github.com/jafdell/StreamKEK/issues/new?template=bug_report.yml">Report a bug</a> or <a href="https://github.com/jafdell/StreamKEK/issues/new?template=feature_request.yml">request a feature</a>. Each opens a short form on GitHub, which needs a GitHub account.</p>
+          <p class="small">Also there: the <a href="https://github.com/jafdell/StreamKEK/blob/main/CHANGELOG.md">changelog</a>, the <a href="https://github.com/jafdell/StreamKEK/blob/main/LICENSE">license</a> and <a href="https://github.com/jafdell/StreamKEK/blob/main/CONTRIBUTING.md">how the code is laid out</a>.</p>
+        </section>
+        <section id="install">
+          <h2>Install</h2>
+          <p>StreamKEK works in Chrome, Brave and other Chromium browsers, with no API key and no extra account. After installing it, reload any open Twitch tabs.</p>
+          <p>To play streams and let you chat inside Twitch, StreamKEK allows YouTube's and Kick's cookies on twitch.tv. This is why your browser warns about cookie settings when you install it.</p>
+          <p class="actions"><a class="pill pill--big" data-install href="https://chromewebstore.google.com/detail/streamkek/ndkccdbljjejloelgdcbikabojjaeomc">Add to Chrome</a></p>
+        </section>
       </div>
-    </section>
+    </div>
   </main>
 
   <footer class="foot">
-    <div class="wrap foot__in">
+    <div class="foot__in">
       <div>
         <p>StreamKEK is unofficial. It is not affiliated with or endorsed by Twitch, YouTube or Kick.</p>
         <p>Its code is public under MIT with the Commons Clause: free to use, change and share, but not to sell.</p>

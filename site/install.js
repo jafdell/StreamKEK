@@ -35,9 +35,10 @@
   if (mobile) note = 'StreamKEK is for desktop browsers. Open this page on a computer to install it.';
   else if (!chromium) note = "StreamKEK needs Chrome, Brave or another Chromium browser. It can't be installed in this one.";
 
+  // The button in the bar has no room for a note under it.
   const name = note ? null : browserName();
   for (const button of buttons) {
     if (name) button.textContent = `Add to ${name}`;
-    if (note) addNote(button, note);
+    if (note && button.dataset.install !== 'bar') addNote(button, note);
   }
 })();
