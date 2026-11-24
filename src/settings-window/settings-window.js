@@ -491,13 +491,13 @@
   // writes the first, in background/whats-new.js, and this window the second.
   const news = { version: null, seen: null };
 
-  // A dot on What's new in the list, from an update until it's been opened.
+  // A pill saying New on What's new in the list, from an update until it's been opened.
   function drawNewsMark() {
     const unseen = !!news.version && news.version !== news.seen;
     const link = [...feedbackLink.children].find((each) => each.dataset.category === WHATS_NEW);
     if (!link || link.classList.contains('category-link--news') === unseen) return;
     link.classList.toggle('category-link--news', unseen);
-    // The dot is only drawn, so this says it in words.
+    // Says what the pill, which settings-window.css draws, means.
     link.title = unseen ? 'New since the last update' : '';
   }
 

@@ -164,7 +164,7 @@ All in `chrome.storage.local`. A key in `SETTINGS` is written by the settings wi
 | `showKickFollows` | boolean, default true | background |
 | `liveNotificationsSeen` | `{[platform]:{at,streams:{[id]:[streamId]}}}`: each favorite's last known streams, by site | background |
 | `whatsNewVersion` | the version the browser last updated StreamKEK to, like `1.10.0`. Not there after a first install. `background/whats-new.js` | background |
-| `whatsNewSeen` | the version whose **What's new** was opened last. While it differs from `whatsNewVersion`, the settings window marks **What's new** with a dot | settings window |
+| `whatsNewSeen` | the version whose **What's new** was opened last. While it differs from `whatsNewVersion`, the settings window marks **What's new** with a pill saying New | settings window |
 | `kickVolume` | number above 0, up to 1, default 1 | Kick's player frame |
 | `favoriteChannels` | `[{id,platform,slug,login,name,handle,avatar}]`, in your order. Fields as that site's channels have them; Twitch's have `login` and the id `twitch:<login>` | Twitch page |
 | `chatHidden` | boolean | Twitch page |
