@@ -8,19 +8,20 @@ import vm from 'node:vm';
 
 import { extractJson } from '../src/features/youtube/background/youtube-pages.js';
 import { viewerCount } from '../src/features/youtube/background/live-entry.js';
+import { streamDescription } from '../src/features/youtube/background/about.js';
 import { inputToUrl } from '../src/features/youtube/background/channels.js';
 import { liveChannelsFromGuide, signInFromPage } from '../src/features/youtube/background/subscriptions.js';
 import { subscriptionsToRead } from '../src/features/youtube/background/poller.js';
 import { flippedSettings } from '../src/background/renamed-settings.js';
-import { channelPageToLive, followedStreamToLive, slugFromInput, startedAtIso } from '../src/features/kick/background/kick-api.js';
+import { channelAbout, channelPageToLive, followedStreamToLive, slugFromInput, startedAtIso } from '../src/features/kick/background/kick-api.js';
 import { copyExpiry, isRealCookie } from '../src/features/kick/background/twitch-frame-cookies.js';
 import { isSamePage, liveChanges, notificationAddress, notificationFor, notificationId, streamAddress } from '../src/features/notifications/background/live-changes.js';
 import { twitchLiveFrom } from '../src/features/notifications/background/twitch-live.js';
 
 // format.js is a classic content script, so it runs in a context holding the globals it expects.
-const context = { skek: { helpers: { el() {} }, streams: {} } };
+const context = { skek: { helpers: { el() {} }, streams: {} }, URL };
 vm.runInNewContext(readFileSync(new URL('../src/features/streams/twitch/format.js', import.meta.url), 'utf8'), context);
-const { compact } = context.skek.streams;
+const { compact, linkParts } = context.skek.streams;
 
 const favoritesContext = { skek: { helpers: { onBodyReady() {} }, streams: {} } };
 vm.runInNewContext(readFileSync(new URL('../src/features/streams/twitch/favorites.js', import.meta.url), 'utf8'), favoritesContext);
@@ -835,6 +836,70 @@ test('channelPageToLive has no entry for an offline channel', () => {
   assert.equal(channelPageToLive(page).entry, null);
   assert.equal(channelPageToLive(page).channel.avatar, 'pic');
   assert.equal(channelPageToLive({ ...page, livestream: { id: 1, is_live: true } }).entry.category, 'Kick');
+});
+
+test('channelAbout reads a Kick channel\'s followers, words, links and panels', () => {
+  const page = {
+    followers_count: '3334880',
+    verified: true,
+    user: { bio: ' Sup. ', instagram: 'adin', twitter: 'adin', youtube: '@adin', discord: 'adin', tiktok: 'adin', facebook: null },
+  };
+  const links = [
+    { order: 1, title: '', description: 'Second\nline', link: '', image: { url: 'https://files.kick.com/images/b.webp' } },
+    { order: 0, title: 'First', description: '', link: 'https://example.com/tip', image: { url: 'https://files.kick.com/images/a.webp' } },
+  ];
+  const about = channelAbout(page, links);
+  assert.equal(about.followers, 3334880);
+  assert.equal(about.verified, true);
+  assert.equal(about.bio, 'Sup.');
+  assert.deepEqual(
+    about.socials.map((social) => social.url),
+    ['https://instagram.com/adin', 'https://x.com/adin', 'https://youtube.com/@adin', 'https://discord.gg/adin', 'https://tiktok.com/@adin'],
+  );
+  assert.deepEqual(about.panels, [
+    { title: 'First', text: '', link: 'https://example.com/tip', image: 'https://files.kick.com/images/a.webp' },
+    { title: '', text: 'Second\nline', link: null, image: 'https://files.kick.com/images/b.webp' },
+  ]);
+});
+
+test('channelAbout passes on only addresses that open a website, and pictures from Kick', () => {
+  const links = [
+    { title: 'Script', link: 'javascript:alert(1)', image: { url: 'https://evil.example/x.png' } },
+    { title: 'Lookalike', link: 'data:text/html,x', image: { url: 'https://files.kick.com.evil.example/x.png' } },
+    { link: 'https://example.com/', image: { url: 'javascript:alert(1)' } },
+    null,
+    'text',
+  ];
+  const about = channelAbout({ user: { twitter: '', youtube: 'channel/UC123' } }, links);
+  assert.deepEqual(about.panels, [
+    { title: 'Script', text: '', link: null, image: null },
+    { title: 'Lookalike', text: '', link: null, image: null },
+  ]);
+  assert.deepEqual(about.socials, [{ name: 'YouTube', url: 'https://youtube.com/channel/UC123' }]);
+  assert.equal(about.followers, null);
+  assert.equal(about.verified, false);
+  assert.deepEqual(channelAbout({}, { not: 'a list' }).panels, []);
+});
+
+test('streamDescription reads a YouTube stream\'s description, only for that channel\'s video', () => {
+  const player = { videoDetails: { channelId: 'UCa', shortDescription: ' Tonight: speedruns.\nhttps://example.com ' } };
+  assert.equal(streamDescription(player, 'UCa'), 'Tonight: speedruns.\nhttps://example.com');
+  assert.equal(streamDescription(player, 'UCb'), '');
+  assert.equal(streamDescription(null, 'UCa'), '');
+});
+
+test('linkParts finds the web addresses in a text', () => {
+  // The parts come from another context, so they're compared as JSON.
+  const parts = (text) => JSON.parse(JSON.stringify(linkParts(text)));
+  assert.deepEqual(parts('Shop: https://example.com/a?b=1. Bye (see https://x.example/y)'), [
+    { text: 'Shop: ' },
+    { text: 'https://example.com/a?b=1', url: 'https://example.com/a?b=1' },
+    { text: '. Bye (see ' },
+    { text: 'https://x.example/y', url: 'https://x.example/y' },
+    { text: ')' },
+  ]);
+  assert.deepEqual(parts('no links, javascript:alert(1) neither'), [{ text: 'no links, javascript:alert(1) neither' }]);
+  assert.deepEqual(parts(''), []);
 });
 
 test('viewerCount reads plain numbers', () => {

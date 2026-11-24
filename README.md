@@ -11,6 +11,7 @@ It works in Chrome, Brave and other Chromium browsers, with no API key and no ex
 ### Watching
 
 - **YouTube and Kick streams inside Twitch:** your live YouTube subscriptions and Kick follows show in Twitch's sidebar and on the Following page, and open with their chat in a Twitch-style view. Add other channels with the **+** button, and hide the ones you don't want.
+- **About the stream and channel:** scroll down under a YouTube or Kick stream, like under a Twitch one, to see a YouTube stream's description, or a Kick channel's followers, description, links and panels.
 - **Multi-stream:** drag a channel from the sidebar onto the page to watch two to four streams at once, with their chats, from any mix of Twitch, YouTube and Kick. Drag between streams to resize them, drag a stream's name onto another to swap them, and choose which one has the sound.
 - **Favorites:** press a channel's star, or drag it to the top of the sidebar, to keep channels from all three sites together in your own order while they're live.
 - **Go-live notifications:** get a notification when a favorite starts a stream, also with no Twitch tab open. Off by default.

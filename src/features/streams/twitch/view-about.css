@@ -1,0 +1,83 @@
+/* The About section under a stream in the stream view, built by view-about.js to look like the one
+   under Twitch's own streams. */
+
+/* The player and the info bar fill the view as they did without it, and scrolling shows the rest.
+   With no scrollbar, like Twitch's page, so the video keeps its full width. */
+.skek-screen { flex: 0 0 100%; min-height: 0; display: flex; flex-direction: column; }
+.skek-view--about .skek-main { overflow-y: auto; scrollbar-width: none; }
+
+.skek-about { display: none; flex: 0 0 auto; padding: 4px 16px 32px; }
+.skek-view--about .skek-about { display: block; }
+/* Theatre, stacked and floating chat show only the stream and chat. */
+.skek-view--full-window .skek-main { overflow: hidden; }
+.skek-view--full-window .skek-about { display: none; }
+
+.skek-about__channel { max-width: 1200px; margin: 0 auto; }
+.skek-about__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.1;
+}
+.skek-about__box + .skek-about__title { margin-top: 24px; }
+.skek-about__verified { display: inline-flex; color: var(--color-text-link, #bf94ff); }
+.skek-about__box {
+  display: flex;
+  gap: 24px;
+  padding: 16px;
+  border-radius: 4px;
+  background: var(--color-background-base);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.skek-about__words { flex: 1 1 auto; min-width: 0; }
+.skek-about__followers { margin: 0 0 4px; color: var(--color-text-alt-2); }
+.skek-about__followers strong { color: var(--color-text-base); font-weight: 600; }
+/* A streamer's own words: their line breaks are kept, and a long address can't widen the page. */
+.skek-about__bio,
+.skek-about__panel-text { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--color-text-alt-2); }
+.skek-about__bio a { color: var(--color-text-link, #bf94ff); }
+/* A long text shows its first lines until Show more is pressed. */
+.skek-about__bio--folded { max-height: calc(1.4em * 8); overflow: hidden; }
+.skek-about__more {
+  margin-top: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text-base);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.skek-about__more:hover { color: var(--color-text-link, #bf94ff); }
+.skek-about__socials { flex: 0 1 auto; max-width: 40%; margin: 0; padding: 0; list-style: none; overflow-wrap: anywhere; }
+.skek-about__socials .skek-icon { flex: 0 0 auto; }
+.skek-about__socials a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  color: var(--color-text-alt-2) !important;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+.skek-about__socials a:hover { color: var(--color-text-link, #bf94ff) !important; }
+.skek-about__socials svg { width: 16px; height: 16px; }
+
+/* Twitch's panels are 320px wide, as many beside each other as fit. */
+.skek-about__panels {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px 20px;
+  margin-top: 24px;
+}
+.skek-about__panel { width: 320px; font-size: 14px; line-height: 1.4; }
+.skek-about__panel > * + * { margin-top: 8px; }
+.skek-about__panel-title { margin: 0; font-size: 18px; font-weight: 600; overflow-wrap: anywhere; }
+.skek-about__panel img { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+.skek-about__panel a { display: block; color: var(--color-text-link, #bf94ff); overflow-wrap: anywhere; }

@@ -56,6 +56,7 @@
         "src/features/streams/twitch/sidebar.js",
         "src/features/streams/twitch/view-frames.js",
         "src/features/streams/twitch/view-layouts.js",
+        "src/features/streams/twitch/view-about.js",
         "src/features/streams/twitch/stream-view.js",
         "src/features/streams/twitch/multi-view.js",
         "src/features/streams/twitch/routes.js",
@@ -109,6 +110,7 @@
         "src/features/streams/twitch/stream-tip.css",
         "src/features/streams/twitch/manager-frame.css",
         "src/features/streams/twitch/stream-view.css",
+        "src/features/streams/twitch/view-about.css",
         "src/features/streams/twitch/multi-view.css",
         "src/features/streams/twitch/following.css"
       ],

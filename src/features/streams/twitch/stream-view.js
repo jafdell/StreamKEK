@@ -1,5 +1,6 @@
 // The Twitch-style stream view for other sites: its info bar, and opening and closing it. Its two
-// frames are in view-frames.js, and its theatre, stacked and floating modes in view-layouts.js.
+// frames are in view-frames.js, its theatre, stacked and floating modes in view-layouts.js, and the
+// About section under a stream in view-about.js.
 (() => {
   'use strict';
 
@@ -32,112 +33,121 @@
     const root = el(
       'div',
       { id: VIEW_ID, class: 'skek-view' },
-      el(
-        'div',
-        { class: 'skek-main', on: { mousemove: showOverlay } },
-        ref('player', el('div', { class: 'skek-player' })),
+      ref(
+        'main',
         el(
           'div',
-          { class: 'skek-info' },
+          { class: 'skek-main', on: { mousemove: showOverlay } },
+          // What fills the view before any scrolling: the player with the info bar under it.
           el(
             'div',
-            { class: 'skek-info__avatar' },
-            ref('avatar', el('img', { class: 'skek-info__img', alt: '', referrerPolicy: 'no-referrer' })),
-            ref('badge', el('span', { class: 'skek-info__badge' }, 'LIVE')),
-          ),
-          el(
-            'div',
-            { class: 'skek-info__body' },
+            { class: 'skek-screen' },
+            ref('player', el('div', { class: 'skek-player' })),
             el(
               'div',
-              { class: 'skek-info__row' },
-              ref('name', el('a', { class: 'skek-info__name', target: '_blank', rel: 'noopener' })),
+              { class: 'skek-info' },
               el(
                 'div',
-                { class: 'skek-info__actions' },
-                ref(
-                  'floatingButton',
+                { class: 'skek-info__avatar' },
+                ref('avatar', el('img', { class: 'skek-info__img', alt: '', referrerPolicy: 'no-referrer' })),
+                ref('badge', el('span', { class: 'skek-info__badge' }, 'LIVE')),
+              ),
+              el(
+                'div',
+                { class: 'skek-info__body' },
+                el(
+                  'div',
+                  { class: 'skek-info__row' },
+                  ref('name', el('a', { class: 'skek-info__name', target: '_blank', rel: 'noopener' })),
                   el(
-                    'button',
-                    {
-                      class: 'skek-button skek-button--icon',
-                      type: 'button',
-                      ariaLabel: 'Floating chat',
-                      'data-skek-tooltip': 'StreamKEK (Alt+C)',
-                      on: { click: () => toggleLayout('floating') },
-                    },
-                    icon('floating'),
+                    'div',
+                    { class: 'skek-info__actions' },
+                    ref(
+                      'floatingButton',
+                      el(
+                        'button',
+                        {
+                          class: 'skek-button skek-button--icon',
+                          type: 'button',
+                          ariaLabel: 'Floating chat',
+                          'data-skek-tooltip': 'StreamKEK (Alt+C)',
+                          on: { click: () => toggleLayout('floating') },
+                        },
+                        icon('floating'),
+                      ),
+                    ),
+                    ref(
+                      'stackedButton',
+                      el(
+                        'button',
+                        {
+                          class: 'skek-button skek-button--icon',
+                          type: 'button',
+                          ariaLabel: 'Stacked mode',
+                          'data-skek-tooltip': 'StreamKEK (Alt+S)',
+                          on: { click: () => toggleLayout('stacked') },
+                        },
+                        icon('stacked'),
+                      ),
+                    ),
+                    ref(
+                      'theatreButton',
+                      el(
+                        'button',
+                        {
+                          class: 'skek-button skek-button--icon',
+                          type: 'button',
+                          ariaLabel: 'Theatre mode',
+                          'data-skek-tooltip': 'StreamKEK (Alt+T)',
+                          on: { click: () => toggleLayout('theatre') },
+                        },
+                        icon('theatre'),
+                      ),
+                    ),
+                    ref(
+                      'external',
+                      el(
+                        'a',
+                        { class: 'skek-button', target: '_blank', rel: 'noopener', 'data-skek-tooltip': 'StreamKEK' },
+                        icon('external'),
+                        ref('externalLabel', el('span', {})),
+                      ),
+                    ),
                   ),
                 ),
-                ref(
-                  'stackedButton',
+                el(
+                  'div',
+                  { class: 'skek-info__row' },
                   el(
-                    'button',
-                    {
-                      class: 'skek-button skek-button--icon',
-                      type: 'button',
-                      ariaLabel: 'Stacked mode',
-                      'data-skek-tooltip': 'StreamKEK (Alt+S)',
-                      on: { click: () => toggleLayout('stacked') },
-                    },
-                    icon('stacked'),
+                    'div',
+                    { class: 'skek-info__text' },
+                    ref('title', el('p', { class: 'skek-info__title' })),
+                    ref('category', el('p', { class: 'skek-info__category' })),
                   ),
-                ),
-                ref(
-                  'theatreButton',
                   el(
-                    'button',
-                    {
-                      class: 'skek-button skek-button--icon',
-                      type: 'button',
-                      ariaLabel: 'Theatre mode',
-                      'data-skek-tooltip': 'StreamKEK (Alt+T)',
-                      on: { click: () => toggleLayout('theatre') },
-                    },
-                    icon('theatre'),
-                  ),
-                ),
-                ref(
-                  'external',
-                  el(
-                    'a',
-                    { class: 'skek-button', target: '_blank', rel: 'noopener', 'data-skek-tooltip': 'StreamKEK' },
-                    icon('external'),
-                    ref('externalLabel', el('span', {})),
+                    'div',
+                    { class: 'skek-info__stats' },
+                    el('span', { class: 'skek-stat skek-stat--viewers' }, icon('person'), ref('viewers', el('span', {}))),
+                    el('span', { class: 'skek-stat' }, icon('clock'), ref('uptime', el('span', {}))),
                   ),
                 ),
               ),
             ),
-            el(
-              'div',
-              { class: 'skek-info__row' },
-              el(
-                'div',
-                { class: 'skek-info__text' },
-                ref('title', el('p', { class: 'skek-info__title' })),
-                ref('category', el('p', { class: 'skek-info__category' })),
-              ),
-              el(
-                'div',
-                { class: 'skek-info__stats' },
-                el('span', { class: 'skek-stat skek-stat--viewers' }, icon('person'), ref('viewers', el('span', {}))),
-                el('span', { class: 'skek-stat' }, icon('clock'), ref('uptime', el('span', {}))),
-              ),
-            ),
           ),
-        ),
-        ref(
-          'reopen',
-          el(
-            'button',
-            {
-              class: 'skek-iconbtn skek-reopen',
-              type: 'button',
-              title: 'Expand chat',
-              ariaLabel: 'Expand chat',
-              on: { click: () => setChatHidden(false) },
-            },
-            icon('expand'),
+          ref('about', el('div', { class: 'skek-about' })),
+          ref(
+            'reopen',
+            el(
+              'button',
+              {
+                class: 'skek-iconbtn skek-reopen',
+                type: 'button',
+                title: 'Expand chat',
+                ariaLabel: 'Expand chat',
+                on: { click: () => setChatHidden(false) },
+              },
+              icon('expand'),
+            ),
           ),
         ),
       ),
@@ -184,6 +194,7 @@
     }
     state.pinnedVideoId = stream?.videoId ?? null;
     loadStream(channel, stream);
+    shared.showAbout();
 
     const site = siteOf(channel);
     if (site.loadsDetails && stream && !stream.startedAt && !detailsRequested.has(stream.videoId)) {

@@ -2,6 +2,7 @@
 // streams/background/site-background.js.
 
 import { allowCookiesOnTwitch, sendRequestsAsSite } from '../../streams/background/site-background.js';
+import { fetchAbout } from './about.js';
 import { addChannel, removeChannel } from './channels.js';
 import { background } from './poller.js';
 import { loadStreamDetails } from './live-entry.js';
@@ -17,6 +18,7 @@ export const messageHandlers = {
     await background.setShowFollowed(msg.enabled);
     return { ok: true };
   },
+  'youtube-live:loadAbout': async (msg) => ({ ok: true, about: await fetchAbout(msg.channelId, msg.videoId) }),
   'youtube-live:loadStreamDetails': async (msg) => {
     await loadStreamDetails(msg.channelId, msg.videoId);
     return { ok: true };

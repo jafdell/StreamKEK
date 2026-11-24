@@ -19,7 +19,8 @@
     close: '<path d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4 6.4 5Z"/>',
     chat: '<path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9l-5 4v-4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/>',
     speakerOff: '<path d="M4 9v6h4l5 4V5L8 9H4Zm11.4.6 1.6 1.6 1.6-1.6 1.4 1.4-1.6 1.6 1.6 1.6-1.4 1.4-1.6-1.6-1.6 1.6-1.4-1.4 1.6-1.6-1.6-1.6 1.4-1.4Z"/>',
-    bolt: '<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/>',
+    verified: '<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1.5 14.5-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4-7 7Z"/>',
+    bolt:'<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/>',
     // Animated by multi-view.css, and still where motion is reduced.
     soundBars: '<rect class="skek-sound-bar" x="3" y="10" width="3" height="10" rx="1.5"/><rect class="skek-sound-bar" x="8" y="4" width="3" height="16" rx="1.5"/><rect class="skek-sound-bar" x="13" y="13" width="3" height="7" rx="1.5"/><rect class="skek-sound-bar" x="18" y="7" width="3" height="13" rx="1.5"/>',
     star: '<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/>',

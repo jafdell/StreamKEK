@@ -151,7 +151,8 @@ test('every site in sites.js is complete', () => {
   const handlers = { ...youtubeHandlers, ...kickHandlers };
   const seen = new Set();
   for (const [platform, site] of Object.entries(context.skek.sites)) {
-    for (const action of ['add', 'remove', 'hide', 'unhide', 'refresh', ...(site.loadsDetails ? ['loadStreamDetails'] : [])]) {
+    const asked = [...(site.loadsDetails ? ['loadStreamDetails'] : []), ...(site.loadsAbout ? ['loadAbout'] : [])];
+    for (const action of ['add', 'remove', 'hide', 'unhide', 'refresh', ...asked]) {
       assert.ok(handlers[`${site.messagePrefix}:${action}`], `${platform} has no handler for ${action}`);
     }
     assert.ok(settingKeys.has(site.followsSetting), `${platform} needs the setting ${site.followsSetting}`);
