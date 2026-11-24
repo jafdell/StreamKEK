@@ -125,6 +125,11 @@ html[data-embedded] body { width: auto; min-height: 0; padding: 0; background: t
    it. A long list scrolls here, after about six channels, rather than making the settings longer. */
 html[data-embedded],
 html[data-embedded] body { height: auto; }
+/* The page never scrolls there, since the frame follows its height. Without this, a list that grew
+   showed a scrollbar for a moment, until the frame caught up. That changed the page's width while
+   its size was being reported, which the browser logs as an error: "ResizeObserver loop completed
+   with undelivered notifications". */
+html[data-embedded] { overflow: hidden; }
 html[data-embedded] #list { max-height: 270px; }
 html[data-embedded] #hidden { margin-top: 0; }
 html[data-embedded] ul { margin: 10px 0 0; }
