@@ -11,6 +11,9 @@ html[data-skek-kick-watch] [role='dialog'],
 html[data-skek-kick-watch] [role='alertdialog'] {
   visibility: visible !important;
 }
+/* Kick's own chat is on this page too, and hiding it with the rest still leaves the browser laying it
+   out for every message. The stream view shows chat in a frame of its own, so this one isn't drawn. */
+html[data-skek-kick-watch] #channel-chatroom { display: none !important; }
 html[data-skek-kick-watch] #injected-channel-player {
   position: fixed !important;
   inset: 0 !important;

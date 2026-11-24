@@ -9,7 +9,8 @@ import vm from 'node:vm';
 import { extractJson } from '../src/features/youtube/background/youtube-pages.js';
 import { viewerCount } from '../src/features/youtube/background/live-entry.js';
 import { inputToUrl } from '../src/features/youtube/background/channels.js';
-import { liveChannelsFromGuide } from '../src/features/youtube/background/subscriptions.js';
+import { liveChannelsFromGuide, signInFromPage } from '../src/features/youtube/background/subscriptions.js';
+import { subscriptionsToRead } from '../src/features/youtube/background/poller.js';
 import { flippedSettings } from '../src/background/renamed-settings.js';
 import { channelPageToLive, followedStreamToLive, slugFromInput, startedAtIso } from '../src/features/kick/background/kick-api.js';
 import { copyExpiry, isRealCookie } from '../src/features/kick/background/twitch-frame-cookies.js';
@@ -717,6 +718,26 @@ test('liveChannelsFromGuide keeps only live channels, once each', () => {
   const lofi = 'UCSJ4gkVC6NrvII8umztf0Ow';
   const guide = { items: [entry(lofi, true), entry(lofi, true), entry('UCc5afI6aaaaaaaaaaaaaaaa', false), entry('FEwhat_to_watch', true)] };
   assert.deepEqual(liveChannelsFromGuide(guide), [{ id: lofi, name: 'Lofi Girl', handle: '@LofiGirl', avatar: 'large' }]);
+});
+
+test('signInFromPage reads what asking for the guide needs, or that you are signed out', () => {
+  const page = '{"LOGGED_IN":true,"SESSION_INDEX":"2","INNERTUBE_CLIENT_VERSION":"2.20261120.01.00","DELEGATED_SESSION_ID":"1234567890"}';
+  assert.deepEqual(signInFromPage(page, 5), { at: 5, authUser: '2', clientVersion: '2.20261120.01.00', pageId: '1234567890' });
+  assert.deepEqual(signInFromPage('{"LOGGED_IN":true}', 5), { at: 5, authUser: '0', clientVersion: null, pageId: null });
+  assert.equal(signInFromPage('{"LOGGED_IN":false,"SESSION_INDEX":"0"}', 5), null);
+});
+
+test('subscriptionsToRead leaves out a live subscription whose pages were just read', () => {
+  const minutes = (count) => count * 60_000;
+  const channels = [{ id: 'new' }, { id: 'recent' }, { id: 'old' }, { id: 'never' }];
+  const previous = { recent: {}, old: {}, never: {} };
+  const readAt = { new: minutes(9), recent: minutes(8), old: minutes(5) };
+  const ids = (now) => subscriptionsToRead(channels, previous, readAt, now).map((c) => c.id);
+  // One that wasn't live a minute ago is read whatever is remembered about it.
+  assert.deepEqual(ids(minutes(10)), ['new', 'old', 'never']);
+  // The fifth check after a read does it again, even if it comes a little early.
+  assert.deepEqual(ids(minutes(13) - 5000), ['new', 'recent', 'old', 'never']);
+  assert.deepEqual(ids(minutes(12)), ['new', 'old', 'never']);
 });
 
 test('flippedSettings keeps what people chose under the old hide settings', () => {

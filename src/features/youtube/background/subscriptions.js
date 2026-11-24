@@ -35,11 +35,29 @@ async function authorizationHeader() {
   return `SAPISIDHASH ${time}_${hex}`;
 }
 
-// `html` is any signed-in YouTube page. A brand account only gets its own subscriptions
-// with the page ID. sendRequestsAsSite in index.js makes the request come from YouTube.
-async function fetchGuideChannels(html) {
+// What a signed-in YouTube page says about your sign-in, which asking for the guide needs: which of
+// your accounts it is, a brand account's page ID, and the version of YouTube's site. Null when the
+// page says you're signed out.
+export function signInFromPage(html, now) {
+  if (!html.includes('"LOGGED_IN":true')) return null;
   const config = (name) => html.match(new RegExp(`"${name}":"?([\\w.]+)`))?.[1];
-  const pageId = html.match(/"DELEGATED_SESSION_ID":"(\d+)"/)?.[1];
+  return {
+    at: now,
+    authUser: config('SESSION_INDEX') ?? '0',
+    clientVersion: config('INNERTUBE_CLIENT_VERSION') ?? null,
+    pageId: html.match(/"DELEGATED_SESSION_ID":"(\d+)"/)?.[1] ?? null,
+  };
+}
+
+// That page is over 2 MB and what it says rarely changes, so it's read again only this often, not on
+// every check. Kept in session storage: the worker can stop between checks, and it's gone when the
+// browser closes. Switching YouTube accounts can show the other account's subscriptions until then.
+const SIGN_IN_KEY = 'youtubeSignIn';
+const SIGN_IN_MS = 15 * 60_000;
+
+// A brand account only gets its own subscriptions with the page ID. sendRequestsAsSite in index.js
+// makes the request come from YouTube.
+async function fetchGuideChannels({ authUser, clientVersion, pageId }) {
   const res = await fetch(`${YT}/youtubei/v1/guide?prettyPrint=false`, {
     method: 'POST',
     credentials: 'include',
@@ -48,11 +66,11 @@ async function fetchGuideChannels(html) {
       'Content-Type': 'application/json',
       Authorization: await authorizationHeader(),
       'X-Origin': YT,
-      'X-Goog-AuthUser': config('SESSION_INDEX') ?? '0',
+      'X-Goog-AuthUser': authUser,
       ...(pageId ? { 'X-Goog-PageId': pageId } : {}),
     },
     body: JSON.stringify({
-      context: { client: { clientName: 'WEB', clientVersion: config('INNERTUBE_CLIENT_VERSION') } },
+      context: { client: { clientName: 'WEB', clientVersion: clientVersion ?? undefined } },
     }),
   });
   if (!res.ok) throw new Error(`YouTube answered ${res.status}`);
@@ -60,7 +78,20 @@ async function fetchGuideChannels(html) {
 }
 
 export async function fetchLiveSubscriptions() {
-  const { html } = await fetchPage(`${YT}/`);
-  if (!html.includes('"LOGGED_IN":true')) return { signedOut: true, channels: [] };
-  return { signedOut: false, channels: await fetchGuideChannels(html) };
+  const { [SIGN_IN_KEY]: kept } = await chrome.storage.session.get(SIGN_IN_KEY);
+  const now = Date.now();
+  const fresh = !!kept && now - kept.at < SIGN_IN_MS;
+  const signIn = fresh ? kept : signInFromPage((await fetchPage(`${YT}/`)).html, now);
+  if (!signIn) {
+    await chrome.storage.session.remove(SIGN_IN_KEY);
+    return { signedOut: true, channels: [] };
+  }
+  if (!fresh) await chrome.storage.session.set({ [SIGN_IN_KEY]: signIn });
+  try {
+    return { signedOut: false, channels: await fetchGuideChannels(signIn) };
+  } catch (e) {
+    // What was kept may be out of date, after signing out for one, so the next check reads the page again.
+    await chrome.storage.session.remove(SIGN_IN_KEY);
+    throw e;
+  }
 }

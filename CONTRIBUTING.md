@@ -168,3 +168,5 @@ All in `chrome.storage.local`. A key in `SETTINGS` is written by the settings wi
 | `chatBlockedWords`, `chatHighlightedWords` | `[string]`, default empty | settings window |
 | `floatingChat` | `{x,y,width,height,opacity}`, each optional | Twitch page |
 | `recentEmotes` | `[{name,twitch}]`, the last emotes you sent in Twitch's chat, newest first. `twitch` is the emote's id, only on Twitch's own | Twitch page |
+
+Two more are in `chrome.storage.session`, which the background writes and the browser empties when it closes. They only save YouTube from being asked the same thing every minute, so nothing backs them up: `youtubeSignIn` is `{at,authUser,clientVersion,pageId}`, what YouTube's home page says about your sign-in, and `youtubePagesRead` is `{[id]:time}`, when each live subscription's own pages were last read.
