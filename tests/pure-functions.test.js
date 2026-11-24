@@ -8,18 +8,21 @@ import vm from 'node:vm';
 
 import { extractJson } from '../src/features/youtube/background/youtube-pages.js';
 import { viewerCount } from '../src/features/youtube/background/live-entry.js';
+import { updatedVersion } from '../src/background/whats-new.js';
+import { streamDescription } from '../src/features/youtube/background/about.js';
 import { inputToUrl } from '../src/features/youtube/background/channels.js';
-import { liveChannelsFromGuide } from '../src/features/youtube/background/subscriptions.js';
+import { liveChannelsFromGuide, signInFromPage } from '../src/features/youtube/background/subscriptions.js';
+import { subscriptionsToRead } from '../src/features/youtube/background/poller.js';
 import { flippedSettings } from '../src/background/renamed-settings.js';
-import { channelPageToLive, followedStreamToLive, slugFromInput, startedAtIso } from '../src/features/kick/background/kick-api.js';
+import { channelAbout, channelPageToLive, followedStreamToLive, slugFromInput, startedAtIso } from '../src/features/kick/background/kick-api.js';
 import { copyExpiry, isRealCookie } from '../src/features/kick/background/twitch-frame-cookies.js';
 import { isSamePage, liveChanges, notificationAddress, notificationFor, notificationId, streamAddress } from '../src/features/notifications/background/live-changes.js';
 import { twitchLiveFrom } from '../src/features/notifications/background/twitch-live.js';
 
 // format.js is a classic content script, so it runs in a context holding the globals it expects.
-const context = { skek: { helpers: { el() {} }, streams: {} } };
+const context = { skek: { helpers: { el() {} }, streams: {} }, URL };
 vm.runInNewContext(readFileSync(new URL('../src/features/streams/twitch/format.js', import.meta.url), 'utf8'), context);
-const { compact } = context.skek.streams;
+const { compact, linkParts } = context.skek.streams;
 
 const favoritesContext = { skek: { helpers: { onBodyReady() {} }, streams: {} } };
 vm.runInNewContext(readFileSync(new URL('../src/features/streams/twitch/favorites.js', import.meta.url), 'utf8'), favoritesContext);
@@ -719,6 +722,26 @@ test('liveChannelsFromGuide keeps only live channels, once each', () => {
   assert.deepEqual(liveChannelsFromGuide(guide), [{ id: lofi, name: 'Lofi Girl', handle: '@LofiGirl', avatar: 'large' }]);
 });
 
+test('signInFromPage reads what asking for the guide needs, or that you are signed out', () => {
+  const page = '{"LOGGED_IN":true,"SESSION_INDEX":"2","INNERTUBE_CLIENT_VERSION":"2.20261120.01.00","DELEGATED_SESSION_ID":"1234567890"}';
+  assert.deepEqual(signInFromPage(page, 5), { at: 5, authUser: '2', clientVersion: '2.20261120.01.00', pageId: '1234567890' });
+  assert.deepEqual(signInFromPage('{"LOGGED_IN":true}', 5), { at: 5, authUser: '0', clientVersion: null, pageId: null });
+  assert.equal(signInFromPage('{"LOGGED_IN":false,"SESSION_INDEX":"0"}', 5), null);
+});
+
+test('subscriptionsToRead leaves out a live subscription whose pages were just read', () => {
+  const minutes = (count) => count * 60_000;
+  const channels = [{ id: 'new' }, { id: 'recent' }, { id: 'old' }, { id: 'never' }];
+  const previous = { recent: {}, old: {}, never: {} };
+  const readAt = { new: minutes(9), recent: minutes(8), old: minutes(5) };
+  const ids = (now) => subscriptionsToRead(channels, previous, readAt, now).map((c) => c.id);
+  // One that wasn't live a minute ago is read whatever is remembered about it.
+  assert.deepEqual(ids(minutes(10)), ['new', 'old', 'never']);
+  // The fifth check after a read does it again, even if it comes a little early.
+  assert.deepEqual(ids(minutes(13) - 5000), ['new', 'recent', 'old', 'never']);
+  assert.deepEqual(ids(minutes(12)), ['new', 'old', 'never']);
+});
+
 test('flippedSettings keeps what people chose under the old hide settings', () => {
   assert.deepEqual(flippedSettings({ hideYouTubeLive: true }), { set: { showYouTubeLive: false }, remove: ['hideYouTubeLive'] });
   assert.deepEqual(flippedSettings({ hideKickLive: false }), { set: { showKickLive: true }, remove: ['hideKickLive'] });
@@ -814,6 +837,78 @@ test('channelPageToLive has no entry for an offline channel', () => {
   assert.equal(channelPageToLive(page).entry, null);
   assert.equal(channelPageToLive(page).channel.avatar, 'pic');
   assert.equal(channelPageToLive({ ...page, livestream: { id: 1, is_live: true } }).entry.category, 'Kick');
+});
+
+test('channelAbout reads a Kick channel\'s followers, words, links and panels', () => {
+  const page = {
+    followers_count: '3334880',
+    verified: true,
+    user: { bio: ' Sup. ', instagram: 'adin', twitter: 'adin', youtube: '@adin', discord: 'adin', tiktok: 'adin', facebook: null },
+  };
+  const links = [
+    { order: 1, title: '', description: 'Second\nline', link: '', image: { url: 'https://files.kick.com/images/b.webp' } },
+    { order: 0, title: 'First', description: '', link: 'https://example.com/tip', image: { url: 'https://files.kick.com/images/a.webp' } },
+  ];
+  const about = channelAbout(page, links);
+  assert.equal(about.followers, 3334880);
+  assert.equal(about.verified, true);
+  assert.equal(about.bio, 'Sup.');
+  assert.deepEqual(
+    about.socials.map((social) => social.url),
+    ['https://instagram.com/adin', 'https://x.com/adin', 'https://youtube.com/@adin', 'https://discord.gg/adin', 'https://tiktok.com/@adin'],
+  );
+  assert.deepEqual(about.panels, [
+    { title: 'First', text: '', link: 'https://example.com/tip', image: 'https://files.kick.com/images/a.webp' },
+    { title: '', text: 'Second\nline', link: null, image: 'https://files.kick.com/images/b.webp' },
+  ]);
+});
+
+test('channelAbout passes on only addresses that open a website, and pictures from Kick', () => {
+  const links = [
+    { title: 'Script', link: 'javascript:alert(1)', image: { url: 'https://evil.example/x.png' } },
+    { title: 'Lookalike', link: 'data:text/html,x', image: { url: 'https://files.kick.com.evil.example/x.png' } },
+    { link: 'https://example.com/', image: { url: 'javascript:alert(1)' } },
+    null,
+    'text',
+  ];
+  const about = channelAbout({ user: { twitter: '', youtube: 'channel/UC123' } }, links);
+  assert.deepEqual(about.panels, [
+    { title: 'Script', text: '', link: null, image: null },
+    { title: 'Lookalike', text: '', link: null, image: null },
+  ]);
+  assert.deepEqual(about.socials, [{ name: 'YouTube', url: 'https://youtube.com/channel/UC123' }]);
+  assert.equal(about.followers, null);
+  assert.equal(about.verified, false);
+  assert.deepEqual(channelAbout({}, { not: 'a list' }).panels, []);
+});
+
+test('streamDescription reads a YouTube stream\'s description, only for that channel\'s video', () => {
+  const player = { videoDetails: { channelId: 'UCa', shortDescription: ' Tonight: speedruns.\nhttps://example.com ' } };
+  assert.equal(streamDescription(player, 'UCa'), 'Tonight: speedruns.\nhttps://example.com');
+  assert.equal(streamDescription(player, 'UCb'), '');
+  assert.equal(streamDescription(null, 'UCa'), '');
+});
+
+test('linkParts finds the web addresses in a text', () => {
+  // The parts come from another context, so they're compared as JSON.
+  const parts = (text) => JSON.parse(JSON.stringify(linkParts(text)));
+  assert.deepEqual(parts('Shop: https://example.com/a?b=1. Bye (see https://x.example/y)'), [
+    { text: 'Shop: ' },
+    { text: 'https://example.com/a?b=1', url: 'https://example.com/a?b=1' },
+    { text: '. Bye (see ' },
+    { text: 'https://x.example/y', url: 'https://x.example/y' },
+    { text: ')' },
+  ]);
+  assert.deepEqual(parts('no links, javascript:alert(1) neither'), [{ text: 'no links, javascript:alert(1) neither' }]);
+  assert.deepEqual(parts(''), []);
+});
+
+test('updatedVersion notes an update to another version, and nothing else', () => {
+  assert.equal(updatedVersion({ reason: 'update', previousVersion: '1.9.1' }, '1.10.0'), '1.10.0');
+  // The Reload button on the extensions page.
+  assert.equal(updatedVersion({ reason: 'update', previousVersion: '1.10.0' }, '1.10.0'), null);
+  assert.equal(updatedVersion({ reason: 'install' }, '1.10.0'), null);
+  assert.equal(updatedVersion({ reason: 'chrome_update' }, '1.10.0'), null);
 });
 
 test('viewerCount reads plain numbers', () => {

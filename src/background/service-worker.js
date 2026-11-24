@@ -11,6 +11,7 @@ import {
   startBackground as startNotifications,
 } from '../features/notifications/background/index.js';
 import { moveRenamedSettings } from './renamed-settings.js';
+import { noteUpdate } from './whats-new.js';
 
 const handlers = { __proto__: null, ...youtubeLiveHandlers, ...kickLiveHandlers, ...notificationHandlers }; // so 'constructor' etc. stay unknown types
 
@@ -24,6 +25,8 @@ chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
     .catch((e) => reply({ ok: false, error: e.message }));
   return true; // keeps the channel open for the async reply
 });
+
+chrome.runtime.onInstalled.addListener(noteUpdate);
 
 moveRenamedSettings();
 startYoutubeLive();

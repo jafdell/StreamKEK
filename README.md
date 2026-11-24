@@ -11,6 +11,7 @@ It works in Chrome, Brave and other Chromium browsers, with no API key and no ex
 ### Watching
 
 - **YouTube and Kick streams inside Twitch:** your live YouTube subscriptions and Kick follows show in Twitch's sidebar and on the Following page, and open with their chat in a Twitch-style view. Add other channels with the **+** button, and hide the ones you don't want.
+- **About the stream and channel:** scroll down under a YouTube or Kick stream, like under a Twitch one, to see a YouTube stream's description, or a Kick channel's followers, description, links and panels.
 - **Multi-stream:** drag a channel from the sidebar onto the page to watch two to four streams at once, with their chats, from any mix of Twitch, YouTube and Kick. Drag between streams to resize them, drag a stream's name onto another to swap them, and choose which one has the sound.
 - **Favorites:** press a channel's star, or drag it to the top of the sidebar, to keep channels from all three sites together in your own order while they're live.
 - **Go-live notifications:** get a notification when a favorite starts a stream, also with no Twitch tab open. Off by default.
@@ -18,6 +19,7 @@ It works in Chrome, Brave and other Chromium browsers, with no API key and no ex
 - **Stacked mode (Alt+S):** the stream at full width with chat under it, for narrow windows.
 - **Theatre mode (Alt+T):** on YouTube and Kick streams, like Twitch's own.
 - **Audio only (Alt+A):** listen to a Twitch stream or video without the picture, which saves data and battery.
+- **Volume boost:** make a quiet Twitch stream or video up to four times louder with the button beside the volume, until you reload or change channel.
 - **Keep quality in background tabs:** stop Twitch lowering a live stream to 360p when its tab is in the background. Off by default.
 - **Reload player on errors:** Twitch's player reloads itself when a stream stops with an error, instead of you doing it by hand.
 - **Start when a channel goes live:** wait on an offline Twitch channel and the stream starts by itself when it goes live, with no refresh. Off by default.
@@ -47,7 +49,7 @@ It works in Chrome, Brave and other Chromium browsers, with no API key and no ex
 - **One searchable window:** open it from StreamKEK's icon in Twitch's top bar or the browser toolbar.
 - **Backup and restore:** save your settings, channels, favorites and chat words to a file, and put them back after a reinstall.
 - **Themes:** 16 themes that recolor Twitch, the settings window and the YouTube and Kick stream view, like Midnight, Synthwave and one for each season, besides Twitch's own dark and light. The seasons, Christmas and Halloween also move a little, like snow falling behind the sidebar, which a switch turns off. Kick's chat stays dark in a light theme.
-- **What's new:** see what each version added, there or in the [changelog](CHANGELOG.md).
+- **What's new:** see what each version added, there or in the [changelog](CHANGELOG.md). After an update, a small **New** tag marks it until you open it.
 
 ## Install
 

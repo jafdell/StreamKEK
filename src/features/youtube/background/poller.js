@@ -14,11 +14,27 @@ export const KEYS = { own: 'channels', followed: 'subChannels', live: 'live', st
 
 export const background = createSiteBackground({ platform: 'youtube', keys: KEYS, followsSetting: 'showSubscriptions', runPoll });
 
+// YouTube's list of your subscriptions says every minute which of them are live. A live one's own
+// pages only add its title, viewers and streams, and are several MB each time, so they're read when
+// it goes live and then about every five minutes. A little under five, so the fifth check reads them.
+const PAGES_MS = 4.5 * 60_000;
+// When each live subscription's pages were last read: { [channelId]: time }. In session storage, as
+// the worker can stop between checks. Empty after a browser restart, so everything is read once then.
+const PAGES_READ_KEY = 'youtubePagesRead';
+
+// The live subscriptions whose pages need reading now: those that weren't live at the last check,
+// and those whose pages were read a while ago.
+export function subscriptionsToRead(channels, previous, readAt, now) {
+  return channels.filter((channel) => !previous[channel.id] || !(now - readAt[channel.id] < PAGES_MS));
+}
+
+// `read` is the channels YouTube answered for, live or not.
 async function checkChannels(channels, previous) {
-  const result = { live: {}, avatars: {}, consentRequired: false };
+  const result = { live: {}, avatars: {}, read: [], consentRequired: false };
   await forEachLimited(channels, async (channel) => {
     try {
       const info = await checkChannel(channel.id, previous[channel.id]);
+      result.read.push(channel.id);
       if (info) {
         result.live[channel.id] = info.entry;
         if (info.avatar) result.avatars[channel.id] = info.avatar;
@@ -32,16 +48,29 @@ async function checkChannels(channels, previous) {
   return result;
 }
 
-// Adds live subscriptions to `live`. A channel you added yourself is already there.
-async function checkSubscriptions(live, previous, previousSubs, hidden) {
+// Adds live subscriptions to `live`. A channel you added yourself is already there, and its own page
+// is read at every check: `ownIds` keeps those out of what's remembered here.
+async function checkSubscriptions(live, previous, previousSubs, hidden, ownIds) {
   const result = { subChannels: { ...previousSubs }, signedOut: false, consentRequired: false };
   try {
     const subs = await fetchLiveSubscriptions();
     result.signedOut = subs.signedOut;
     const shown = subs.channels.filter((c) => !hidden[c.id]);
-    const checked = await checkChannels(shown.filter((c) => !live[c.id]), previous);
+    const { [PAGES_READ_KEY]: readAt = {} } = await chrome.storage.session.get(PAGES_READ_KEY);
+    const now = Date.now();
+    const waiting = shown.filter((c) => !live[c.id]);
+    const toRead = subscriptionsToRead(waiting, previous, readAt, now);
+    // Still live by YouTube's list, and read not long ago, so what was known then stands.
+    for (const c of waiting) if (!toRead.includes(c)) live[c.id] = previous[c.id];
+    const checked = await checkChannels(toRead, previous);
     Object.assign(live, checked.live);
     result.consentRequired = checked.consentRequired;
+    // Only the subscriptions live now, so this never grows.
+    const times = shown
+      .filter((c) => !ownIds.has(c.id))
+      .map((c) => [c.id, checked.read.includes(c.id) ? now : readAt[c.id]])
+      .filter(([, at]) => at);
+    await chrome.storage.session.set({ [PAGES_READ_KEY]: Object.fromEntries(times) });
     for (const channel of shown) {
       if (!live[channel.id]) continue;
       result.subChannels[channel.id] = {
@@ -71,7 +100,7 @@ async function runPoll() {
   const own = await checkChannels(channels, previous);
   const { live } = own;
   const subs = showSubscriptions
-    ? await checkSubscriptions(live, previous, previousSubs, hiddenChannels)
+    ? await checkSubscriptions(live, previous, previousSubs, hiddenChannels, new Set(channels.map((c) => c.id)))
     : { subChannels: previousSubs, signedOut: false, consentRequired: false };
 
   // Re-read: things may have changed while we were fetching.

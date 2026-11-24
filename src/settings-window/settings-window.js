@@ -487,6 +487,27 @@
     return section;
   }
 
+  // The version an update brought, and the one whose What's new has been opened. The background
+  // writes the first, in background/whats-new.js, and this window the second.
+  const news = { version: null, seen: null };
+
+  // A pill saying New on What's new in the list, from an update until it's been opened.
+  function drawNewsMark() {
+    const unseen = !!news.version && news.version !== news.seen;
+    const link = [...feedbackLink.children].find((each) => each.dataset.category === WHATS_NEW);
+    if (!link || link.classList.contains('category-link--news') === unseen) return;
+    link.classList.toggle('category-link--news', unseen);
+    // Says what the pill, which settings-window.css draws, means.
+    link.title = unseen ? 'New since the last update' : '';
+  }
+
+  function markNewsSeen() {
+    if (!news.version || news.version === news.seen) return;
+    news.seen = news.version;
+    chrome.storage.local.set({ whatsNewSeen: news.seen });
+    drawNewsMark();
+  }
+
   // The version under the list becomes the way to What's new.
   function linkVersionLabel() {
     const link = document.createElement('button');
@@ -530,6 +551,8 @@
       // The list scrolls too, when the window is short.
       if (isCurrent) link.scrollIntoView({ block: 'nearest' });
     }
+    // Clicked, or scrolled to. Not when a search happens to leave it at the top.
+    if (current === WHATS_NEW && !search.value) markNewsSeen();
   }
 
   // Scrolling asks for this far more often than the page is drawn.
@@ -620,9 +643,14 @@
       const change = changes[dropdown.dataset.key];
       if (change) dropdown.value = change.newValue ?? settingDefaults[dropdown.dataset.key];
     }
+    // Opened in the other place this window can be, or an update while it's open.
+    if (changes.whatsNewVersion) news.version = changes.whatsNewVersion.newValue ?? null;
+    if (changes.whatsNewSeen) news.seen = changes.whatsNewSeen.newValue ?? null;
+    if (changes.whatsNewVersion || changes.whatsNewSeen) drawNewsMark();
   });
 
-  Promise.all([chrome.storage.local.get({ ...settingDefaults, ...chatWords.DEFAULTS }), changelog.loadChangelog()]).then(([saved, versions]) => {
+  const NEWS_DEFAULTS = { whatsNewVersion: null, whatsNewSeen: null };
+  Promise.all([chrome.storage.local.get({ ...settingDefaults, ...chatWords.DEFAULTS, ...NEWS_DEFAULTS }), changelog.loadChangelog()]).then(([saved, versions]) => {
     const divider = document.createElement('hr');
     divider.className = 'categories__divider';
     categoryLinks.append(...settingCategories.map(categoryLink), divider, ...siteCategories.map(categoryLink));
@@ -636,6 +664,9 @@
       categories.push(WHATS_NEW);
       feedbackLink.append(categoryLink(WHATS_NEW));
       linkVersionLabel();
+      news.version = saved.whatsNewVersion;
+      news.seen = saved.whatsNewSeen;
+      drawNewsMark();
     }
     filterItems();
     if (categories.includes(askedCategory)) scrollToCategory(askedCategory, false);

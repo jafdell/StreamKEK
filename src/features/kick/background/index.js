@@ -3,6 +3,7 @@
 
 import { allowCookiesOnTwitch, sendRequestsAsSite } from '../../streams/background/site-background.js';
 import { addChannel, removeChannel } from './channels.js';
+import { fetchAbout } from './kick-api.js';
 import { background } from './poller.js';
 import { startTwitchFrameCookies } from './twitch-frame-cookies.js';
 
@@ -13,6 +14,7 @@ export const messageHandlers = {
     await removeChannel(msg.id);
     return { ok: true };
   },
+  'kick-live:loadAbout': async (msg) => ({ ok: true, about: await fetchAbout(msg.slug) }),
   'kick-live:showFollows': async (msg) => {
     await background.setShowFollowed(msg.enabled);
     return { ok: true };

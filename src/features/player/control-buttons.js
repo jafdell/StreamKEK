@@ -1,5 +1,5 @@
-// The buttons StreamKEK adds to Twitch's player controls, beside theatre mode's. modes.js and
-// audio-only.js each add their own with this.
+// The buttons StreamKEK adds to Twitch's player controls. modes.js and audio-only.js each add
+// their own with this, beside theatre mode's, and volume-boost.js adds its beside the volume.
 (() => {
   'use strict';
 

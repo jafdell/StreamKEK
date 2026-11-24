@@ -23,6 +23,10 @@
       linkPattern: /^(https?:\/\/)?([\w-]+\.)?(youtube\.com|youtu\.be)\//i,
       // The /watch page only says when a stream started and what it's playing if asked separately.
       loadsDetails: true,
+      // The stream view shows an About section under the stream, asked for separately.
+      loadsAbout: true,
+      // It's about the stream, not the channel: the stream's own description.
+      aboutPerStream: true,
       section: { id: 'skek-section', title: 'YouTube Live', glyph: 'youtube' },
       following: {
         path: '/directory/following/youtube',
@@ -54,6 +58,7 @@
       placeholder: 'Kick channel name or link',
       managerHint: 'Add a channel by name or channel link.',
       linkPattern: /^(https?:\/\/)?([\w-]+\.)?kick\.com\//i,
+      loadsAbout: true,
       section: { id: 'skek-kick-section', title: 'Kick Live', glyph: 'kick' },
       following: {
         path: '/directory/following/kick',

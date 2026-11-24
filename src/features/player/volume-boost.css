@@ -1,0 +1,79 @@
+/* Volume boost on Twitch's own player: the button beside Twitch's volume slider, and its own
+   slider while it's on. volume-boost.js puts the state on <html>. */
+
+.skek-boost {
+  display: flex;
+  align-items: center;
+}
+
+/* Twitch keeps the room for its volume slider while the slider is hidden. That would leave a gap
+   between the sound button and this one, so the room goes until the slider shows.
+   volume-boost.js says when it's hidden. */
+.player-controls__left-control-group > :has(+ .skek-boost--slider-hidden) .volume-slider__slider-container {
+  width: 0 !important;
+  overflow: hidden;
+}
+
+/* Fainter than Twitch's own buttons while it's off, so it doesn't pass for the sound button
+   beside it. */
+.skek-boost button {
+  opacity: 0.55;
+}
+.skek-boost button:is(:hover, :focus-visible) {
+  opacity: 1;
+}
+
+html[data-skek-volume-boost='on'] .skek-boost button {
+  opacity: 1;
+  color: var(--color-twitch-purple-11, #bf94ff);
+}
+
+/* Something else has the video's sound, and the tooltip says so. */
+html[data-skek-volume-boost='failed'] .skek-boost button {
+  opacity: 0.3;
+}
+
+.skek-boost__level {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 0 4px;
+}
+html[data-skek-volume-boost='on'] .skek-boost__level {
+  display: flex;
+}
+
+/* Like Twitch's volume slider: a thin line, white up to a round white handle. */
+.skek-boost__level input {
+  appearance: none;
+  width: 80px;
+  height: 16px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.skek-boost__level input::-webkit-slider-runnable-track {
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(to right, #fff var(--skek-boost-fill, 0%), rgba(255, 255, 255, 0.35) var(--skek-boost-fill, 0%));
+}
+.skek-boost__level input::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: #fff;
+}
+.skek-boost__level input:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.skek-boost__value {
+  min-width: 4ch;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
