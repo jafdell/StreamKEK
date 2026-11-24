@@ -60,9 +60,11 @@ html[data-skek-player-mode='floating'] .right-column--theatre,
   opacity: 0;
   transition: opacity 0.2s;
 }
+/* floating-window.js says when the mouse is over the chat. Don't ask with html:has(:hover) instead:
+   the browser then searches the whole page again every time the mouse crosses anything on it. */
 .skek-float__bar:hover,
 html[data-skek-float-moving] .skek-float__bar,
-html:has(.right-column--theatre:hover, .skek-view--floating .skek-chat:hover) .skek-float__bar {
+html[data-skek-float-hover] .skek-float__bar {
   opacity: 1;
 }
 .skek-float__title { flex: 1 1 auto; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }

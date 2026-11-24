@@ -35,6 +35,8 @@
   let lastRender = null;
   // The star on the Twitch card under the mouse. Only one, since it goes into Twitch's own markup.
   let twitchStar = null;
+  // The card that shows where a dragged channel would land, and the class that says which side.
+  let dropMark = null;
 
   const isFavorite = (channel) => state.favorites.some((c) => c.id === channel.id);
 
@@ -273,11 +275,16 @@
     card.append(twitchStar);
   }
 
-  function clearDropMarks() {
-    for (const card of document.querySelectorAll('.skek-card--drop-before, .skek-card--drop-after')) {
-      card.classList.remove('skek-card--drop-before', 'skek-card--drop-after');
-    }
+  // Only touches the page when the mark moves, since this is asked for all through a drag.
+  function setDropMark(card, className) {
+    const next = card ? { card, className } : null;
+    if (dropMark?.card === next?.card && dropMark?.className === next?.className) return;
+    dropMark?.card.classList.remove(dropMark.className);
+    next?.card.classList.add(next.className);
+    dropMark = next;
   }
+
+  const clearDropMarks = () => setDropMark(null);
 
   // The card the drop would go in front of, or null for the end of the list.
   function cardBelow(section, y, channel) {
@@ -301,10 +308,13 @@
     accepts: (event, channel) => isOverFavorites(event, document.getElementById(SECTION_ID)) || isOverRestOfSidebar(event, channel),
     mark(event, channel) {
       const section = document.getElementById(SECTION_ID);
-      if (!isOverFavorites(event, section)) return;
+      if (!isOverFavorites(event, section)) {
+        clearDropMarks();
+        return;
+      }
       const below = cardBelow(section, event.clientY, channel);
-      if (below) below.classList.add('skek-card--drop-before');
-      else [...section.querySelectorAll(OUR_CARD)].at(-1)?.classList.add('skek-card--drop-after');
+      if (below) setDropMark(below, 'skek-card--drop-before');
+      else setDropMark([...section.querySelectorAll(OUR_CARD)].at(-1), 'skek-card--drop-after');
     },
     clearMarks: clearDropMarks,
     drop(event, channel) {

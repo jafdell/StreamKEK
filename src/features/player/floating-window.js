@@ -17,6 +17,9 @@
   const DEFAULT_TOP = 0.155;
   const DEFAULT_HEIGHT = 0.39;
   const EDGES = ['e', 'w', 's', 'se', 'sw'];
+  // Twitch's chat and the stream view's, as floating-window.css places them.
+  const CHAT = '.right-column--theatre, .skek-view--floating .skek-chat';
+  const HOVER = 'data-skek-float-hover';
   const root = document.documentElement;
 
   let saved = {};
@@ -109,6 +112,14 @@
     return Math.max(min, Math.min(size, max));
   }
 
+  // The bar shows while the mouse is over the chat under the window, which floating-window.css reads
+  // from <html>. A frame's chat counts from the frame itself, the last thing here the mouse is over.
+  function followHover(event) {
+    root.toggleAttribute(HOVER, !!event.target.closest?.(CHAT));
+  }
+
+  const endHover = () => root.removeAttribute(HOVER);
+
   function buildBox() {
     const opacity = saved.opacity ?? DEFAULT_OPACITY;
     setOpacity(opacity);
@@ -174,6 +185,8 @@
     document.body.append(box);
     place();
     addEventListener('resize', place);
+    document.addEventListener('mouseover', followHover);
+    root.addEventListener('mouseleave', endHover);
     enterFullscreen();
   }
 
@@ -183,6 +196,9 @@
     box = null;
     fullscreenSeen = false;
     removeEventListener('resize', place);
+    document.removeEventListener('mouseover', followHover);
+    root.removeEventListener('mouseleave', endHover);
+    endHover();
     leaveFullscreen();
   }
 

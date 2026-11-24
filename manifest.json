@@ -61,6 +61,7 @@
         "src/features/streams/twitch/routes.js",
         "src/features/streams/twitch/following.js",
         "src/features/streams/twitch/main.js",
+        "src/features/themes/twitch-effects.js",
         "src/features/sidebar/preview.js",
         "src/features/sidebar/current-channel.js",
         "src/features/browse/sort-order.js",

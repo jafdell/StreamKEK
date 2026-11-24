@@ -279,10 +279,12 @@
   }
 
   /* Nothing is there to move where none of it could be seen: in fullscreen, in theatre mode and
-     in the stream view's modes that fill the window. */
-  html[data-skek-on~='themeAnimations']:has(:fullscreen, .persistent-player--theatre, .skek-view--full-window) :is(body, .top-nav__menu)::before,
-  html[data-skek-on~='themeAnimations']:has(:fullscreen, .persistent-player--theatre, .skek-view--full-window) :is(body, .top-nav__menu)::after,
-  html[data-skek-on~='themeAnimations']:has(:fullscreen, .persistent-player--theatre, .skek-view--full-window)::before {
+     in the stream view's modes that fill the window. twitch-effects.js says when. Don't ask with
+     html:has() instead: the browser then searches the whole page again every time anything on it
+     changes, which cost a few milliseconds for each chat message. */
+  html[data-skek-on~='themeAnimations'][data-skek-covered] :is(body, .top-nav__menu)::before,
+  html[data-skek-on~='themeAnimations'][data-skek-covered] :is(body, .top-nav__menu)::after,
+  html[data-skek-on~='themeAnimations'][data-skek-covered]::before {
     content: none;
   }
 }

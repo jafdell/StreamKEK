@@ -43,6 +43,10 @@
   let tickTimer = null;
   let observer = null;
   let dropOverlay = null;
+  // Where on it a dragged channel can be dropped: 'anywhere', only on its 'tiles', or 'nothing'.
+  let dropTakes = 'nothing';
+  // The part of it the drop would land on now: the overlay itself or one of its tiles.
+  let dropOver = null;
   // The stream whose bar is being dragged, with what shows while it is.
   let moving = null;
   let layoutQueued = false;
@@ -53,8 +57,10 @@
   // The icon is only replaced when it changes, so the sound bars don't restart their animation each
   // time the layout is worked out again, which happens many times while the window is resized.
   function setButton(button, label, iconName) {
-    button.title = label;
-    button.ariaLabel = label;
+    if (button.title !== label) {
+      button.title = label;
+      button.ariaLabel = label;
+    }
     if (button.dataset.skekIcon === iconName) return;
     button.dataset.skekIcon = iconName;
     button.replaceChildren(icon(iconName));
@@ -243,8 +249,13 @@
     });
   }
 
+  // Only built again when it would read differently, since the layout is worked out again for every
+  // frame of a drag between streams.
   function renderPicker() {
     const { multi } = state;
+    const shows = JSON.stringify([multi.chatId, multi.entries.map((entry) => [entry.id, entry.channel.name])]);
+    if (shows === multi.pickerShows) return;
+    multi.pickerShows = shows;
     multi.refs.picker.replaceChildren(
       ...multi.entries.map((entry) =>
         el(
@@ -573,7 +584,7 @@
 
   function openMulti() {
     const { root, refs } = buildRoot();
-    state.multi = { root, refs, entries: [], dividers: [], splits: {}, hash: '', audioId: null, chatId: null, chatHidden: false, full: false, sharedChat: false, started: false };
+    state.multi = { root, refs, entries: [], dividers: [], splits: {}, hash: '', audioId: null, chatId: null, chatHidden: false, full: false, sharedChat: false, started: false, pickerShows: '' };
     savedTitle = document.title;
     setChatHidden(false);
     setFull(false);
@@ -702,7 +713,8 @@
     return `Drop to watch ${channel.name} side by side (${playing.length + 1} of ${MAX_MULTI_STREAMS})`;
   }
 
-  // Frames take in a drag and never tell the page, so this covers them while one is going on.
+  // Frames take in a drag and never tell the page, so this covers them while one is going on. What
+  // it would take is worked out once here, for the whole drag: see sidebar-drag.js.
   function showDrop(channel) {
     const playing = playingEntries();
     const alreadyOpen = playing.some((e) => e.id === channel.id);
@@ -712,6 +724,7 @@
       { class: `${DROP_CLASS}${alreadyOpen ? ` ${DROP_CLASS}--refused` : ''}` },
       el('p', { class: `${DROP_CLASS}__message` }, dropMessage(channel, playing)),
     );
+    dropTakes = alreadyOpen ? 'nothing' : full ? 'tiles' : 'anywhere';
     placeRoot(dropOverlay, false);
     if (!full || alreadyOpen || !state.multi) return;
 
@@ -724,20 +737,22 @@
     }
   }
 
-  function dropAccepts(event, channel) {
-    if (!dropOverlay || !event.target.closest?.(`.${DROP_CLASS}`)) return false;
-    const playing = playingEntries();
-    if (playing.some((e) => e.id === channel.id)) return false;
-    return playing.length < MAX_MULTI_STREAMS || !!event.target.closest(`.${DROP_CLASS}__tile`);
+  function dropAccepts(event) {
+    if (!dropOverlay || dropTakes === 'nothing' || !event.target.closest?.(`.${DROP_CLASS}`)) return false;
+    return dropTakes === 'anywhere' || !!event.target.closest(`.${DROP_CLASS}__tile`);
   }
 
   function dropMark(event) {
-    const tile = event.target.closest(`.${DROP_CLASS}__tile`);
-    (tile ?? dropOverlay).classList.add(`${DROP_CLASS}--over`);
+    const over = event.target.closest(`.${DROP_CLASS}__tile`) ?? dropOverlay;
+    if (over === dropOver) return;
+    dropClearMarks();
+    dropOver = over;
+    over.classList.add(`${DROP_CLASS}--over`);
   }
 
   function dropClearMarks() {
-    for (const node of document.querySelectorAll(`.${DROP_CLASS}--over`)) node.classList.remove(`${DROP_CLASS}--over`);
+    dropOver?.classList.remove(`${DROP_CLASS}--over`);
+    dropOver = null;
   }
 
   function dropChannel(event, channel) {
@@ -756,6 +771,7 @@
   }
 
   function hideDrop() {
+    dropClearMarks();
     dropOverlay?.remove();
     dropOverlay = null;
   }

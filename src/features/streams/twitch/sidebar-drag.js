@@ -4,6 +4,8 @@
 //   drop(event, channel)     it was dropped here
 //   mark(event, channel), clearMarks()  optional, to show where it would land
 //   start(channel), end()    optional, for when a drag begins and ends
+// The browser asks many times a second for as long as the drag lasts, a still mouse included, so
+// accepts, mark and clearMarks must change nothing in the page when nothing has changed.
 (() => {
   'use strict';
 
@@ -66,8 +68,8 @@
 
   function onDragOver(event) {
     if (!dragged) return;
-    clearMarks();
     const target = targetFor(event);
+    for (const other of targets) if (other !== target) other.clearMarks?.();
     if (!target) return;
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
