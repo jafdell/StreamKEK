@@ -77,6 +77,7 @@
         "src/features/player/floating-window.js",
         "src/features/player/modes.js",
         "src/features/player/audio-only.js",
+        "src/features/player/volume-boost.js",
         "src/features/player/go-live.js"
       ],
       "css": [
@@ -101,6 +102,7 @@
         "src/features/player/extensions.css",
         "src/features/player/modes.css",
         "src/features/player/audio-only.css",
+        "src/features/player/volume-boost.css",
         "src/features/player/floating-window.css",
         "src/features/streams/twitch/sidebar.css",
         "src/features/streams/twitch/favorites.css",
