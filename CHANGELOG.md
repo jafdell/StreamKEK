@@ -5,6 +5,13 @@ What's new in each version of StreamKEK, newest first.
 <!-- The settings window shows this file under What's new, so keep its shape: a "## version - date"
      heading, then one "- " line per change, with ** around the part to show in bold. -->
 
+## 1.10.0 - 2026-11-24
+
+- **Volume boost:** a lightning bolt button beside the sound button in Twitch's player makes a quiet stream or video up to four times louder, without distorting the loud moments. It turns off when you reload or change channel.
+- **About under YouTube and Kick streams:** scroll down under a stream to see a Kick channel's followers, description, links and panels, or a YouTube stream's description.
+- **New after an update:** What's new gets a small New tag in this window's list after StreamKEK updates, until you open it.
+- **Faster:** dragging a channel from the sidebar is smoother, Twitch's pages are lighter in a theme with motion, and checking who's live on YouTube downloads much less.
+
 ## 1.9.1 - 2026-11-23
 
 - **New logo:** StreamKEK has a new icon in the browser toolbar, Twitch's top bar and the settings window.
