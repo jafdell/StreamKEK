@@ -8,6 +8,7 @@ import vm from 'node:vm';
 
 import { extractJson } from '../src/features/youtube/background/youtube-pages.js';
 import { viewerCount } from '../src/features/youtube/background/live-entry.js';
+import { updatedVersion } from '../src/background/whats-new.js';
 import { streamDescription } from '../src/features/youtube/background/about.js';
 import { inputToUrl } from '../src/features/youtube/background/channels.js';
 import { liveChannelsFromGuide, signInFromPage } from '../src/features/youtube/background/subscriptions.js';
@@ -900,6 +901,14 @@ test('linkParts finds the web addresses in a text', () => {
   ]);
   assert.deepEqual(parts('no links, javascript:alert(1) neither'), [{ text: 'no links, javascript:alert(1) neither' }]);
   assert.deepEqual(parts(''), []);
+});
+
+test('updatedVersion notes an update to another version, and nothing else', () => {
+  assert.equal(updatedVersion({ reason: 'update', previousVersion: '1.9.1' }, '1.10.0'), '1.10.0');
+  // The Reload button on the extensions page.
+  assert.equal(updatedVersion({ reason: 'update', previousVersion: '1.10.0' }, '1.10.0'), null);
+  assert.equal(updatedVersion({ reason: 'install' }, '1.10.0'), null);
+  assert.equal(updatedVersion({ reason: 'chrome_update' }, '1.10.0'), null);
 });
 
 test('viewerCount reads plain numbers', () => {

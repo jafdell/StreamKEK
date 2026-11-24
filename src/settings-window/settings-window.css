@@ -73,6 +73,25 @@ html.framed body { width: 100%; height: 100%; }
 .feedback-category .category-link:last-child { margin-bottom: 0; }
 .feedback-category .category-link:not([aria-current='true']) { color: var(--muted); }
 
+/* What's new after an update, until it's been opened: a small dot at the end of its row, which
+   fades in and out three times and then stays still. */
+.category-link--news::after {
+  content: '';
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  margin-left: auto;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: news-dot 1.6s ease-in-out 3;
+}
+@keyframes news-dot {
+  50% { opacity: 0.3; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .category-link--news::after { animation: none; }
+}
+
 /* Lines up with the icon above it, and stays quieter than anything you can click. */
 .version { flex: 0 0 auto; margin: 10px 0 0; padding: 0 10px; color: var(--muted); font-size: 12px; line-height: 1; opacity: 0.7; }
 /* It leads to What's new, once there is one. */
