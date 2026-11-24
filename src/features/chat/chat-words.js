@@ -117,8 +117,9 @@
         if (bodyElement) checkLine(lineElement, bodyElement);
       }
     }
-    // A message that has left chat would otherwise be kept in memory by its ranges.
-    if (wordPaint) for (const range of wordPaint) if (!range.startContainer.isConnected) wordPaint.delete(range);
+    // When a message leaves chat, the browser moves its ranges to where the message was and leaves them
+    // empty. They'd stay there for good, and every one of them slows each later change to the page.
+    if (wordPaint) for (const range of wordPaint) if (range.collapsed || !range.startContainer.isConnected) wordPaint.delete(range);
   }
 
   // On every frame rather than through skek.helpers.onPageChange, which only exists on Twitch's page

@@ -7,8 +7,9 @@ const CHANNEL_ID = /^UC[\w-]{22}$/;
 import { ConsentRequired, YT, extractJson, fetchPage, watchPageSections } from './youtube-pages.js';
 import { buildLiveEntry } from './live-entry.js';
 
-// Returns the channel's live entry and avatar, or null when it's not live right now.
-export async function checkChannel(channelId, known) {
+// Returns the channel's live entry and avatar, or null when it's not live right now. With
+// `listReadLately`, its list of streams is left unread: see buildLiveEntry.
+export async function checkChannel(channelId, known, listReadLately = false) {
   const { html } = await fetchPage(`${YT}/channel/${channelId}/live`);
   const player = extractJson(html, 'ytInitialPlayerResponse = ');
   const details = player?.videoDetails;
@@ -29,6 +30,7 @@ export async function checkChannel(channelId, known) {
       },
     ],
     known,
+    listReadLately,
   );
   return { entry, avatar: thumbs?.at(-1)?.url ?? null };
 }
