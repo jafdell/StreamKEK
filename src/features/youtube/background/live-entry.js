@@ -53,12 +53,18 @@ function withoutNulls(object) {
 
 // `found` is what's already known to be live. Details are only fetched for the top
 // stream here; the others are fetched if you open them (see loadStreamDetails).
-export async function buildLiveEntry(channelId, found, known) {
+// The channel's list of streams is several MB and only adds the other streams it's running. With
+// `listReadLately` it's left unread, unless a stream was found that isn't among the known ones: what
+// was known then stands, with what was just found laid over it.
+export async function buildLiveEntry(channelId, found, known, listReadLately = false) {
   const previous = knownStreams(known);
-  const listed = await fetchChannelStreams(channelId).catch(() => previous);
+  const allKnown = found.every((stream) => previous.some((s) => s.videoId === stream.videoId));
+  const sources = listReadLately && allKnown
+    ? [...previous, ...found]
+    : [...found, ...(await fetchChannelStreams(channelId).catch(() => previous))];
 
   const byVideo = new Map();
-  for (const stream of [...found, ...listed]) {
+  for (const stream of sources) {
     byVideo.set(stream.videoId, { ...byVideo.get(stream.videoId), ...withoutNulls(stream) });
   }
   const streams = [...byVideo.values()]

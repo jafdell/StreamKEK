@@ -7,7 +7,7 @@ import { test } from 'node:test';
 import vm from 'node:vm';
 
 import { extractJson } from '../src/features/youtube/background/youtube-pages.js';
-import { viewerCount } from '../src/features/youtube/background/live-entry.js';
+import { buildLiveEntry, viewerCount } from '../src/features/youtube/background/live-entry.js';
 import { updatedVersion } from '../src/background/whats-new.js';
 import { streamDescription } from '../src/features/youtube/background/about.js';
 import { inputToUrl } from '../src/features/youtube/background/channels.js';
@@ -740,6 +740,38 @@ test('subscriptionsToRead leaves out a live subscription whose pages were just r
   // The fifth check after a read does it again, even if it comes a little early.
   assert.deepEqual(ids(minutes(13) - 5000), ['new', 'recent', 'old', 'never']);
   assert.deepEqual(ids(minutes(12)), ['new', 'old', 'never']);
+});
+
+test('buildLiveEntry leaves the list of streams unread while it was read lately', async () => {
+  const first = { videoId: 'a', title: 'Old title', viewers: 100, category: 'Minecraft', startedAt: '2026-11-24T10:00:00Z' };
+  const second = { videoId: 'b', title: 'Second', viewers: 50, category: null, startedAt: null };
+  const known = { ...first, streams: [first, second] };
+  const now = { videoId: 'a', title: 'New title', viewers: 120, category: null };
+  // YouTube answers with pages that list no streams.
+  const asked = [];
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    asked.push(url);
+    return { url, ok: true, text: async () => '' };
+  };
+  try {
+    // What the live page just said goes over what was known, and the other stream stays.
+    const kept = await buildLiveEntry('UCx', [now], known, true);
+    assert.deepEqual(asked, []);
+    assert.deepEqual([kept.title, kept.viewers, kept.category, kept.startedAt], ['New title', 120, 'Minecraft', first.startedAt]);
+    assert.deepEqual(kept.streams.map((s) => s.videoId), ['a', 'b']);
+    // A stream that wasn't known is a reason to read the list at once.
+    const other = await buildLiveEntry('UCx', [{ ...now, videoId: 'c' }], known, true);
+    assert.equal(asked[0], 'https://www.youtube.com/channel/UCx/streams');
+    assert.deepEqual(other.streams.map((s) => s.videoId), ['c']);
+    // And so is the list not having been read lately.
+    asked.length = 0;
+    const read = await buildLiveEntry('UCx', [now], known);
+    assert.deepEqual(asked, ['https://www.youtube.com/channel/UCx/streams']);
+    assert.deepEqual(read.streams.map((s) => s.videoId), ['a']);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
 });
 
 test('flippedSettings keeps what people chose under the old hide settings', () => {
