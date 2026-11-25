@@ -1,6 +1,6 @@
 // The home page's script, for what CSS alone can't work: picking a theme, the Theme animations
-// switch, the slider on floating chat and dragging its window, the emote picker, and chat that
-// keeps moving. The page reads the same without it.
+// switch, the slider and buttons on floating chat and dragging its window, the emote picker, and
+// chat that keeps moving. The page reads the same without it.
 (() => {
   'use strict';
 
@@ -56,13 +56,32 @@
     slider.disabled = false;
   }
 
+  // The two buttons on floating chat's bar, as in the extension: one lines the messages up on the
+  // right or back on the left, and the other puts the background behind each message only.
+  // They're off in the page until they can work.
+  function followFloatButtons(align, messages) {
+    const shot = align.closest('.shot');
+    const icon = align.querySelector('use');
+    align.addEventListener('click', () => {
+      const right = shot.dataset.floatAlign !== 'right';
+      shot.dataset.floatAlign = right ? 'right' : 'left';
+      icon.setAttribute('href', right ? '#i-align-right' : '#i-align-left');
+      align.title = align.ariaLabel = right ? 'Line messages up on the left' : 'Line messages up on the right';
+    });
+    messages.addEventListener('click', () => {
+      messages.ariaPressed = String(shot.toggleAttribute('data-float-messages'));
+    });
+    align.disabled = false;
+    messages.disabled = false;
+  }
+
   // The floating chat window moves when dragged by its bar, and stays inside its stream. A window
   // that changes size puts it back where it started, since its place may no longer be inside.
   function makeDraggable(floating) {
     const bar = floating.querySelector('.skek-float__bar');
     let grip = null;
     bar.addEventListener('pointerdown', (event) => {
-      if (event.target.closest('input')) return;
+      if (event.target.closest('input, button')) return;
       grip = { x: event.clientX - floating.offsetLeft, y: event.clientY - floating.offsetTop };
       bar.setPointerCapture(event.pointerId);
     });
@@ -182,6 +201,9 @@
   if (animations) followSwitch(animations);
   const slider = document.getElementById('float-opacity');
   if (slider) followSlider(slider);
+  const floatAlign = document.getElementById('float-align');
+  const floatMessages = document.getElementById('float-messages');
+  if (floatAlign && floatMessages) followFloatButtons(floatAlign, floatMessages);
   const floating = document.getElementById('float-window');
   if (floating) makeDraggable(floating);
   const emotes = document.querySelector('.skek-picker');

@@ -971,8 +971,9 @@ figcaption { margin-top: 10px; padding-inline: var(--screen-pad); color: var(--m
 
 /* Floating chat over a fullscreen stream, from src/features/player/floating-window.css: the
    window's bar, and chat under it on a background that fades. --skek-float-opacity is what the
-   slider on the bar sets, and theme.js lets the window be dragged by that bar. The text keeps a
-   halo in the page's color, from src/features/player/modes.css. */
+   slider on the bar sets, and theme.js lets the window be dragged by that bar. Its two buttons set
+   data-float-align and data-float-messages on the picture, for the rules under these. The text
+   keeps a halo in the page's color, from src/features/player/modes.css. */
 /* Never too short for the chat window on it. */
 .float-shot { --skek-float-opacity: 0.85; position: relative; aspect-ratio: 16 / 8.6; min-height: 380px; background: #000; }
 .float-shot__pic { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
@@ -1000,6 +1001,24 @@ figcaption { margin-top: 10px; padding-inline: var(--screen-pad); color: var(--m
   cursor: pointer;
 }
 .skek-float__opacity:disabled { cursor: default; }
+.skek-float__button {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.skek-float__button:disabled { cursor: default; }
+.skek-float__button:enabled:hover { background: rgba(255, 255, 255, 0.18); }
+/* The color Twitch's lighter purple gets in a theme, from src/features/themes/twitch-colors.css. */
+.skek-float__button[aria-pressed='true'] { color: oklch(from var(--skek-t-accent) max(l, calc(min(l, 0.6) + 0.15)) calc(c * 0.85) h); }
 .skek-float__chat {
   padding: 6px 0;
   background: rgb(from var(--base) r g b / var(--skek-float-opacity));
@@ -1007,6 +1026,20 @@ figcaption { margin-top: 10px; padding-inline: var(--screen-pad); color: var(--m
   line-height: 20px;
   text-shadow: 0 0 3px light-dark(#fff, #000), 0 1px 2px light-dark(#fff, #000);
 }
+/* The two buttons, as src/features/player/modes.css does them: the edge the messages line up
+   against, and a background behind each message only, as wide as the message. */
+.float-shot[data-float-align='right'] .twchat__line { text-align: right; }
+.float-shot[data-float-messages] .skek-float__chat { background: none; }
+.float-shot[data-float-messages] .twchat__line {
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: calc(100% - 12px);
+  margin: 3px 6px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgb(from var(--base) r g b / var(--skek-float-opacity));
+}
+.float-shot[data-float-messages][data-float-align='right'] .twchat__line { margin-left: auto; }
 
 /* Chat, between switches that change it and the emote picker. */
 .lab { display: grid; grid-template-columns: minmax(0, 1fr) 380px minmax(0, 1fr); background: var(--raised); }
