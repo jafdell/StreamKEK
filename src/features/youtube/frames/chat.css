@@ -349,6 +349,8 @@ html.skek[data-skek-transparent] #manager-pages,
 html.skek[data-skek-transparent] yt-live-chat-renderer #input-manager {
   background: transparent !important;
 }
+/* YouTube's line between the donation chips and the messages, which would show against the video. */
+html.skek[data-skek-transparent] #contents > #separator { display: none !important; }
 html.skek[data-skek-transparent] #items {
   text-shadow: 0 0 3px var(--skek-halo), 0 1px 2px var(--skek-halo);
 }
@@ -363,6 +365,24 @@ html.skek[data-skek-transparent] #item-scroller {
   animation: skek-float-scrollbar linear;
   animation-timeline: scroll(self);
   animation-range: 0 calc(100% - 30px);
+}
+/* The floating window's two switches, which chat-settings.js marks here: the edge the messages
+   line up against, and a background behind each message only, as wide as the message. Paid
+   messages keep their own cards. See player/modes.css, which does the same for Twitch's chat. */
+html.skek[data-skek-transparent][data-skek-float-align='right'] :is(yt-live-chat-text-message-renderer, yt-live-chat-viewer-engagement-message-renderer) {
+  text-align: right;
+}
+html.skek[data-skek-transparent][data-skek-float-messages] :is(yt-live-chat-text-message-renderer, yt-live-chat-viewer-engagement-message-renderer) {
+  box-sizing: border-box !important;
+  width: fit-content !important;
+  max-width: calc(100% - 12px) !important;
+  margin: 3px 6px !important;
+  padding: 3px 8px !important;
+  border-radius: 6px !important;
+  background: rgb(from var(--skek-bg) r g b / var(--skek-float-opacity)) !important;
+}
+html.skek[data-skek-transparent][data-skek-float-messages][data-skek-float-align='right'] :is(yt-live-chat-text-message-renderer, yt-live-chat-viewer-engagement-message-renderer) {
+  margin-left: auto !important;
 }
 html.skek[data-skek-theme-base='dark'] { --skek-halo: #000; }
 html.skek[data-skek-theme-base='light'] { --skek-halo: #fff; }

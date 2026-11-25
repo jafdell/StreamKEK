@@ -23,6 +23,27 @@ html[data-skek-kick-chat][data-skek-transparent] .bg-surface-bg-lowest {
   background: transparent !important;
 }
 html[data-skek-kick-chat][data-skek-transparent] #channel-chatroom { text-shadow: 0 0 3px #000, 0 1px 2px #000; }
+/* The floating window's two switches, which chat-settings.js marks here: the edge the messages
+   line up against, and a background behind each message only, as wide as the message. Kick places
+   each row itself, by its height, so the space between them is the row's own, not a margin. See
+   player/modes.css, which does the same for Twitch's chat. */
+html[data-skek-kick-chat][data-skek-transparent][data-skek-float-align='right'] #chatroom-messages [data-index] > div > :first-child {
+  text-align: right;
+}
+html[data-skek-kick-chat][data-skek-transparent][data-skek-float-messages] #chatroom-messages [data-index] > div {
+  padding-block: 2px !important;
+}
+html[data-skek-kick-chat][data-skek-transparent][data-skek-float-messages] #chatroom-messages [data-index] > div > :first-child {
+  box-sizing: border-box !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  padding: 3px 8px !important;
+  border-radius: 6px !important;
+  background: rgb(from var(--skek-kick-bg) r g b / var(--skek-float-opacity)) !important;
+}
+html[data-skek-kick-chat][data-skek-transparent][data-skek-float-messages][data-skek-float-align='right'] #chatroom-messages [data-index] > div > :first-child {
+  margin-left: auto !important;
+}
 /* The message box and what's under it show only while using the window, so chat can fill it. */
 html[data-skek-kick-chat][data-skek-transparent]:not(:hover, :focus-within) #chatroom-footer { display: none !important; }
 /* The scrollbar shows only when scrolled up from the newest messages. See player/modes.css. */

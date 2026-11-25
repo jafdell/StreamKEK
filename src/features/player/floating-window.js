@@ -1,12 +1,15 @@
 // The window around floating chat, for both Twitch's player (player/modes.js) and the stream view
-// (view-layouts.js): real fullscreen, plus a bar and edges to move and resize it and a slider for
-// its background. The chat itself can't live in this window, because Twitch owns its chat and
-// moving the stream view's would reload its frame. So floating-window.css places each chat under
-// the window instead.
+// (view-layouts.js): real fullscreen, plus a bar and edges to move and resize it, a slider for its
+// background, and two switches: which edge the messages line up against, and whether the
+// background is behind the whole window or only behind each message. The chat itself can't live
+// in this window, because Twitch owns its chat and moving the stream view's would reload its
+// frame. So floating-window.css places each chat under the window instead, and each chat's own
+// CSS lines up its messages and draws their backgrounds: player/modes.css for Twitch's, and each
+// site's frames/chat.css, which streams/frames/chat-settings.js tells what to show.
 (() => {
   'use strict';
 
-  const { el } = skek.helpers;
+  const { el, icon } = skek.helpers;
 
   const DEFAULT_WIDTH = 380;
   const DEFAULT_OPACITY = 70;
@@ -25,6 +28,7 @@
   let saved = {};
   let box = null;
   let onExit = null;
+  let onLook = null;
   // Fullscreen can take a moment to start, so losing it only counts after it was seen on.
   let fullscreenSeen = false;
 
@@ -32,8 +36,39 @@
     saved = stored.floatingChat ?? {};
   });
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && changes.floatingChat) saved = changes.floatingChat.newValue ?? {};
+    if (area !== 'local' || !changes.floatingChat) return;
+    saved = changes.floatingChat.newValue ?? {};
+    // Another tab's switches, for a window that's open here.
+    if (box) applyLook();
   });
+
+  // How the messages look, for the chat's own CSS and for a frame's chat, which can't read <html>.
+  function look() {
+    return {
+      align: saved.align === 'right' ? 'right' : 'left',
+      messagesOnly: saved.messagesOnly === true,
+      opacity: (saved.opacity ?? DEFAULT_OPACITY) / 100,
+    };
+  }
+
+  function applyLook() {
+    const { align, messagesOnly, opacity } = look();
+    root.style.setProperty('--skek-float-opacity', String(opacity));
+    if (box) {
+      root.dataset.skekFloatAlign = align;
+      root.toggleAttribute('data-skek-float-messages', messagesOnly);
+      const alignButton = box.querySelector('.skek-float__button--align');
+      alignButton.replaceChildren(icon(align === 'right' ? 'alignRight' : 'alignLeft'));
+      alignButton.title = alignButton.ariaLabel = align === 'right' ? 'Line messages up on the left' : 'Line messages up on the right';
+      box.querySelector('.skek-float__button--messages').ariaPressed = String(messagesOnly);
+    }
+    onLook?.();
+  }
+
+  function clearLook() {
+    delete root.dataset.skekFloatAlign;
+    root.removeAttribute('data-skek-float-messages');
+  }
 
   // Kept on screen, whatever size the screen was when it was saved.
   function currentRect() {
@@ -58,12 +93,14 @@
     root.style.setProperty('--skek-float-height', `${height}px`);
   }
 
-  function setOpacity(percent) {
-    saved = { ...saved, opacity: percent };
-    root.style.setProperty('--skek-float-opacity', String(percent / 100));
-  }
-
   const save = () => chrome.storage.local.set({ floatingChat: saved });
+
+  // Shown at once, and saved when `keep` says the change is finished: a slider reports every step.
+  function change(values, keep = true) {
+    saved = { ...saved, ...values };
+    applyLook();
+    if (keep) save();
+  }
 
   // Follows the pointer until it's let go. Capturing it, and turning off the frames and video
   // under it in the CSS, keeps it from getting lost over them.
@@ -121,8 +158,6 @@
   const endHover = () => root.removeAttribute(HOVER);
 
   function buildBox() {
-    const opacity = saved.opacity ?? DEFAULT_OPACITY;
-    setOpacity(opacity);
     return el(
       'div',
       { class: 'skek-float' },
@@ -132,22 +167,39 @@
           class: 'skek-float__bar',
           on: {
             pointerdown: (event) => {
-              if (!event.target.closest('input')) followPointer(event, moved);
+              if (!event.target.closest('input, button')) followPointer(event, moved);
             },
           },
         },
         el('span', { class: 'skek-float__title' }, 'Stream Chat'),
+        // applyLook gives the first its icon and name, and says whether the second is on.
+        el('button', {
+          class: 'skek-float__button skek-float__button--align',
+          type: 'button',
+          on: { click: () => change({ align: look().align === 'right' ? 'left' : 'right' }) },
+        }),
+        el(
+          'button',
+          {
+            class: 'skek-float__button skek-float__button--messages',
+            type: 'button',
+            title: 'Background behind each message only',
+            ariaLabel: 'Background behind each message only',
+            on: { click: () => change({ messagesOnly: !look().messagesOnly }) },
+          },
+          icon('messageBackgrounds'),
+        ),
         el('input', {
           class: 'skek-float__opacity',
           type: 'range',
           min: 0,
           max: 100,
           step: 5,
-          value: opacity,
+          value: saved.opacity ?? DEFAULT_OPACITY,
           title: 'Background transparency',
           ariaLabel: 'Background transparency',
           on: {
-            input: (event) => setOpacity(Number(event.target.value)),
+            input: (event) => change({ opacity: Number(event.target.value) }, false),
             change: save,
           },
         }),
@@ -178,11 +230,14 @@
 
   // onExit is called if fullscreen ends some other way, like Esc or a player's own fullscreen,
   // which a double-click on the video asks for. Chat can't show over that, so it counts as leaving.
-  function open(exit) {
+  // onLook is called when how the messages look changes, for a chat in a frame to be told.
+  function open(exit, lookChanged = null) {
     if (box) return;
     onExit = exit;
+    onLook = lookChanged;
     box = buildBox();
     document.body.append(box);
+    applyLook();
     place();
     addEventListener('resize', place);
     document.addEventListener('mouseover', followHover);
@@ -194,6 +249,8 @@
     if (!box) return;
     box.remove();
     box = null;
+    onLook = null;
+    clearLook();
     fullscreenSeen = false;
     removeEventListener('resize', place);
     document.removeEventListener('mouseover', followHover);
@@ -208,5 +265,5 @@
     else if (fullscreenSeen) onExit();
   });
 
-  skek.floatingWindow = { open, close };
+  skek.floatingWindow = { open, close, look };
 })();

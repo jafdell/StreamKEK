@@ -1,0 +1,75 @@
+/* The picture-in-picture button over a stream's player frame. picture-in-picture.js adds it, only
+   in a frame on Twitch, so nothing here shows on the site's own pages. Every value is set, and each
+   rule starts at html, so that a site's own rules for buttons can't win over these. */
+
+html > .skek-pip-button {
+  all: initial;
+  position: fixed;
+  top: 50%;
+  right: 12px;
+  z-index: 2147483647;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
+html > .skek-pip-button svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  pointer-events: none;
+}
+
+html > .skek-pip-button--show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+html > .skek-pip-button:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+html > .skek-pip-button:focus-visible {
+  outline: 2px solid #bf94ff;
+  outline-offset: 2px;
+}
+
+/* The stream is in the window. */
+html > .skek-pip-button--on {
+  color: #bf94ff;
+}
+
+/* Its name, to the left of it, since it sits at the right edge. */
+html > .skek-pip-button--show:hover::after,
+html > .skek-pip-button--ask::after {
+  content: attr(data-skek-label);
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 6px);
+  transform: translateY(-50%);
+  padding: 4px 6px;
+  border-radius: 4px;
+  background: #fff;
+  color: #0e0e10;
+  font: 600 13px/1.2 Inter, Roobert, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Alt+P was pressed outside this frame, and the browser wants a click in it. */
+html > .skek-pip-button--ask {
+  outline: 2px solid #bf94ff;
+  outline-offset: 2px;
+}

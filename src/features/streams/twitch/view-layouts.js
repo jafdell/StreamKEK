@@ -1,5 +1,6 @@
 // The stream view's theatre, stacked and floating chat modes. The same modes on Twitch's own player
-// are in features/player/, and both use its floating window.
+// are in features/player/, and both use its floating window. Also Alt+P for picture-in-picture,
+// which only the player's frame can open: see frames/picture-in-picture.js.
 (() => {
   'use strict';
 
@@ -8,6 +9,7 @@
 
   const OVERLAY_MS = 3000;
   const LAYOUT_SHORTCUTS = { KeyT: 'theatre', KeyS: 'stacked', KeyC: 'floating' };
+  const PICTURE_IN_PICTURE_SHORTCUT = 'KeyP';
 
   let overlayTimer = null;
 
@@ -29,7 +31,7 @@
     view.refs.theatreButton.ariaLabel = layout === 'theatre' ? 'Exit theatre mode' : 'Theatre mode';
     view.refs.stackedButton.ariaLabel = layout === 'stacked' ? 'Exit stacked mode' : 'Stacked mode';
     view.refs.floatingButton.ariaLabel = layout === 'floating' ? 'Exit floating chat' : 'Floating chat';
-    if (layout === 'floating') skek.floatingWindow.open(() => setLayout(null));
+    if (layout === 'floating') skek.floatingWindow.open(() => setLayout(null), syncChatFrame);
     else skek.floatingWindow.close();
     syncChatFrame();
     if (layout) showOverlay();
@@ -41,6 +43,13 @@
     setLayout(state.view.layout === layout ? null : layout);
   }
 
+  // Asks a player's frame to open or close its picture-in-picture window. For multi-view.js too.
+  function askPictureInPicture(frame) {
+    if (frame?.contentWindow) frame.contentWindow.postMessage({ skekPictureInPicture: 'toggle' }, new URL(frame.src).origin);
+  }
+
+  const playerFrame = () => state.view?.root.querySelector('.skek-player__frame');
+
   // Captured first, so Alt+T doesn't also switch Twitch's own player behind the view.
   addEventListener(
     'keydown',
@@ -48,11 +57,14 @@
       const { view } = state;
       if (!view) return;
       // Ctrl is left out because AltGr reports as Ctrl+Alt on Windows.
-      const layout = event.altKey && !event.ctrlKey ? LAYOUT_SHORTCUTS[event.code] : null;
-      if (!layout && !(event.key === 'Escape' && view.layout)) return;
+      const alt = event.altKey && !event.ctrlKey;
+      const layout = alt ? LAYOUT_SHORTCUTS[event.code] : null;
+      const pictureInPicture = alt && event.code === PICTURE_IN_PICTURE_SHORTCUT;
+      if (!layout && !pictureInPicture && !(event.key === 'Escape' && view.layout)) return;
       event.preventDefault();
       event.stopPropagation();
       if (layout) toggleLayout(layout);
+      else if (pictureInPicture) askPictureInPicture(playerFrame());
       else setLayout(null);
     },
     true,
@@ -67,8 +79,9 @@
     else if (message === 'toggle-theatre') toggleLayout('theatre');
     else if (message === 'toggle-stacked') toggleLayout('stacked');
     else if (message === 'toggle-floating') toggleLayout('floating');
+    else if (message === 'toggle-picture-in-picture') askPictureInPicture(playerFrame());
     else if (message === 'exit-theatre' && view.layout) setLayout(null);
   });
 
-  Object.assign(shared, { showOverlay, toggleLayout });
+  Object.assign(shared, { showOverlay, toggleLayout, askPictureInPicture });
 })();

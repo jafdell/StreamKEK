@@ -9,7 +9,7 @@
 
   const shared = skek.streams;
   const { el, icon, onBodyReady } = skek.helpers;
-  const { state, platformOf, siteOf, streamsOf, compact, frame, chatSettings, placeRoot, pauseTwitchVideos, resumeTwitchVideos, multiLayout, swapStreams, MAX_MULTI_STREAMS, CHANNEL_PATH } = shared;
+  const { state, platformOf, siteOf, streamsOf, compact, frame, chatSettings, placeRoot, pauseTwitchVideos, resumeTwitchVideos, multiLayout, swapStreams, askPictureInPicture, MAX_MULTI_STREAMS, CHANNEL_PATH } = shared;
 
   const VIEW_ID = 'skek-view';
   const PLAYER_ALLOW = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
@@ -584,7 +584,7 @@
 
   function openMulti() {
     const { root, refs } = buildRoot();
-    state.multi = { root, refs, entries: [], dividers: [], splits: {}, hash: '', audioId: null, chatId: null, chatHidden: false, full: false, sharedChat: false, started: false, pickerShows: '' };
+    state.multi = { root, refs, entries: [], dividers: [], splits: {}, hash: '', audioId: null, windowId: null, chatId: null, chatHidden: false, full: false, sharedChat: false, started: false, pickerShows: '' };
     savedTitle = document.title;
     setChatHidden(false);
     setFull(false);
@@ -776,6 +776,16 @@
     dropOverlay = null;
   }
 
+  // Alt+P is for the stream whose picture-in-picture window is open, to close it. With none open,
+  // it's for the stream the key was pressed over, the only one the browser lets open a window, or
+  // else the one with the sound, or the first that's playing. frames/picture-in-picture.js says
+  // which stream's window is open.
+  function pictureInPictureFrame(pressedIn) {
+    const { entries, audioId, windowId } = state.multi;
+    const playing = entries.filter((e) => e.playerFrame);
+    return (playing.find((e) => e.id === windowId) ?? pressedIn ?? playing.find((e) => e.id === audioId) ?? playing[0])?.playerFrame;
+  }
+
   // Captured first, so Alt+T doesn't also switch Twitch's own player behind the view. The other two
   // modes need a whole stream, so there's nothing for them to do here.
   addEventListener(
@@ -790,11 +800,12 @@
         return;
       }
       // Ctrl is left out because AltGr reports as Ctrl+Alt on Windows.
-      const shortcut = event.altKey && !event.ctrlKey && ['KeyT', 'KeyS', 'KeyC'].includes(event.code) ? event.code : null;
+      const shortcut = event.altKey && !event.ctrlKey && ['KeyT', 'KeyS', 'KeyC', 'KeyP'].includes(event.code) ? event.code : null;
       if (!shortcut && !(event.key === 'Escape' && multi.full)) return;
       event.preventDefault();
       event.stopPropagation();
       if (shortcut === 'KeyT') setFull(!multi.full);
+      else if (shortcut === 'KeyP') askPictureInPicture(pictureInPictureFrame());
       else if (!shortcut) setFull(false);
     },
     true,
@@ -808,7 +819,15 @@
     if (message === 'activity') showControls();
     else if (message === 'toggle-theatre') setFull(!multi.full);
     else if (message === 'exit-theatre' && multi.full) setFull(false);
-    else if (message === 'audio') {
+    else if (message === 'toggle-picture-in-picture') {
+      askPictureInPicture(pictureInPictureFrame(multi.entries.find((e) => e.playerFrame?.contentWindow === event.source)));
+    } else if (message === 'picture-in-picture') {
+      // One stream's window opening closes another's, and the two can report in either order.
+      const entry = multi.entries.find((e) => e.playerFrame?.contentWindow === event.source);
+      if (!entry) return;
+      if (event.data.open === true) multi.windowId = entry.id;
+      else if (multi.windowId === entry.id) multi.windowId = null;
+    } else if (message === 'audio') {
       const entry = multi.entries.find((e) => e.playerFrame?.contentWindow === event.source);
       if (!entry) return;
       if (!event.data.muted) setAudio(entry.id);

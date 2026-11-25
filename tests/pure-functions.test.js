@@ -281,7 +281,7 @@ test('a backup saves everything, and restoring it gives back the same', () => {
     chatHighlightedWords: ['word'],
     kickVolume: 0.5,
     chatHidden: true,
-    floatingChat: { x: 10, y: 20, opacity: 0.5 },
+    floatingChat: { x: 10, y: 20, opacity: 50, align: 'right', messagesOnly: true },
     recentEmotes: [{ name: 'KEKW' }, { name: ':)', twitch: '1' }, { name: 'esfandPls', twitch: 'emotesv2_38b199e5' }],
   };
   const backup = createBackup(saved, '1.4.0', new Date('2026-11-07T00:00:00Z'));
@@ -311,7 +311,7 @@ test('parseBackup keeps only what is valid, and leaves out the rest', () => {
     kickVolume: 5,
     chatHidden: 1,
     chatBlockedWords: ['ok', '', 3, 'x'.repeat(301)],
-    floatingChat: { x: 1, y: 'no', extra: 2, width: null },
+    floatingChat: { x: 1, y: 'no', extra: 2, width: null, align: 'middle', messagesOnly: 'yes' },
     recentEmotes: [{ name: 'KEKW', twitch: '../x', count: 3 }, { name: 'two words' }, { name: '' }, { twitch: '25' }, 'Kappa', null, { name: 'Kappa', twitch: '25' }],
     channels: [
       { id: 'UCgood', name: 'Good', avatar: 'http://example.com/a.png', extra: 'dropped', handle: '@a/../b', slug: '../x', login: 'a b', platform: 'a/b' },

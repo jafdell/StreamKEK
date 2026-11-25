@@ -3,6 +3,8 @@
 // some seconds to come back from it. Twitch's page tells the player each time the tab is hidden
 // or shown, so this tells the player it's shown, right after. Only the player hears that: the
 // rest of the page still knows the tab is hidden.
+// A stream in a picture-in-picture window is being watched while its tab is hidden, so its quality is
+// kept too, whatever the setting says: see picture-in-picture.js here and in streams/frames/.
 // Runs in the page itself, because reaching the player means going through React's internals, as
 // quality.js does. src/twitch/page-sync.js sets the attribute, and embed-settings.js does in
 // Twitch's embedded player, for the multi-stream view.
@@ -26,8 +28,11 @@
     return null;
   }
 
+  // The setting, or a stream being watched in a picture-in-picture window.
+  const wanted = () => document.documentElement.matches(ON) || !!document.pictureInPictureElement;
+
   function keep() {
-    if (!document.hidden || !document.documentElement.matches(ON)) return;
+    if (!document.hidden || !wanted()) return;
     try {
       findPlayer()?.setVisible(true);
     } catch {

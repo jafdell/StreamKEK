@@ -1,0 +1,10 @@
+/* Picture-in-picture on Twitch's own player. picture-in-picture.js says what the attribute means. */
+
+html[data-skek-pip] .skek-player-button--pip button {
+  color: var(--color-twitch-purple-11, #bf94ff);
+}
+
+/* Audio only has no picture to put in the window. */
+html[data-skek-audio-state='on']:not([data-skek-pip]) .skek-player-button--pip {
+  display: none !important;
+}

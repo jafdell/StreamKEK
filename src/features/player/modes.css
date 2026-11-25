@@ -59,6 +59,11 @@ html[data-skek-player-mode='floating'] .right-column--theatre :is(
   background: transparent !important;
 }
 
+/* Twitch draws a line down the left of its chat column, which would show against the video. */
+html[data-skek-player-mode='floating'] .right-column--theatre .channel-root__right-column > * {
+  border: 0 !important;
+}
+
 /* The message box and what's under it show only while using the window, so chat can fill it. */
 html[data-skek-player-mode='floating'] .right-column--theatre:not(:hover, :focus-within) .chat-input {
   display: none !important;
@@ -66,6 +71,64 @@ html[data-skek-player-mode='floating'] .right-column--theatre:not(:hover, :focus
 
 html[data-skek-player-mode='floating'] .right-column--theatre :is([class*='chat-list--'], .video-chat__message-list-wrapper) {
   text-shadow: 0 0 3px var(--skek-float-halo), 0 1px 2px var(--skek-float-halo);
+}
+
+/* The floating window's two switches, which floating-window.js marks on <html>. Each message in
+   chat, and each notice between them, is a box of its own in the list: on streams a plain div
+   around the line, on videos a list item.
+   The edge the messages line up against: */
+html[data-skek-player-mode='floating'][data-skek-float-align='right'] .right-column--theatre :is(
+  .chat-scrollable-area__message-container > div,
+  .video-chat__message-list-wrapper li
+) {
+  text-align: right;
+}
+/* Twitch lays a line's parts out in a row from the left, which a short message doesn't fill. */
+html[data-skek-player-mode='floating'][data-skek-float-align='right'] .right-column--theatre :is(
+  .chat-scrollable-area__message-container [class*='chat-line__'],
+  .video-chat__message-list-wrapper .vod-message
+) {
+  justify-content: flex-end;
+}
+
+/* A background behind each message only, as wide as the message, in place of the window's. */
+html[data-skek-player-mode='floating'][data-skek-float-messages] .right-column--theatre :is(
+  .chat-scrollable-area__message-container > div:not(:empty),
+  .video-chat__message-list-wrapper li
+) {
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: calc(100% - 12px);
+  margin: 3px 6px;
+  border-radius: 6px;
+  background: rgb(from var(--skek-float-color) r g b / var(--skek-float-opacity));
+}
+/* Twitch's own space around a line, which is too wide for a box this size. The line's corners are
+   rounded too, for the lines Twitch colors itself, like a highlighted message. */
+html[data-skek-player-mode='floating'][data-skek-float-messages] .right-column--theatre :is(
+  .chat-scrollable-area__message-container > div > *,
+  .video-chat__message-list-wrapper .vod-message
+) {
+  padding: 3px 8px !important;
+  border-radius: 6px;
+}
+/* On videos Twitch gives each item the list's full width, in a row that wraps. As a column, each
+   box keeps a row to itself however narrow it is. */
+html[data-skek-player-mode='floating'][data-skek-float-messages] .right-column--theatre .video-chat__message-list-wrapper ul {
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+}
+html[data-skek-player-mode='floating'][data-skek-float-messages] .right-column--theatre .video-chat__message-list-wrapper li {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  width: fit-content !important;
+}
+html[data-skek-player-mode='floating'][data-skek-float-messages][data-skek-float-align='right'] .right-column--theatre :is(
+  .chat-scrollable-area__message-container > div:not(:empty),
+  .video-chat__message-list-wrapper li
+) {
+  align-self: flex-end;
+  margin-left: auto;
 }
 
 /* The scrollbar shows only when scrolled up from the newest messages. Scrolling drives this

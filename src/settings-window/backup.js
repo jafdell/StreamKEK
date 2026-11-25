@@ -83,7 +83,10 @@
   function cleanFloatingChat(value) {
     if (!isObject(value)) return undefined;
     const kept = ['x', 'y', 'width', 'height', 'opacity'].filter((key) => Number.isFinite(value[key]));
-    return Object.fromEntries(kept.map((key) => [key, value[key]]));
+    const cleaned = Object.fromEntries(kept.map((key) => [key, value[key]]));
+    if (value.align === 'left' || value.align === 'right') cleaned.align = value.align;
+    if (typeof value.messagesOnly === 'boolean') cleaned.messagesOnly = value.messagesOnly;
+    return cleaned;
   }
 
   // Each is a name to type, with the id its image is built from when it's one of Twitch's own emotes.
