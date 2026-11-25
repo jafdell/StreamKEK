@@ -1,6 +1,9 @@
 /* Floating chat, for both Twitch's chat and the stream view's. floating-window.js sets the
    position, size and opacity on <html>. Each chat sits right under the window's bar, over the
-   video and below Twitch's modals (5000). Only the background fades, so the text stays readable. */
+   video and below Twitch's modals (5000). Only the background fades, so the text stays readable.
+   It also sets data-skek-float-align, 'left' or 'right', for the edge the messages line up
+   against, and data-skek-float-messages while the background is behind each message only. Each
+   chat does those itself: player/modes.css for Twitch's, a site's frames/chat.css for its own. */
 
 html {
   --skek-float-bar-height: 32px;
@@ -28,6 +31,12 @@ html[data-skek-player-mode='floating'] .right-column--theatre,
   height: calc(var(--skek-float-height) - var(--skek-float-bar-height)) !important;
   border: 0 !important;
   background: rgb(from var(--skek-float-color) r g b / var(--skek-float-opacity)) !important;
+}
+
+/* With a background behind each message, the window has none of its own. */
+html[data-skek-float-messages][data-skek-player-mode='floating'] .right-column--theatre,
+html[data-skek-float-messages] .skek-view--floating .skek-chat {
+  background: transparent !important;
 }
 
 .skek-float {
@@ -68,6 +77,23 @@ html[data-skek-float-hover] .skek-float__bar {
   opacity: 1;
 }
 .skek-float__title { flex: 1 1 auto; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.skek-float__button {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.skek-float__button:hover { background: rgba(255, 255, 255, 0.18); }
+.skek-float__button[aria-pressed='true'] { color: var(--color-twitch-purple-11, #bf94ff); }
+.skek-float__button svg { width: 18px; height: 18px; }
 .skek-float__opacity { flex: 0 0 90px; width: 90px; margin: 0; accent-color: var(--color-twitch-purple-9, #9147ff); cursor: pointer; }
 
 .skek-float__edge { position: absolute; touch-action: none; pointer-events: auto; }

@@ -58,10 +58,14 @@
   }
 
   // In floating chat the window draws the background, so the frame has to stop drawing its own.
+  // The frame also lines up its messages and draws their backgrounds, as the window's switches say.
   function syncChatFrame() {
     const { view } = state;
     const chatFrame = view?.refs.chat.querySelector('iframe');
-    chatFrame?.contentWindow.postMessage({ skekChatTransparent: view.layout === 'floating' }, new URL(chatFrame.src).origin);
+    chatFrame?.contentWindow.postMessage(
+      { skekChatTransparent: view.layout === 'floating', skekChatFloat: skek.floatingWindow.look() },
+      new URL(chatFrame.src).origin,
+    );
   }
 
   Object.assign(shared, { frame, chatSettings, loadStream, syncChatFrame });

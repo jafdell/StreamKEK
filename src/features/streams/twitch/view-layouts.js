@@ -31,7 +31,7 @@
     view.refs.theatreButton.ariaLabel = layout === 'theatre' ? 'Exit theatre mode' : 'Theatre mode';
     view.refs.stackedButton.ariaLabel = layout === 'stacked' ? 'Exit stacked mode' : 'Stacked mode';
     view.refs.floatingButton.ariaLabel = layout === 'floating' ? 'Exit floating chat' : 'Floating chat';
-    if (layout === 'floating') skek.floatingWindow.open(() => setLayout(null));
+    if (layout === 'floating') skek.floatingWindow.open(() => setLayout(null), syncChatFrame);
     else skek.floatingWindow.close();
     syncChatFrame();
     if (layout) showOverlay();

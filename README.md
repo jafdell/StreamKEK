@@ -15,7 +15,7 @@ It works in Chrome, Brave and other Chromium browsers, with no API key and no ex
 - **Multi-stream:** drag a channel from the sidebar onto the page to watch two to four streams at once, with their chats, from any mix of Twitch, YouTube and Kick. Drag between streams to resize them, drag a stream's name onto another to swap them, and choose which one has the sound.
 - **Favorites:** press a channel's star, or drag it to the top of the sidebar, to keep channels from all three sites together in your own order while they're live.
 - **Go-live notifications:** get a notification when a favorite starts a stream, also with no Twitch tab open. Off by default.
-- **Floating chat (Alt+C):** watch Twitch, YouTube or Kick fullscreen with chat in a window you can move, resize and make see-through.
+- **Floating chat (Alt+C):** watch Twitch, YouTube or Kick fullscreen with chat in a window you can move, resize and make see-through. Line its messages up on the left or the right, and put the background behind the whole chat or only behind each message.
 - **Stacked mode (Alt+S):** the stream at full width with chat under it, for narrow windows.
 - **Theatre mode (Alt+T):** on YouTube and Kick streams, like Twitch's own.
 - **Picture-in-picture (Alt+P):** pop a Twitch, YouTube or Kick stream out into a small window that stays on top of your other apps, which you can move and resize.
