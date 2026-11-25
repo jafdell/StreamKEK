@@ -349,6 +349,8 @@ html.skek[data-skek-transparent] #manager-pages,
 html.skek[data-skek-transparent] yt-live-chat-renderer #input-manager {
   background: transparent !important;
 }
+/* YouTube's line between the donation chips and the messages, which would show against the video. */
+html.skek[data-skek-transparent] #contents > #separator { display: none !important; }
 html.skek[data-skek-transparent] #items {
   text-shadow: 0 0 3px var(--skek-halo), 0 1px 2px var(--skek-halo);
 }

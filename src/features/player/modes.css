@@ -59,6 +59,11 @@ html[data-skek-player-mode='floating'] .right-column--theatre :is(
   background: transparent !important;
 }
 
+/* Twitch draws a line down the left of its chat column, which would show against the video. */
+html[data-skek-player-mode='floating'] .right-column--theatre .channel-root__right-column > * {
+  border: 0 !important;
+}
+
 /* The message box and what's under it show only while using the window, so chat can fill it. */
 html[data-skek-player-mode='floating'] .right-column--theatre:not(:hover, :focus-within) .chat-input {
   display: none !important;
