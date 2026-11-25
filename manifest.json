@@ -79,6 +79,7 @@
         "src/features/player/modes.js",
         "src/features/player/audio-only.js",
         "src/features/player/volume-boost.js",
+        "src/features/player/picture-in-picture.js",
         "src/features/player/go-live.js"
       ],
       "css": [
@@ -104,6 +105,7 @@
         "src/features/player/modes.css",
         "src/features/player/audio-only.css",
         "src/features/player/volume-boost.css",
+        "src/features/player/picture-in-picture.css",
         "src/features/player/floating-window.css",
         "src/features/streams/twitch/sidebar.css",
         "src/features/streams/twitch/favorites.css",
@@ -150,7 +152,11 @@
         "src/features/streams/frames/layout-keys.js",
         "src/features/streams/frames/mouse-activity.js",
         "src/features/streams/frames/audio.js",
+        "src/features/streams/frames/picture-in-picture.js",
         "src/features/player/embed-settings.js"
+      ],
+      "css": [
+        "src/features/streams/frames/picture-in-picture.css"
       ],
       "all_frames": true,
       "run_at": "document_start"
@@ -230,9 +236,11 @@
         "src/features/streams/frames/layout-keys.js",
         "src/features/streams/frames/mouse-activity.js",
         "src/features/streams/frames/audio.js",
+        "src/features/streams/frames/picture-in-picture.js",
         "src/features/youtube/frames/watch.js"
       ],
       "css": [
+        "src/features/streams/frames/picture-in-picture.css",
         "src/features/youtube/frames/watch.css"
       ],
       "all_frames": true,
@@ -280,9 +288,11 @@
         "src/features/streams/frames/layout-keys.js",
         "src/features/streams/frames/mouse-activity.js",
         "src/features/streams/frames/audio.js",
+        "src/features/streams/frames/picture-in-picture.js",
         "src/features/kick/frames/watch.js"
       ],
       "css": [
+        "src/features/streams/frames/picture-in-picture.css",
         "src/features/kick/frames/watch.css"
       ],
       "all_frames": true,

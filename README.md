@@ -18,6 +18,7 @@ It works in Chrome, Brave and other Chromium browsers, with no API key and no ex
 - **Floating chat (Alt+C):** watch Twitch, YouTube or Kick fullscreen with chat in a window you can move, resize and make see-through.
 - **Stacked mode (Alt+S):** the stream at full width with chat under it, for narrow windows.
 - **Theatre mode (Alt+T):** on YouTube and Kick streams, like Twitch's own.
+- **Picture-in-picture (Alt+P):** pop a Twitch, YouTube or Kick stream out into a small window that stays on top of your other apps, which you can move and resize.
 - **Audio only (Alt+A):** listen to a Twitch stream or video without the picture, which saves data and battery.
 - **Volume boost:** make a quiet Twitch stream or video up to four times louder with the button beside the volume, until you reload or change channel.
 - **Keep quality in background tabs:** stop Twitch lowering a live stream to 360p when its tab is in the background. Off by default.
