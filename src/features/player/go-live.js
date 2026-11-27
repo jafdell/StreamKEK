@@ -10,6 +10,9 @@
 // Sometimes Twitch notices by itself on Home, and plays the stream in the picture at the top of the
 // page instead of in its normal view. So a page that showed the channel as offline and now shows
 // that picture gets its "Watch now" link clicked, which opens the normal view with no reload.
+// Twitch can also show the channel as live, with its viewers and LIVE badge, while the player still
+// has nothing in it: after that link, or after a reload that came just before the stream was there.
+// Nothing on Twitch's page starts the player then, so that gets a reload as well.
 // If Twitch's markup changes, nothing happens.
 // This loads after emotes.js, for the channel in the address.
 (() => {
@@ -51,23 +54,44 @@
   const WATCH = '.channel-root--watch';
   const WATCH_NOW = "a[data-a-target='home-live-overlay-button']";
   const CHAT_BOX = "[data-a-target='chat-input']";
+  // Twitch's player. With nothing loaded its video has readyState 0, where a paused stream has 1,
+  // and it may show OFFLINE_SCREEN, the channel's latest video. GATE is the player saying something
+  // of its own, like an error, which a reload for going live isn't for.
+  const VIDEO = '.video-ref video';
+  const OFFLINE_SCREEN = '.video-player__overlay .offline-recommendations-video-card';
+  const GATE = "[data-a-target='player-overlay-content-gate']";
   const QUERY = 'query($login:String!){user(login:$login){stream{id}}}';
   // In the tab's sessionStorage, so it's still there after the reload.
   const KEY = 'skek-go-live';
   const CHECK_MS = 15_000;
   const LOOK_MS = 2_000;
   const TIMEOUT_MS = 10_000;
+  // How long the player has had nothing in it before that counts. When Twitch starts the stream by
+  // itself, the player is empty for a moment first.
+  const EMPTY_MS = 6_000;
 
-  // The channel Twitch has said is offline since this page opened.
+  // The channel Twitch has said is offline since this page opened, or since it last showed a stream.
   let offlineSeen = null;
   // The channel whose page has shown it as offline, and hasn't shown its stream in the normal view
   // since. A stream at the top of its Home is then one that just started, not one you went to Home
   // from.
   let offlineShown = null;
+  // The channel whose page doesn't show it as offline while its player has nothing in it, and since
+  // when: { login, since }.
+  let empty = null;
   let checking = false;
 
   const channelHere = () => channelPage(location.pathname, skek.chatEmotes.channelFromPath);
   const showsOffline = () => !!document.querySelector(OFFLINE);
+
+  function playerEmpty() {
+    if (document.querySelector(GATE)) return false;
+    return !!document.querySelector(OFFLINE_SCREEN) || document.querySelector(VIDEO)?.readyState === 0;
+  }
+
+  // Whether the page is waiting for the stream: it shows the channel as offline, or its player has
+  // stayed empty.
+  const waits = (login) => showsOffline() || (empty?.login === login && Date.now() - empty.since >= EMPTY_MS);
 
   function lastReload() {
     try {
@@ -83,9 +107,13 @@
     const login = channelHere();
     if (!login) return;
     if (offlineSeen !== login) offlineSeen = null;
-    if (!showsOffline()) {
-      // The stream is showing, so there's nothing left to try again.
-      if (document.querySelector(LIVE)) sessionStorage.removeItem(KEY);
+    if (!waits(login)) {
+      // The stream is showing, so there's nothing left to try again, and a stream that drops out
+      // later isn't one that just started.
+      if (document.querySelector(LIVE) && !playerEmpty()) {
+        offlineSeen = null;
+        sessionStorage.removeItem(KEY);
+      }
       return;
     }
     checking = true;
@@ -98,7 +126,7 @@
         return;
       }
       // The page can have changed while Twitch answered.
-      if (channelHere() !== login || !showsOffline()) return;
+      if (channelHere() !== login || !waits(login)) return;
       if (document.querySelector(CHAT_BOX)?.textContent.replace(/﻿/g, '').trim()) return;
       const sawOffline = offlineSeen === login;
       const reloaded = lastReload();
@@ -113,11 +141,17 @@
     }
   }
 
-  // Opens the normal view when Twitch started the stream at the top of Home by itself.
+  // Opens the normal view when Twitch started the stream at the top of Home by itself, and notes
+  // for check() how long the player has been empty.
   function look() {
-    if (!document.documentElement.matches(ON) || document.getElementById('skek-view')) return;
+    if (!document.documentElement.matches(ON) || document.getElementById('skek-view')) {
+      empty = null;
+      return;
+    }
     const login = channelHere();
     if (offlineShown !== login) offlineShown = null;
+    if (!login || showsOffline() || !playerEmpty()) empty = null;
+    else if (empty?.login !== login) empty = { login, since: Date.now() };
     if (!login) return;
     if (showsOffline()) {
       offlineShown = login;
