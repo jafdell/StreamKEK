@@ -1,0 +1,108 @@
+/* What button-intro.js shows once after a first install: the page dimmed except a hole around the
+   extension's button, a pulsing ring around the hole, and a callout under it. It's StreamKEK's own
+   purple and white in every theme, light or dark: the dimmed page behind it is dark in all of them. */
+.skek-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 4000; /* above floating chat (3002), under Twitch's modals (5000) and the settings window */
+  pointer-events: none;
+  --skek-intro-accent: #9147ff; /* the icon's purple */
+  --skek-intro-on-accent: #fff;
+}
+.skek-intro[hidden] { display: none; }
+
+.skek-intro__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  pointer-events: auto;
+}
+
+.skek-intro__ring {
+  position: absolute;
+  width: 56px; /* twice HOLE in button-intro.js */
+  height: 56px;
+  border: 3px solid var(--skek-intro-accent);
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+.skek-intro__ring::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--skek-intro-accent);
+  opacity: 0;
+}
+
+.skek-intro__callout {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  max-width: min(360px, calc(100vw - 16px));
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--skek-intro-accent);
+  color: var(--skek-intro-on-accent);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  font-size: 15px;
+  line-height: 1.35;
+  pointer-events: auto;
+}
+/* The arrow up to the button. button-intro.js sets where along the top it sits. */
+.skek-intro__callout::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: var(--skek-intro-arrow, 50%);
+  transform: translateX(-50%);
+  border: 10px solid transparent;
+  border-top: 0;
+  border-bottom-color: var(--skek-intro-accent);
+}
+
+/* Ringed, since the icon is purple too. */
+.skek-intro__logo {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  box-shadow: 0 0 0 2px var(--skek-intro-on-accent);
+}
+.skek-intro__title { margin: 0; font-size: 18px; font-weight: 700; }
+.skek-intro__text { margin: 2px 0 0; }
+
+/* The callout's colors swapped round. */
+.skek-intro__done {
+  flex: 0 0 auto;
+  height: 32px;
+  margin-left: 4px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--skek-intro-on-accent);
+  color: var(--skek-intro-accent);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.skek-intro__done:hover { opacity: 0.9; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .skek-intro { animation: skek-intro-in 0.25s ease-out; }
+  .skek-intro__ring::after { animation: skek-intro-pulse 1.4s ease-out infinite; }
+  .skek-intro__callout { animation: skek-intro-nudge 1.4s ease-in-out infinite; }
+}
+@keyframes skek-intro-in {
+  from { opacity: 0; }
+}
+@keyframes skek-intro-pulse {
+  from { transform: scale(1); opacity: 0.9; }
+  to { transform: scale(1.7); opacity: 0; }
+}
+/* Toward the button and back. */
+@keyframes skek-intro-nudge {
+  50% { transform: translateY(-5px); }
+}
