@@ -8,6 +8,7 @@ import vm from 'node:vm';
 
 import { extractJson } from '../src/features/youtube/background/youtube-pages.js';
 import { buildLiveEntry, viewerCount } from '../src/features/youtube/background/live-entry.js';
+import { isFirstInstall } from '../src/background/first-install.js';
 import { updatedVersion } from '../src/background/whats-new.js';
 import { streamDescription } from '../src/features/youtube/background/about.js';
 import { inputToUrl } from '../src/features/youtube/background/channels.js';
@@ -941,6 +942,15 @@ test('updatedVersion notes an update to another version, and nothing else', () =
   assert.equal(updatedVersion({ reason: 'update', previousVersion: '1.10.0' }, '1.10.0'), null);
   assert.equal(updatedVersion({ reason: 'install' }, '1.10.0'), null);
   assert.equal(updatedVersion({ reason: 'chrome_update' }, '1.10.0'), null);
+});
+
+test('isFirstInstall is only true for a first install', () => {
+  assert.equal(isFirstInstall({ reason: 'install' }), true);
+  // An update, and the Reload button on the extensions page.
+  assert.equal(isFirstInstall({ reason: 'update', previousVersion: '1.9.1' }), false);
+  assert.equal(isFirstInstall({ reason: 'update', previousVersion: '1.10.0' }), false);
+  assert.equal(isFirstInstall({ reason: 'chrome_update' }), false);
+  assert.equal(isFirstInstall({ reason: 'shared_module_update' }), false);
 });
 
 test('viewerCount reads plain numbers', () => {

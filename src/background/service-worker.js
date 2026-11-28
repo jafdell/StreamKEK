@@ -11,6 +11,7 @@ import {
   startBackground as startNotifications,
 } from '../features/notifications/background/index.js';
 import { moveRenamedSettings } from './renamed-settings.js';
+import { noteInstall } from './first-install.js';
 import { noteUpdate } from './whats-new.js';
 
 const handlers = { __proto__: null, ...youtubeLiveHandlers, ...kickLiveHandlers, ...notificationHandlers }; // so 'constructor' etc. stay unknown types
@@ -27,6 +28,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
 });
 
 chrome.runtime.onInstalled.addListener(noteUpdate);
+chrome.runtime.onInstalled.addListener(noteInstall);
 
 moveRenamedSettings();
 startYoutubeLive();
