@@ -1,0 +1,32 @@
+# StreamKEK
+
+> StreamKEK is a free browser extension for Chrome, Brave and other Chromium browsers that brings YouTube and Kick live streams and their chat into Twitch. It is unofficial: not affiliated with or endorsed by Twitch, YouTube or Kick.
+
+- Price: free, with no account and no API key.
+- Works in: Chrome, Brave, Edge and other Chromium browsers on a computer. Not on phones.
+- Privacy: no server, no account and no analytics. What it saves stays in the browser.
+- Contact: support@streamkek.com
+- Code: public on GitHub under MIT with the Commons Clause: free to use, change and share, but not to sell.
+
+## What it does
+
+- YouTube and Kick streams inside Twitch: your live YouTube subscriptions and Kick follows show in Twitch's sidebar and on its Following page, and open there with their chat.
+- Multi-stream: two to four streams at once, with their chats, from any mix of Twitch, YouTube and Kick.
+- Floating chat (Alt+C): fullscreen with chat in a window you can move, resize and make see-through.
+- Stacked mode (Alt+S), theatre mode (Alt+T), picture-in-picture (Alt+P) and audio only (Alt+A).
+- Chat: 7TV, BTTV and FFZ emotes in Twitch chat, blocked and highlighted words, one font size for all three sites' chat, and seeing deleted messages.
+- Favorites from all three sites in one list, with optional go-live notifications.
+- 16 themes that recolor Twitch.
+- A tidier Twitch: hide parts of the sidebar, chat and player, keep the sort order you pick, and choose the quality streams start at.
+
+## Pages
+
+- [Home](https://streamkek.com/): what StreamKEK does, shown with drawings you can try, and how to install it.
+- [Support](https://streamkek.com/support): how to report a bug or request a feature, and fixes for common problems.
+- [Privacy policy](https://streamkek.com/privacy): what the extension saves, what it sends and where, and what Twitch can see.
+
+## Elsewhere
+
+- [Chrome Web Store](https://chromewebstore.google.com/detail/streamkek/ndkccdbljjejloelgdcbikabojjaeomc): where to install it.
+- [Source code](https://github.com/jafdell/StreamKEK): the code and its README, which lists every feature.
+- [Changelog](https://github.com/jafdell/StreamKEK/blob/main/CHANGELOG.md): what each version added.

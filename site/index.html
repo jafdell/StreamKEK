@@ -7,19 +7,87 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>StreamKEK: YouTube and Kick streams inside Twitch</title>
-  <meta name="description" content="StreamKEK is a free browser extension that brings YouTube and Kick live streams and their chat into Twitch, lets you watch up to four streams at once, and gives you more control over Twitch's player, chat and sidebar.">
+  <meta name="description" content="StreamKEK is a free browser extension for Chrome, Brave and other Chromium browsers that brings YouTube and Kick live streams and their chat into Twitch.">
   <meta name="theme-color" content="#0e0e10">
-  <meta property="og:title" content="StreamKEK: YouTube and Kick streams inside Twitch">
-  <meta property="og:description" content="A free browser extension that makes Twitch the one place you watch live streams.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://streamkek.com/">
   <link rel="canonical" href="https://streamkek.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="StreamKEK">
+  <meta property="og:title" content="StreamKEK: YouTube and Kick streams inside Twitch">
+  <meta property="og:description" content="StreamKEK is a free browser extension for Chrome, Brave and other Chromium browsers that brings YouTube and Kick live streams and their chat into Twitch.">
+  <meta property="og:url" content="https://streamkek.com/">
+  <meta property="og:image" content="https://streamkek.com/assets/preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="StreamKEK's icon beside the words: Watch YouTube and Kick streams inside Twitch.">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="assets/icon-48.png" type="image/png">
+  <link rel="preload" href="assets/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="palettes.css">
   <link rel="stylesheet" href="effects.css">
   <link rel="stylesheet" href="styles.css">
   <script src="theme.js" defer></script>
   <script src="install.js" defer></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://streamkek.com/#website",
+        "url": "https://streamkek.com/",
+        "name": "StreamKEK",
+        "description": "StreamKEK is a free browser extension for Chrome, Brave and other Chromium browsers that brings YouTube and Kick live streams and their chat into Twitch.",
+        "inLanguage": "en",
+        "publisher": {
+          "@id": "https://streamkek.com/#author"
+        }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://streamkek.com/#extension",
+        "name": "StreamKEK",
+        "description": "StreamKEK is a free browser extension for Chrome, Brave and other Chromium browsers that brings YouTube and Kick live streams and their chat into Twitch.",
+        "url": "https://streamkek.com/",
+        "image": "https://streamkek.com/assets/icon-128.png",
+        "screenshot": "https://streamkek.com/assets/preview.png",
+        "applicationCategory": "BrowserApplication",
+        "browserRequirements": "A desktop Chromium browser, such as Chrome, Brave or Edge",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "installUrl": "https://chromewebstore.google.com/detail/streamkek/ndkccdbljjejloelgdcbikabojjaeomc",
+        "license": "https://github.com/jafdell/StreamKEK/blob/main/LICENSE",
+        "releaseNotes": "https://github.com/jafdell/StreamKEK/blob/main/CHANGELOG.md",
+        "sameAs": [
+          "https://chromewebstore.google.com/detail/streamkek/ndkccdbljjejloelgdcbikabojjaeomc",
+          "https://github.com/jafdell/StreamKEK"
+        ],
+        "featureList": [
+          "YouTube and Kick live streams and their chat inside Twitch",
+          "Up to four streams at once from Twitch, YouTube and Kick",
+          "Fullscreen with chat floating over the stream",
+          "7TV, BTTV and FFZ emotes in Twitch chat",
+          "Blocked and highlighted chat words",
+          "16 themes for Twitch",
+          "Go-live notifications for favorite channels"
+        ],
+        "author": {
+          "@id": "https://streamkek.com/#author"
+        }
+      },
+      {
+        "@type": "Person",
+        "@id": "https://streamkek.com/#author",
+        "name": "jafdell",
+        "url": "https://github.com/jafdell",
+        "email": "support@streamkek.com"
+      }
+    ]
+  }
+  </script>
 </head>
 <body class="home">
   <!-- The extension's own icons, from src/twitch/helpers.js and src/features/chat/emote-picker.js,
@@ -82,22 +150,18 @@
           <h1>Watch YouTube and Kick streams inside Twitch.</h1>
         </div>
         <div class="band__more">
-          <p>StreamKEK is a free browser extension. Your live YouTube subscriptions and Kick follows show in Twitch's sidebar and on its Following page, and open there with their chat.</p>
+          <p>StreamKEK is a free browser extension for Chrome, Brave and other Chromium browsers. Your live YouTube subscriptions and Kick follows show in Twitch's sidebar and on its Following page, and open there with their chat.</p>
           <p class="actions"><a class="pill pill--big" data-install href="https://chromewebstore.google.com/detail/streamkek/ndkccdbljjejloelgdcbikabojjaeomc">Add to Chrome</a></p>
-          <p class="small">Unofficial: not affiliated with or endorsed by Twitch, YouTube or Kick.</p>
         </div>
       </div>
       <div class="try">
-        <span class="try__tag">Try it</span>
         <label class="power">
           <input class="skek-switch" type="checkbox" role="switch" id="skek-on" autocomplete="off" checked>
-          <span class="when-on">StreamKEK is on. Switch it off to compare.</span>
-          <span class="when-off">StreamKEK is off. This is Twitch without it. Switch it on to compare.</span>
+          StreamKEK
         </label>
-        <span class="when-on">Click a channel in the sidebar to open its stream</span>
       </div>
       <p class="visually-hidden">Next is a drawing of Twitch with StreamKEK on, with made-up channels: Twitch's top bar with StreamKEK's icon in it, the stream of the channel picked in the sidebar, the sidebar with its Favorites, YouTube Live and Kick Live sections, and that stream's chat.</p>
-      <div class="frame shot">
+      <div class="frame shot" data-nosnippet>
         <!-- Twitch's top bar, without its logo. The extension's icon in it opens the settings. -->
         <div class="tw-top" aria-hidden="true">
           <div class="tw-top__links"><span class="tw-top__on">Following</span><span>Browse</span><span class="tw-top__dots"><i></i><i></i><i></i></span></div>
@@ -230,7 +294,6 @@
         <div class="tw-side side-nav" role="radiogroup" aria-label="Channel to open">
           <div class="skek-section skek-only">
             <div class="skek-section__head"><span class="skek-section__title">Favorites</span><span class="skek-iconbtn skek-section__add" aria-hidden="true"><svg width="20" height="20" fill="currentColor"><use href="#i-collapse-left"/></svg></span></div>
-            <p class="added">Channels from all three sites, in your order</p>
               <label class="skek-card skek-card--pick">
                 <input type="radio" name="watch" id="watch-chess" aria-label="quietgambit, a Twitch stream" autocomplete="off">
                 <span class="skek-card__avatar"><span class="skek-card__img av av--1">Q</span><span class="skek-card__platform skek-card__platform--twitch"></span></span>
@@ -270,7 +333,6 @@
           </div>
           <div class="skek-section skek-only">
             <div class="skek-section__head"><span class="skek-section__title">YouTube Live</span><span class="skek-iconbtn skek-section__add" aria-hidden="true"><svg width="20" height="20" fill="currentColor"><use href="#i-plus"/></svg></span></div>
-            <p class="added">Your subscriptions that are live</p>
               <label class="skek-card skek-card--pick">
                 <input type="radio" name="watch" id="watch-harbor" aria-label="Moth &amp; Lantern, a YouTube stream" autocomplete="off" checked>
                 <span class="skek-card__avatar"><span class="skek-card__img av av--4">M</span></span>
@@ -287,7 +349,6 @@
           </div>
           <div class="skek-section skek-only">
             <div class="skek-section__head"><span class="skek-section__title">Kick Live</span><span class="skek-iconbtn skek-section__add" aria-hidden="true"><svg width="20" height="20" fill="currentColor"><use href="#i-plus"/></svg></span></div>
-            <p class="added">Your follows that are live</p>
               <label class="skek-card skek-card--pick">
                 <input type="radio" name="watch" id="watch-cooking" aria-label="copperkettle, a Kick stream" autocomplete="off">
                 <span class="skek-card__avatar"><span class="skek-card__img av av--6">C</span></span>
@@ -479,16 +540,14 @@
         </div>
         <figure class="figure figure--multi">
           <div class="try">
-            <span class="try__tag">Try it</span>
             <span id="multi-count">Streams</span>
             <div class="choices" role="radiogroup" aria-labelledby="multi-count">
               <label class="choice"><input type="radio" name="streams" value="2" autocomplete="off"><span>2</span></label>
               <label class="choice"><input type="radio" name="streams" value="3" autocomplete="off"><span>3</span></label>
               <label class="choice"><input type="radio" name="streams" value="4" autocomplete="off" checked><span>4</span></label>
             </div>
-            <span class="try__more">and click a stream's speaker to move the sound</span>
           </div>
-          <div class="shot skek-multi">
+          <div class="shot skek-multi" data-nosnippet>
             <div class="skek-multi__bar" aria-hidden="true">
               <span class="skek-multi__title">Multi-stream</span>
               <span class="skek-multi__hint"><span class="multi__hint-add">Drag a channel from the sidebar to add it. </span>Drag a stream's name onto another to swap them. Drag between streams to resize them.</span>
@@ -633,7 +692,6 @@
               </div>
             </div>
           </div>
-          <figcaption>A dot stands in for each site's logo: purple for Twitch, red for YouTube and green for Kick.</figcaption>
         </figure>
       </section>
 
@@ -643,11 +701,7 @@
           <p>Press <span class="keys"><kbd>Alt</kbd>+<kbd>C</kbd></span> to watch Twitch, YouTube or Kick fullscreen with chat in a window you can move, resize and make see-through. Line its messages up on the left or the right, and put the background behind the whole chat or only behind each message.</p>
         </div>
         <figure class="figure">
-          <div class="try try--js">
-            <span class="try__tag">Try it</span>
-            <span>Drag the chat window by its bar, fade it with the slider, and press the two buttons beside it</span>
-          </div>
-          <div class="shot float-shot">
+          <div class="shot float-shot" data-nosnippet>
             <img class="float-shot__pic" src="assets/streams/pixel.svg" alt="" width="640" height="360">
             <div class="skek-float" id="float-window">
               <div class="skek-float__bar">
@@ -679,14 +733,13 @@
         </div>
         <div class="lab shot">
           <div class="lab__side">
-            <div class="try"><span class="try__tag">Try it</span></div>
             <label class="lab__switch"><input class="skek-switch" type="checkbox" role="switch" id="lab-emotes" autocomplete="off" checked><span><b>7TV, BTTV and FFZ emotes</b>Pictures where chat would show only their names.</span></label>
             <label class="lab__switch"><input class="skek-switch" type="checkbox" role="switch" id="lab-words" autocomplete="off" checked><span><b>Highlighted words</b>Messages with a word you choose stand out, in all three sites' chat. Here it's "giveaway".</span></label>
             <label class="lab__switch"><input class="skek-switch" type="checkbox" role="switch" id="lab-blocked" autocomplete="off"><span><b>Blocked words</b>Messages with a word you choose are removed, in all three sites' chat. Here it's "spoiler".</span></label>
             <label class="lab__switch"><input class="skek-switch" type="checkbox" role="switch" id="lab-deleted" autocomplete="off"><span><b>See deleted messages</b>Keep reading a message in Twitch chat after a moderator deletes it. Off by default.</span></label>
             <label class="lab__switch"><input class="skek-switch" type="checkbox" role="switch" id="lab-big" autocomplete="off"><span><b>Chat font size</b>One text size for Twitch, YouTube and Kick chat. Here, larger.</span></label>
           </div>
-          <div class="lab__chat twchat">
+          <div class="lab__chat twchat" data-nosnippet>
             <div class="skek-chat__head" aria-hidden="true"><span class="skek-chat__title">Stream Chat</span></div>
             <div class="chat__lines twchat__lines" id="lab-lines" data-live-chat aria-hidden="true">
               <p class="twchat__line"><b class="twchat__name--7">saltmarsh</b>: evening chat <img class="skek-emote" src="assets/emotes/heart-pop.svg" alt="" width="28" height="28"><span class="emote-name">heartPop</span></p>
@@ -739,14 +792,13 @@
                 <button type="button" class="skek-picker__emote" data-name="ggLamp" disabled><img class="skek-emote" src="assets/emotes/gg-lamp.svg" alt="ggLamp" width="34" height="28"></button>
               </div>
             </div>
-            <p class="lab__hint">The emote picker opens from the button in the chat box, with your recently used emotes at the top. You can also click an emote in chat to add it to your message, or type its name. <span class="try__js">Here, click one to send it.</span> Made-up emotes stand in for real ones.</p>
           </div>
         </div>
       </section>
 
       <section class="screen" id="themes">
         <div class="band">
-          <h2>16 themes.<span class="js-only"> Pick one and this page takes it.</span></h2>
+          <h2>16 themes.</h2>
           <p>They recolor Twitch, the settings window and the YouTube and Kick stream view, besides Twitch's own dark and light. The seasons, Christmas and Halloween also move a little, like snow falling behind the sidebar. Kick's chat stays dark in a light theme.</p>
         </div>
         <div class="wall">
@@ -859,7 +911,6 @@
       <section class="screen" id="more">
         <div class="band">
           <h2>And the smaller things.</h2>
-          <p>The rest of what StreamKEK does. Click a name to read about it.</p>
         </div>
         <div class="more">
           <div class="more__group">
@@ -867,7 +918,7 @@
             <details><summary>On the Following page too</summary><p>Your live YouTube subscriptions and Kick follows also show on Twitch's Following page.</p></details>
             <details><summary>Add and hide channels</summary><p>The <strong>+</strong> button adds YouTube and Kick channels you don't follow, and the eye on a channel hides it.</p></details>
             <details><summary>Favorites</summary><p>Press a channel's star, or drag it to the top of the sidebar, to keep channels from all three sites together in your own order while they're live.</p></details>
-            <details><summary>Go-live notifications <span class="more__tag">off by default</span></summary><p>Get a notification when a favorite starts a stream, also with no Twitch tab open.</p></details>
+            <details><summary>Go-live notifications</summary><p>Get a notification when a favorite starts a stream, also with no Twitch tab open.</p></details>
             <details><summary>Stream previews</summary><p>Hover a live channel in the sidebar to see an image of its stream.</p></details>
             <details><summary>Cleaner sidebar</summary><p>Hide For You, Live Channels, Recommended Categories and Viewers Also Watch, and turn off the YouTube Live and Kick Live sections.</p></details>
           </div>
@@ -879,21 +930,21 @@
             <details><summary>Audio only <span class="keys"><kbd>Alt</kbd>+<kbd>A</kbd></span></summary><p>Listen to a Twitch stream or video without the picture, which saves data and battery.</p></details>
             <details><summary>Volume boost</summary><p>Make a quiet Twitch stream or video up to four times louder with the button beside the volume, until you reload or change channel.</p></details>
             <details><summary>Stream quality</summary><p>Choose what streams start at on Twitch, YouTube and Kick, up to 1440p.</p></details>
-            <details><summary>Keep quality in background tabs <span class="more__tag">off by default</span></summary><p>Stop Twitch lowering a live stream to 360p when its tab is in the background.</p></details>
+            <details><summary>Keep quality in background tabs</summary><p>Stop Twitch lowering a live stream to 360p when its tab is in the background.</p></details>
             <details><summary>Reload player on errors</summary><p>Twitch's player reloads itself when a stream stops with an error, instead of you doing it by hand.</p></details>
-            <details><summary>Start when a channel goes live <span class="more__tag">off by default</span></summary><p>Wait on an offline Twitch channel and the stream starts by itself when it goes live, with no refresh.</p></details>
+            <details><summary>Start when a channel goes live</summary><p>Wait on an offline Twitch channel and the stream starts by itself when it goes live, with no refresh.</p></details>
             <details><summary>About the stream and channel</summary><p>Scroll down under a YouTube or Kick stream, like under a Twitch one, to see a YouTube stream's description, or a Kick channel's followers, description, links and panels.</p></details>
             <details><summary>Cleaner player</summary><p>Hide what streamers' Twitch extensions show over the video.</p></details>
           </div>
           <div class="more__group">
             <h3>Chat</h3>
-            <details><summary>Autocomplete emotes with Tab <span class="more__tag">off by default</span></summary><p>Type the start of an emote's name in Twitch chat and press Tab.</p></details>
+            <details><summary>Autocomplete emotes with Tab</summary><p>Type the start of an emote's name in Twitch chat and press Tab.</p></details>
             <details><summary>Latest emote in the chat box</summary><p>The empty Twitch chat box shows the name of the emote chat used last, and Tab puts it in your message.</p></details>
             <details><summary>When you followed a channel</summary><p>Type <code>/followed</code> in Twitch chat to see the date, shown only to you. Your own card in chat shows it too.</p></details>
             <details><summary>Cleaner chat</summary><p>Hide Twitch chat's timestamps, top strip, drops, pinned messages and Hype Train.</p></details>
             <h3>Twitch's pages</h3>
             <details><summary>Sort order that sticks</summary><p>The sort you pick on Browse, live channels and category pages stays in new tabs and after a restart, instead of going back to Recommended For You.</p></details>
-            <details><summary>Auto-claim channel points <span class="more__tag">off by default</span></summary><p>Only in a tab where the stream is playing.</p></details>
+            <details><summary>Auto-claim channel points</summary><p>Only in a tab where the stream is playing.</p></details>
           </div>
           <div class="more__group">
             <h3>Settings</h3>
@@ -915,7 +966,7 @@
         <section id="code">
           <h2>Code and feedback</h2>
           <p>StreamKEK's code is public on <a href="https://github.com/jafdell/StreamKEK">GitHub</a>, under MIT with the Commons Clause: free to use, change and share, but not to sell. Pull requests are welcome. For a bigger change, open an issue first so we can talk it through.</p>
-          <p><a href="https://github.com/jafdell/StreamKEK/issues/new?template=bug_report.yml">Report a bug</a> or <a href="https://github.com/jafdell/StreamKEK/issues/new?template=feature_request.yml">request a feature</a>. Each opens a short form on GitHub, which needs a GitHub account.</p>
+          <p><a href="https://github.com/jafdell/StreamKEK/issues/new?template=bug_report.yml">Report a bug</a> or <a href="https://github.com/jafdell/StreamKEK/issues/new?template=feature_request.yml">request a feature</a>. Each opens a short form on GitHub, which needs a GitHub account. Without one, write to <a href="mailto:support@streamkek.com">support@streamkek.com</a>.</p>
           <p class="small">Also there: the <a href="https://github.com/jafdell/StreamKEK/blob/main/CHANGELOG.md">changelog</a>, the <a href="https://github.com/jafdell/StreamKEK/blob/main/LICENSE">license</a> and <a href="https://github.com/jafdell/StreamKEK/blob/main/CONTRIBUTING.md">how the code is laid out</a>.</p>
         </section>
         <section id="install">

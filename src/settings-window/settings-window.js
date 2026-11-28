@@ -12,12 +12,12 @@
   const WEBSITE = 'https://streamkek.com';
   const VERSION = chrome.runtime.getManifest().version;
 
-  // Things in a category that aren't settings. `build` returns what goes under the label, and
-  // `href` makes the whole row a link instead.
+  // Things in a category that aren't settings. `build` returns what goes under the label, or
+  // beside it with `beside`, and `href` makes the whole row a link instead.
   const CUSTOM_ITEMS = [
     ...Object.entries(sites).map(([platform, { name, managerHint }]) => ({
       category: name,
-      label: `Your ${name} channels`,
+      label: 'Channels',
       hint: managerHint,
       build: () => channelManagerFrame(platform, `${name} channels`),
     })),
@@ -37,12 +37,14 @@
       category: 'Backup',
       label: 'Save a backup',
       hint: 'Saves your settings, channels, favorites and chat words to a file, so you can put them back after reinstalling StreamKEK or moving its folder. No passwords or sign-ins are in it.',
+      beside: true,
       build: () => backup.saveControl(),
     },
     {
       category: 'Backup',
       label: 'Restore a backup',
       hint: 'Puts back what a backup file saved, replacing what you have now. You can check what it holds before anything changes.',
+      beside: true,
       build: () => backup.restoreControl(),
     },
     {
@@ -273,7 +275,7 @@
 
   function customCard(item, saved) {
     const card = document.createElement('div');
-    card.className = 'card';
+    card.className = item.beside ? 'card setting setting--wraps' : 'card';
     card.dataset.search = searchText(item);
     card.append(cardText(item), item.build(saved));
     return card;
@@ -433,12 +435,6 @@
     label.className = 'card__label';
     label.textContent = `Version ${version}`;
     head.append(label);
-    if (version === VERSION) {
-      const yours = document.createElement('span');
-      yours.className = 'version-card__yours';
-      yours.textContent = 'Installed';
-      head.append(yours);
-    }
     if (date) {
       const day = document.createElement('time');
       day.className = 'version-card__date';
@@ -497,8 +493,6 @@
     const link = [...feedbackLink.children].find((each) => each.dataset.category === WHATS_NEW);
     if (!link || link.classList.contains('category-link--news') === unseen) return;
     link.classList.toggle('category-link--news', unseen);
-    // Says what the pill, which settings-window.css draws, means.
-    link.title = unseen ? 'New since the last update' : '';
   }
 
   function markNewsSeen() {
@@ -513,7 +507,6 @@
     const link = document.createElement('button');
     link.className = 'version__link';
     link.type = 'button';
-    link.title = "See what's new";
     link.textContent = versionLabel.textContent;
     link.addEventListener('click', () => showCategory(WHATS_NEW));
     versionLabel.replaceChildren(link);

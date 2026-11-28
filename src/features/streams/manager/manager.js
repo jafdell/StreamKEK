@@ -7,22 +7,21 @@
 
   const params = new URLSearchParams(location.search);
   const site = sites[params.get('site')];
-  // Inside the settings window, which has the heading, the hint and the switch already.
+  // Inside the settings window, which has the heading and the switch already.
   document.documentElement.toggleAttribute('data-embedded', params.has('embedded'));
 
   const form = document.getElementById('add');
   const input = document.getElementById('input');
   const submit = document.getElementById('submit');
   const message = document.getElementById('message');
+  const problem = document.getElementById('problem');
   const switches = document.getElementById('switches');
   const list = document.getElementById('list');
-  const empty = document.getElementById('empty');
   const hiddenSection = document.getElementById('hidden');
   const hiddenTitle = document.getElementById('hidden-title');
   const hiddenList = document.getElementById('hidden-list');
 
-  document.getElementById('title').textContent = `Your ${site.name} channels`;
-  document.getElementById('hint').textContent = site.managerHint;
+  document.getElementById('title').textContent = `${site.name} channels`;
   input.placeholder = site.placeholder;
 
   const WATCHED_KEYS = [...Object.values(site.keys), site.followsSetting];
@@ -53,12 +52,14 @@
     return li;
   }
 
+  // A live channel says so, with how many are watching where the site tells.
   function row(channel, live) {
-    const state = document.createElement('span');
-    state.className = live ? 'state live' : 'state';
-    state.textContent = live
-      ? `Live${live.viewers == null ? '' : ` · ${live.viewers.toLocaleString()} watching`}`
-      : 'Offline';
+    let state = null;
+    if (live) {
+      state = document.createElement('span');
+      state.className = 'state';
+      state.textContent = live.viewers == null ? 'Live' : live.viewers.toLocaleString();
+    }
 
     const remove = document.createElement('button');
     remove.className = 'remove';
@@ -85,32 +86,25 @@
   // The switch for your followed channels, using the setting's own label and message.
   const setting = SETTINGS.find((s) => s.key === site.followsSetting);
   const toggle = document.createElement('input');
-  const toggleState = document.createElement('span');
   const switchLabel = document.createElement('label');
   switchLabel.className = 'subs';
-  const switchText = document.createElement('span');
-  const switchTitle = document.createElement('span');
-  switchTitle.className = 'subs-title';
-  switchTitle.textContent = setting.label;
-  toggleState.className = 'state';
-  switchText.append(switchTitle, toggleState);
   toggle.className = 'skek-switch';
   toggle.type = 'checkbox';
   toggle.setAttribute('role', 'switch');
   // Before storage answers, so a switch that's on doesn't slide on every open.
   toggle.checked = settingDefaults[site.followsSetting];
   toggle.addEventListener('change', () => chrome.runtime.sendMessage({ type: setting.message, enabled: toggle.checked }));
-  switchLabel.append(switchText, toggle);
+  switchLabel.append(setting.label, toggle);
   switches.append(switchLabel);
 
-  function followsState(saved) {
+  // What stops the site's channels from showing, if anything, and what to do about it.
+  function problemText(saved) {
     const status = saved[site.keys.status];
-    if (saved[site.followsSetting] === false) return 'Off';
-    if (status?.signedOut) return `Sign in to ${site.name} in this browser to use this`;
-    if (status?.failed) return `Couldn't reach ${site.name}. Trying again every minute`;
-    const followed = saved[site.keys.followed] ?? {};
-    const live = saved[site.keys.live] ?? {};
-    return `${Object.keys(followed).filter((id) => live[id]).length} live right now`;
+    if (status?.consentRequired) return `${site.name} is showing its cookie prompt. Open ${site.domain} and answer it once.`;
+    if (saved[site.followsSetting] === false) return '';
+    if (status?.signedOut) return `Sign in to ${site.name} in this browser to see who you follow.`;
+    if (status?.failed) return `Couldn't reach ${site.name}.`;
+    return '';
   }
 
   async function render() {
@@ -118,7 +112,6 @@
 
     const rows = (saved[site.keys.own] ?? []).map((c) => row(c, saved[site.keys.live]?.[c.id]));
     list.replaceChildren(...rows);
-    empty.hidden = rows.length > 0;
 
     const hidden = Object.values(saved[site.keys.hidden] ?? {}).sort((a, b) => a.name.localeCompare(b.name));
     hiddenSection.hidden = !hidden.length;
@@ -126,10 +119,8 @@
     hiddenList.replaceChildren(...hidden.map(hiddenRow));
 
     toggle.checked = saved[site.followsSetting] ?? settingDefaults[site.followsSetting];
-    toggleState.textContent = followsState(saved);
-    if (saved[site.keys.status]?.consentRequired) {
-      say(`${site.name} is showing its cookie prompt. Open ${site.domain} and answer it once.`, true);
-    }
+    problem.textContent = problemText(saved);
+    problem.hidden = !problem.textContent;
   }
 
   form.addEventListener('submit', async (event) => {
