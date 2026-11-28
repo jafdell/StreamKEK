@@ -12,7 +12,7 @@
 
 - YouTube and Kick streams inside Twitch: your live YouTube subscriptions and Kick follows show in Twitch's sidebar and on its Following page, and open there with their chat.
 - Multi-stream: two to four streams at once, with their chats, from any mix of Twitch, YouTube and Kick.
-- Floating chat (Alt+C): fullscreen with chat in a window you can move, resize and make see-through.
+- Floating chat (Alt+C): fullscreen with chat in a window you can move, resize and make see-through, with its messages on the left or the right and the background behind the whole chat or only behind each message.
 - Stacked mode (Alt+S), theatre mode (Alt+T), picture-in-picture (Alt+P) and audio only (Alt+A).
 - Chat: 7TV, BTTV and FFZ emotes in Twitch chat, blocked and highlighted words, one font size for all three sites' chat, and seeing deleted messages.
 - Favorites from all three sites in one list, with optional go-live notifications.

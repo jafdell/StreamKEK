@@ -5,6 +5,15 @@ What's new in each version of StreamKEK, newest first.
 <!-- The settings window shows this file under What's new, so keep its shape: a "## version - date"
      heading, then one "- " line per change, with ** around the part to show in bold. -->
 
+## 1.11.0 - 2026-11-28
+
+- **Picture-in-picture (Alt+P):** a button in Twitch's player pops the stream out into a small window that stays on top of your other apps. YouTube and Kick streams, and every stream in multi-stream, have one too, at the middle of the player's right edge. Twitch keeps the stream's quality while the window is open.
+- **Floating chat on either side:** a button in floating chat's bar lines the messages up against the left or the right edge.
+- **Background behind each message:** another button in floating chat's bar puts the background behind each message only, so more of the stream shows. The slider sets how solid it is.
+- **Finding StreamKEK:** after a first install, the first Twitch page you open points out StreamKEK's button in the top bar, once.
+- **Fixed:** with Start the stream when a channel goes live on, the stream now also starts when Twitch shows the channel as live but its player stays empty.
+- **Faster:** chat with highlighted words no longer gets slower the longer a tab stays open, and checking whether YouTube channels you added are live downloads much less.
+
 ## 1.10.0 - 2026-11-24
 
 - **Volume boost:** a lightning bolt button beside the sound button in Twitch's player makes a quiet stream or video up to four times louder, without distorting the loud moments. It turns off when you reload or change channel.
