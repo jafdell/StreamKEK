@@ -8,9 +8,6 @@
   const browserColor = document.querySelector('meta[name="theme-color"]');
   const lessMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
-  // styles.css shows what only works with this script where <html> says it's running.
-  root.classList.add('js');
-
   function span(className) {
     return Object.assign(document.createElement('span'), { className });
   }

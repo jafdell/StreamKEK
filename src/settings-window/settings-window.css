@@ -74,7 +74,7 @@ html.framed body { width: 100%; height: 100%; }
 .feedback-category .category-link:not([aria-current='true']) { color: var(--muted); }
 
 /* What's new after an update, until it's been opened: a small pill saying New at the end of its
-   row, like the Installed one on a version. It fades a little three times and then stays still. */
+   row. It fades a little three times and then stays still. */
 .category-link--news::after {
   content: 'New';
   flex: 0 0 auto;
@@ -167,10 +167,13 @@ a.setting:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px;
 .card__text { min-width: 0; display: flex; flex-direction: column; }
 .card__label { font-weight: 600; }
 .card__hint { color: var(--muted); }
+/* A control beside its label, and anything it has to say under both. The text gives way first, so
+   a long hint can't push the control onto a line of its own. */
+.setting--wraps { flex-wrap: wrap; }
+.setting--wraps .card__text { flex: 1 1 0; }
 
 /* What's new: a card for each version, with its changes as a list. */
 .version-card__head { display: flex; align-items: baseline; gap: 8px; }
-.version-card__yours { padding: 1px 8px; border-radius: 9000px; background: var(--selected); color: var(--accent); font-size: 12px; font-weight: 600; }
 .version-card__date { margin-left: auto; color: var(--muted); font-size: 12px; }
 .version-card__changes { margin: 6px 0 0; padding-left: 18px; color: var(--muted); }
 .version-card__changes li { margin-top: 4px; }
@@ -264,7 +267,7 @@ a.setting:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px;
 .manager-frame { display: block; width: 100%; height: 32px; margin-top: 10px; border: 0; }
 
 /* Save a backup and Restore a backup. */
-.backup-controls { display: flex; gap: 8px; margin-top: 10px; }
+.backup-controls { flex: 0 0 auto; display: flex; gap: 8px; }
 .backup-button {
   height: 32px;
   padding: 0 14px;
@@ -281,7 +284,7 @@ a.setting:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px;
 .backup-button[hidden] { display: none; }
 .backup-button--quiet { background: var(--card); color: var(--text); }
 .backup-button--quiet:hover { background: var(--bg); }
-.backup-message { margin: 10px 0 0; color: var(--text); overflow-wrap: anywhere; }
+.backup-message { flex: 0 0 100%; margin: 0; color: var(--text); overflow-wrap: anywhere; }
 .backup-message--error { color: #ff6b6b; }
 
 /* Blocked words and Highlighted words. */

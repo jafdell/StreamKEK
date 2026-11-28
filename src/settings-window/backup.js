@@ -173,7 +173,7 @@
     const button = document.createElement('button');
     button.className = 'backup-button';
     button.type = 'button';
-    button.textContent = 'Save backup';
+    button.textContent = 'Save';
     button.addEventListener('click', async () => {
       const saved = await chrome.storage.local.get(KEY_DEFAULTS);
       const now = new Date();
@@ -281,9 +281,10 @@
     const controls = document.createElement('div');
     controls.className = 'backup-controls';
     controls.append(input, choose, restore, cancel);
-    const wrapper = document.createElement('div');
-    wrapper.append(controls, message);
-    return wrapper;
+    // The buttons sit beside the label, and the message under both: see .setting--wraps.
+    const parts = document.createDocumentFragment();
+    parts.append(controls, message);
+    return parts;
   }
 
   skek.backup = { KEY_DEFAULTS, NOT_BACKED_UP, createBackup, parseBackup, describeBackup, saveControl, restoreControl };
