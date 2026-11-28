@@ -3,3 +3,7 @@
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Content-Security-Policy: default-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+# The font, icons and drawings rarely change, so a browser keeps them for a week.
+/assets/*
+  Cache-Control: public, max-age=604800

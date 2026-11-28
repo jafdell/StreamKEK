@@ -1,0 +1,6 @@
+# Everyone is welcome: search engines and AI assistants alike, such as Googlebot, Bingbot, GPTBot,
+# OAI-SearchBot, ClaudeBot and PerplexityBot.
+User-agent: *
+Allow: /
+
+Sitemap: https://streamkek.com/sitemap.xml
